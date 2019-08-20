@@ -1,0 +1,10 @@
+{
+  "apps": [{
+    "name": "server",
+    "script": "./app.js",
+    "watch": true,
+    "instances": 1,
+    "exec_mode": "cluster",
+    "log_type": "json"
+  }]
+}
