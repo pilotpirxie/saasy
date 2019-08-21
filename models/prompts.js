@@ -1,47 +1,27 @@
 /* jshint indent: 2 */
 
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('users', {
+  return sequelize.define('prompts', {
     id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
       primaryKey: true,
       autoIncrement: true
     },
-    email: {
-      type: DataTypes.STRING(256),
+    user_id: {
+      type: DataTypes.INTEGER(11),
       allowNull: false
     },
-    password: {
-      type: DataTypes.STRING(256),
+    status: {
+      type: DataTypes.INTEGER(1),
       allowNull: false
     },
-    salt: {
+    user_agent: {
       type: DataTypes.STRING(256),
-      allowNull: false
-    },
-    nickname: {
-      type: DataTypes.STRING(256),
-      allowNull: false
-    },
-    avatar_url: {
-      type: DataTypes.STRING(512),
       allowNull: false
     },
     ip_address: {
       type: DataTypes.STRING(64),
-      allowNull: false
-    },
-    activation_key: {
-      type: DataTypes.STRING(128),
-      allowNull: false
-    },
-    verified: {
-      type: DataTypes.INTEGER(1),
-      allowNull: false
-    },
-    blocked: {
-      type: DataTypes.INTEGER(1),
       allowNull: false
     },
     created_at: {
@@ -55,6 +35,6 @@ module.exports = function(sequelize, DataTypes) {
       defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
     }
   }, {
-    tableName: 'users'
+    tableName: 'prompts'
   });
 };

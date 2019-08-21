@@ -18,7 +18,7 @@ const sql = new Sequelize(
       underscored: true,
       charset: 'utf8',
       dialectOptions: {
-        collate: 'utf8_general_ci'
+        collate: 'utf8_unicode_ci'
       },
       timestamps: true,
       createdAt: 'created_at',
