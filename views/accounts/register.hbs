@@ -1,0 +1,51 @@
+{{> accounts-header}}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12 col-lg-6 offset-lg-3 text-center">
+            <h2>Create new account</h2>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-12 col-lg-6 offset-lg-3">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" action="/accounts/register">
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" class="form-control" name="email" placeholder="Email Address" autofocus required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password (must be at least 8 characters)</label>
+                            <input type="password" class="form-control" name="password" placeholder="Password" pattern=".{8,}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Repeat Password</label>
+                            <input type="password" class="form-control" name="repeat-password" placeholder="Repeat Password" required>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" name="terms" required> I have read and agree to the Terms and Conditions and Privacy Policy.
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" name="newsletter"> Send me information about new products and services, deals or recommendations by my mail. (optional)
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" name="marketing"> I accept the sending of advertising material related to relevant third-party products and services, via email. (optional)
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary form-control">Create New Account</button>
+                    </form>
+                    <hr />
+                    <div class="text-center">
+                        <label>Already have an account? <a href="/accounts/login">Sign In!</a></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{> accounts-footer-narrow}}
