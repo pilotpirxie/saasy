@@ -8,17 +8,13 @@
     </div>
     <div class="row mt-4">
         <div class="col-12 col-lg-8 offset-lg-2">
-            <div class="card">
-                <div class="card-body">
-                    <div class="list-group">
-                        <a href="#change-password" class="list-group-item list-group-item-action">Change password</a>
-                        <a href="#account-data" class="list-group-item list-group-item-action">Change profile data</a>
-                        <a href="#avatar" class="list-group-item list-group-item-action">Change avatar</a>
-                        <a href="#email-address" class="list-group-item list-group-item-action">Change email address</a>
-                        <a href="#agreements" class="list-group-item list-group-item-action">Change agreements</a>
-                        <a href="#close-account" class="list-group-item list-group-item-action">Close account</a>
-                    </div>
-                </div>
+            <div class="list-group">
+                <a href="#change-password" class="list-group-item list-group-item-action">Change password</a>
+                <a href="#account-data" class="list-group-item list-group-item-action">Change profile data</a>
+                <a href="#avatar" class="list-group-item list-group-item-action">Change avatar</a>
+                <a href="#email-address" class="list-group-item list-group-item-action">Change email address</a>
+                <a href="#agreements" class="list-group-item list-group-item-action">Change agreements</a>
+                <a href="#close-account" class="list-group-item list-group-item-action">Close account</a>
             </div>
         </div>
     </div>
@@ -42,6 +38,7 @@
                             <label>Repeat new password</label>
                             <input type="password" class="form-control" name="repeat-new-password" placeholder="Repeat new password" pattern=".{8,}" required>
                         </div>
+                        <input type="hidden" name="_csrf" value="{{csrf}}" hidden/>
                         <button type="submit" class="btn btn-primary">Change</button>
                     </form>
                 </div>
@@ -60,6 +57,7 @@
                             <label>Nickname</label>
                             <input type="text" class="form-control" name="nickname" placeholder="Nickname visible to others">
                         </div>
+                        <input type="hidden" name="_csrf" value="{{csrf}}" hidden/>
                         <button type="submit" class="btn btn-primary">Change</button>
                     </form>
                 </div>
@@ -73,11 +71,12 @@
                     <h4>Avatar</h4>
                 </div>
                 <div class="card-body">
-                    <form method="post" action="/accounts/avatar" accept=".png,.jpg,.jpeg,image/*" enctype="multipart/form-data">
+                    <form method="post" action="/accounts/avatar" enctype="multipart/form-data">
                         <img src="#" class="img-thumbnail img-fluid mb-4">
                         <div class="form-group">
-                            <input type="file" name="avatar">
+                            <input type="file" name="avatar" accept="image/png,image/jpeg,image/jpg">
                         </div>
+                        <input type="hidden" name="_csrf" value="{{csrf}}" hidden/>
                         <button type="submit" class="btn btn-primary">Change</button>
                     </form>
                 </div>
@@ -101,6 +100,7 @@
                             <label>Confirm your current password</label>
                             <input type="password" class="form-control" name="current-password" placeholder="Current password">
                         </div>
+                        <input type="hidden" name="_csrf" value="{{csrf}}" hidden/>
                         <button type="submit" class="btn btn-primary">Change</button>
                     </form>
                 </div>
@@ -125,6 +125,7 @@
                                 <input type="checkbox" name="marketing"> I accept the sending of advertising material related to relevant third-party products and services, via email.
                             </label>
                         </div>
+                        <input type="hidden" name="_csrf" value="{{csrf}}" hidden/>
                         <button type="submit" class="btn btn-primary">Change</button>
                     </form>
                 </div>
@@ -148,6 +149,7 @@
                                 <input type="checkbox" name="confirm"> Deleting your account is an irreversible process, which we can't revert even if you perform it by accident. I understand and accept this.
                             </label>
                         </div>
+                        <input type="hidden" name="_csrf" value="{{csrf}}" hidden/>
                         <button type="submit" class="btn btn-danger">Close account</button>
                     </form>
                 </div>
