@@ -17,5 +17,8 @@
     "mysql2": "^1.6.5",
     "request": "^2.88.0",
     "sequelize": "^5.2.9"
+  },
+  "scripts": {
+    "start": "nodemon app.js"
   }
 }

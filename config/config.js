@@ -1,4 +1,17 @@
 module.exports = {
+  METADATA: {
+    NAME: 'Yap Starter',
+    DESCRIPTION: 'Lorem ipsum dolor sit amet',
+    KEYWORDS: 'lorem,ipsum,dolor,sit,amet',
+    COMPANY_NAME: 'Company Name',
+    LANGUAGE: 'en',
+    ROBOTS: 'index, follow',
+    CATEGORY: 'business',
+    CONTACT_EMAIL: 'contact@company.com',
+    URL: 'https://example.com',
+    RATING: 'general',
+    COVER_IMAGE: 'https://example.com/images/'
+  },
   DEFAULT_PORT: 8080,
   SESSION_SECRET: '',
   DB_NAME: 'yapstarter',
