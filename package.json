@@ -14,10 +14,12 @@
     "express-handlebars": "^3.0.2",
     "express-rate-limit": "^5.0.0",
     "express-session": "^1.15.6",
+    "ftp": "^0.3.10",
     "joi": "^14.3.1",
     "mysql2": "^1.6.5",
     "request": "^2.88.0",
-    "sequelize": "^5.2.9"
+    "sequelize": "^5.2.9",
+    "uuid": "^3.3.3"
   },
   "scripts": {
     "start": "nodemon app.js"

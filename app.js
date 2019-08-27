@@ -37,11 +37,14 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 sql.testConnection();
 
+app.use((req, res, next) => {
+  req.setTimeout(8000);
+  next();
+});
+
 // routing
 app.use('/', require('./routes/home.js'));
 app.use('/accounts', require('./routes/accounts.js'));
-
-// error handling
 
 // status code 404
 app.use('*', require('./lib/status404'));

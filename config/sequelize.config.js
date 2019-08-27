@@ -7,13 +7,13 @@ const date = new Date();
  * @type {Sequelize}
  */
 const sql = new Sequelize(
-  config.DB_NAME,
-  config.DB_USER,
-  config.DB_PASS,
+  config.DB.NAME,
+  config.DB.USER,
+  config.DB.PASS,
   {
     dialect: 'mysql',
-    host: config.DB_HOST,
-    port: config.DB_PORT,
+    host: config.DB.HOST,
+    port: config.DB.PORT,
     define: {
       underscored: true,
       charset: 'utf8',

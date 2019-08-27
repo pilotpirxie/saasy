@@ -13,12 +13,23 @@ module.exports = {
     COVER_IMAGE: 'https://example.com/images/'
   },
   DEFAULT_PORT: 8080,
-  SESSION_SECRET: '',
-  DB_NAME: 'yapstarter',
-  DB_USER: 'root',
-  DB_PASS: '',
-  DB_HOST: 'localhost',
-  DB_PORT: 3306,
+  SESSION_SECRET: 'mkfbdvmdskj34uu4512u52u35v4sbdkjfbhsdregy3yv6t',
+  DB: {
+    NAME: 'yapstarter',
+    USER: 'root',
+    PASS: '',
+    HOST: 'localhost',
+    PORT: 3306,
+  },
+  CDN_FTP_SERVER: {
+    PUBLIC_URL: 'http://localhost/cdn/',
+    REMOTE_DIRECTORY: '/cdn/',
+    USER: 'ftp_test_user',
+    PASS: '',
+    HOST: 'localhost',
+    PORT: 21,
+    SECURE: false
+  },
   CAPTCHA_SITE_KEY: '',
   CAPTCHA_SECRET: '',
   ALERT_CODES: {

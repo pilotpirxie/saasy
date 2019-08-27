@@ -25,9 +25,6 @@ const createParamsObject = function (req) {
     params: { ...req.params },
     body: { ...req.body },
   };
-
-  // return Object.assign({}, req.query, req.params, req.body);
-  // return Object.assign({}, req.params, req.body);
 };
 
 module.exports = validation;
