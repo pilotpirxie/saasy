@@ -19,6 +19,7 @@
     "mysql2": "^1.6.5",
     "request": "^2.88.0",
     "sequelize": "^5.2.9",
+    "ua-parser-js": "^0.7.20",
     "uuid": "^3.3.3"
   },
   "scripts": {

@@ -24,8 +24,20 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(256),
       allowNull: false
     },
+    auth_type: {
+      type: DataTypes.INTEGER(4),
+      allowNull: false
+    },
     avatar_url: {
       type: DataTypes.STRING(512),
+      allowNull: false
+    },
+    newsletter: {
+      type: DataTypes.INTEGER(1),
+      allowNull: false
+    },
+    marketing: {
+      type: DataTypes.INTEGER(1),
       allowNull: false
     },
     ip_address: {

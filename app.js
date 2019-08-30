@@ -8,6 +8,7 @@ const cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session');
 const sql = require('./config/sequelize.config');
 const rateLimit = require('express-rate-limit');
+const cacheInvalidateMiddleware = require('./util/cacheInvalidateMiddleware');
 
 // handlebars settings
 const hbs = exphbs.create({
@@ -29,7 +30,7 @@ app.use(rateLimit(require('./config/rateLimit.config')));
 app.use(cookieSession({
   name: 'session',
   keys: [config.SESSION_SECRET],
-  maxAge: 48 * 60 * 60 * 1000,
+  maxAge: config.SESSION_TIMEOUT,
   secure: false
 }));
 app.use(bodyParser.json());
@@ -41,6 +42,8 @@ app.use((req, res, next) => {
   req.setTimeout(8000);
   next();
 });
+
+app.use(cacheInvalidateMiddleware);
 
 // routing
 app.use('/', require('./routes/home.js'));

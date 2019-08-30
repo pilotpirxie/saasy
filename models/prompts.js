@@ -24,6 +24,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(64),
       allowNull: false
     },
+    auth_type: {
+      type: DataTypes.INTEGER(4),
+      allowNull: false
+    },
     created_at: {
       type: DataTypes.DATE,
       allowNull: false,
