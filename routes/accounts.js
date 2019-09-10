@@ -25,7 +25,8 @@ router.post('/login', [csrfProtection, reverseAuthorisationMiddleware, validatio
   body: {
     email: Joi.string().email().required(),
     password: Joi.string().required(),
-    _csrf: Joi.string().required()
+    _csrf: Joi.string().required(),
+    'g-recaptcha-response': Joi.string().required()
   }
 })], auth.login);
 

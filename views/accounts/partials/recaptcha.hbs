@@ -2,7 +2,7 @@
 <script>
     window.addEventListener('load', () => {
         grecaptcha.ready(function () {
-            grecaptcha.execute('{{captchaSiteKey}}', {action: 'visit'}).then(function (token) {
+            grecaptcha.execute('{{captchaSiteKey}}', {action: 'authenticate'}).then(function (token) {
                 document.getElementById('recaptcha-response').value = token;
             });
         });

@@ -51,7 +51,7 @@ module.exports = {
         }
       });
 
-      if (reCaptchaResponse.data && reCaptchaResponse.data.success) {
+      if (reCaptchaResponse.data && reCaptchaResponse.data.success && reCaptchaResponse.data.score >= config.CAPTCHA_SCORE_THRESHOLD) {
         const userSearch = await Users.findOne({
           where: {
             email: req.body.email,
@@ -93,8 +93,6 @@ module.exports = {
               "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
             }
           });
-
-          console.log(reCaptchaResponse.data);
 
           if (reCaptchaResponse.data && reCaptchaResponse.data.success && reCaptchaResponse.data.score >= config.CAPTCHA_SCORE_THRESHOLD) {
             const userSearch = await Users.findOne({
