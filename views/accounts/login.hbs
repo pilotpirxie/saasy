@@ -23,6 +23,14 @@
                         </div>
                         <input type="hidden" name="_csrf" value="{{csrf}}" hidden/>
                         <button type="submit" class="btn btn-primary form-control">Sign In</button>
+                        <div class="form-group small mt-3 text-muted">
+                            <input type="hidden" hidden name="g-recaptcha-response" id="recaptcha-response">
+                            <label>
+                                This site is protected by reCAPTCHA and the Google
+                                <a href="https://policies.google.com/privacy" target="_blank">Privacy Policy</a> and
+                                <a href="https://policies.google.com/terms" target="_blank">Terms of Service</a> apply.
+                            </label>
+                        </div>
                     </form>
                     <hr />
                     <div class="text-center">
@@ -33,4 +41,6 @@
         </div>
     </div>
 </div>
+
+{{> recaptcha}}
 {{> accounts-footer-narrow}}

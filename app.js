@@ -17,6 +17,7 @@ const hbs = exphbs.create({
   partialsDir: ['views/partials/', 'views/accounts/partials']
 });
 
+console.log('App is starting...');
 // settings
 app.set('trust proxy', 1);
 app.engine('hbs', hbs.engine);
@@ -36,7 +37,8 @@ app.use(cookieSession({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
-sql.testConnection();
+sql.testConnection(undefined, () => sql.synchronizeSchema());
+
 
 app.use((req, res, next) => {
   req.setTimeout(8000);

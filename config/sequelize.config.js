@@ -39,17 +39,34 @@ const sql = new Sequelize(
  * and attach new permissions to the database
  * e.g. Panel -> MySQL -> <database> -> Manage -> Grant permissions -> <pick user> -> pick "All hosts belonging to user"
  * @param {sequelize} connection
+ * @param {function} callback
  */
-function testConnection(connection = sql) {
+function testConnection(connection = sql, callback = () => {}) {
   connection.authenticate().then(() => {
     console.info('Connection has been established successfully');
+    callback();
   }).catch(err => {
     console.error(err);
   });
 }
 
+/**
+ * Synchronize schemas in database
+ * @param {sequelize} connection
+ * @param {boolean} force? Should overwrite information
+ * @param {boolean} showLogs?
+ */
+function synchronizeSchema(connection = sql, force = false, showLogs = false) {
+    connection.sync({logging: showLogs && console.log, force}).then(() => {
+        console.info('Schema has been synchronized successfully');
+    }).catch(err => {
+        console.error(err);
+    });
+}
+
 module.exports = {
   connection: sql,
   dataTypes: Sequelize.DataTypes,
-  testConnection: testConnection,
+  testConnection,
+  synchronizeSchema
 };

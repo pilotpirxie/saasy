@@ -1,7 +1,5 @@
 const config = require('../config/config');
-const sql = require('../config/sequelize.config');
-const users = require('../models/users')(sql.connection, sql.dataTypes);
-const prompts = require('../models/prompts')(sql.connection, sql.dataTypes);
+const {Users, Prompts} = require('../models/index');
 const UAParser = require('ua-parser-js');
 const axios = require('axios');
 const { generatesSalt, generateVerificationCode, encodePassword } = require('../util/helpers');
@@ -19,7 +17,7 @@ async function createSession(userId, email, ipAddress, authType, req, res) {
   try {
     const {browser, engine, os, device} = UAParser(req.headers['user-agent']);
 
-    await prompts.create({
+    await Prompts.create({
       user_id: userId,
       status: 1,
       user_agent: JSON.stringify({browser, engine, os, device: device.type || ''}),
@@ -54,7 +52,7 @@ module.exports = {
       });
 
       if (reCaptchaResponse.data && reCaptchaResponse.data.success) {
-        const userSearch = await users.findOne({
+        const userSearch = await Users.findOne({
           where: {
             email: req.body.email,
             auth_type: 0
@@ -62,7 +60,7 @@ module.exports = {
         });
 
         if (userSearch) {
-          const user = await users.findOne({
+          const user = await Users.findOne({
             where: {
               password: encodePassword(req.body.password, userSearch.salt),
             }
@@ -96,8 +94,10 @@ module.exports = {
             }
           });
 
-          if (reCaptchaResponse.data && reCaptchaResponse.data.success) {
-            const userSearch = await users.findOne({
+          console.log(reCaptchaResponse.data);
+
+          if (reCaptchaResponse.data && reCaptchaResponse.data.success && reCaptchaResponse.data.score >= config.CAPTCHA_SCORE_THRESHOLD) {
+            const userSearch = await Users.findOne({
               where: {
                 email: req.body.email,
                 auth_type: 0
@@ -111,7 +111,7 @@ module.exports = {
               const salt = generatesSalt();
               const verificationCode = generateVerificationCode();
 
-              const user = await users.create({
+              const user = await Users.create({
                 nickname: req.body.email.split('@')[0],
                 email: req.body.email,
                 password: encodePassword(req.body.password, salt),

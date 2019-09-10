@@ -14,11 +14,11 @@ router.get('/', [csrfProtection, authorisationMiddleware], (req, res) => {
 });
 
 router.get('/login', [csrfProtection, reverseAuthorisationMiddleware], (req, res) => {
-  res.render('accounts/login', {metadata: config.METADATA, currentYear: (new Date).getFullYear(), csrf: req.csrfToken()});
+  res.render('accounts/login', {captchaSiteKey: config.CAPTCHA_SITE_KEY, metadata: config.METADATA, currentYear: (new Date).getFullYear(), csrf: req.csrfToken()});
 });
 
 router.get('/register', [csrfProtection, reverseAuthorisationMiddleware], (req, res) => {
-  res.render('accounts/register', {metadata: config.METADATA, currentYear: (new Date).getFullYear(), csrf: req.csrfToken()});
+  res.render('accounts/register', {captchaSiteKey: config.CAPTCHA_SITE_KEY, metadata: config.METADATA, currentYear: (new Date).getFullYear(), csrf: req.csrfToken()});
 });
 
 router.post('/login', [csrfProtection, reverseAuthorisationMiddleware, validation({
@@ -34,6 +34,7 @@ router.post('/register', [csrfProtection, reverseAuthorisationMiddleware, valida
     email: Joi.string().email().required(),
     password: Joi.string().required(),
     'repeat-password': Joi.string().required(),
+    'g-recaptcha-response': Joi.string().required(),
     _csrf: Joi.string().required(),
     terms: Joi.any().required(),
     newsletter: Joi.any().allow('').optional(),
