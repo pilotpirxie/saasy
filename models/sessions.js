@@ -1,7 +1,7 @@
 /* jshint indent: 2 */
 
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('prompts', {
+  return sequelize.define('sessions', {
     id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
@@ -10,10 +10,6 @@ module.exports = function(sequelize, DataTypes) {
     },
     user_id: {
       type: DataTypes.INTEGER(11),
-      allowNull: false
-    },
-    status: {
-      type: DataTypes.INTEGER(1),
       allowNull: false
     },
     user_agent: {
@@ -39,6 +35,6 @@ module.exports = function(sequelize, DataTypes) {
       defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
     }
   }, {
-    tableName: 'prompts'
+    tableName: 'sessions'
   });
 };

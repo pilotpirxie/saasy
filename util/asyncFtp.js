@@ -6,11 +6,11 @@ const uuidv4 = require('uuid/v4');
  * Upload file to FTP server
  *
  * @param sourceFileName
- * @param destinationFileName
+ * @param destinationFileName?
  * @param config {host, port, secure, user, password, destinationDirectory, publicUrl}
  * @return {Promise<any>, {filename: string, url:string}}
  */
-module.exports = function uploadFile(sourceFileName, destinationFileName, config) {
+module.exports = function uploadFile(sourceFileName, destinationFileName = false, config) {
   return new Promise((resolve, reject) => {
 
     const ftpClient = new FtpClient();
@@ -37,13 +37,13 @@ module.exports = function uploadFile(sourceFileName, destinationFileName, config
 //
 // (async () => {
 //   const obj = await uploadFile('img.jpg', undefined, {
-//     host: config.CDN_FTP_SERVER.HOST,
-//     port: config.CDN_FTP_SERVER.PORT,
-//     secure: config.CDN_FTP_SERVER.SECURE,
-//     user: config.CDN_FTP_SERVER.USER,
-//     password: config.CDN_FTP_SERVER.PASS,
-//     destinationDirectory: config.CDN_FTP_SERVER.REMOTE_DIRECTORY,
-//     publicUrl: config.CDN_FTP_SERVER.PUBLIC_URL
+//     host: config.FILE_SERVER.HOST,
+//     port: config.FILE_SERVER.PORT,
+//     secure: config.FILE_SERVER.SECURE,
+//     user: config.FILE_SERVER.USER,
+//     password: config.FILE_SERVER.PASS,
+//     destinationDirectory: config.FILE_SERVER.REMOTE_DIRECTORY,
+//     publicUrl: config.FILE_SERVER.PUBLIC_URL
 //   });
 //   console.log(obj);
 // })();

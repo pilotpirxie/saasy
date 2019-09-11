@@ -24,8 +24,10 @@ module.exports = {
     HOST: 'localhost',
     PORT: 3306,
   },
-  CDN_FTP_SERVER: {
+  FILE_SERVER: {
+    REMOTE_FTP_UPLOAD: true,
     PUBLIC_URL: 'http://localhost/cdn/',
+    LOCAL_DIRECTORY: 'public/uploads/',
     REMOTE_DIRECTORY: '/cdn/',
     USER: 'ftp_test_user',
     PASS: '',
