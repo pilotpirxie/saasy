@@ -126,7 +126,7 @@ module.exports = {
           email: req.body.email,
           password: encodePassword(req.body.password, salt),
           auth_type: 0,
-          avatar_url: '',
+          avatar_url: 'http://localhost/cdn/avatar_default.png',
           salt,
           activation_key: verificationCode,
           verified: config.INITIALLY_VERIFIED ? 1 : 0,
@@ -344,7 +344,7 @@ module.exports = {
 
         let avatarUrl;
         if (config.FILE_SERVER.REMOTE_FTP_UPLOAD) {
-          const file = await uploadFile(newLocalFilePath, undefined, {
+          const file = await uploadFile(newLocalFilePath, `avatar_${req.session.userData.userId}`, {
             host: config.FILE_SERVER.HOST,
             port: config.FILE_SERVER.PORT,
             secure: config.FILE_SERVER.SECURE,
@@ -362,7 +362,6 @@ module.exports = {
         } else {
           avatarUrl = `${config.FILE_SERVER.PUBLIC_URL}${newFilename}`;
         }
-
         const updatedUser = Users.update({
           avatar_url: avatarUrl
         }, {
@@ -377,7 +376,6 @@ module.exports = {
 
         return res.redirect('/accounts?info=updated');
       });
-
 
     } catch (err) {
       next(err);
