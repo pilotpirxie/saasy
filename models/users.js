@@ -1,72 +1,73 @@
 /* jshint indent: 2 */
+/* eslint func-names: 0 */
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   return sequelize.define('users', {
     id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     email: {
       type: DataTypes.STRING(256),
-      allowNull: false
+      allowNull: false,
     },
     password: {
       type: DataTypes.STRING(256),
-      allowNull: false
+      allowNull: false,
     },
     salt: {
       type: DataTypes.STRING(256),
-      allowNull: false
+      allowNull: false,
     },
     nickname: {
       type: DataTypes.STRING(256),
-      allowNull: false
+      allowNull: false,
     },
     auth_type: {
       type: DataTypes.INTEGER(4),
-      allowNull: false
+      allowNull: false,
     },
     avatar_url: {
       type: DataTypes.STRING(512),
-      allowNull: false
+      allowNull: false,
     },
     newsletter: {
       type: DataTypes.INTEGER(1),
-      allowNull: false
+      allowNull: false,
     },
     marketing: {
       type: DataTypes.INTEGER(1),
-      allowNull: false
+      allowNull: false,
     },
     ip_address: {
       type: DataTypes.STRING(64),
-      allowNull: false
+      allowNull: false,
     },
     activation_key: {
       type: DataTypes.STRING(128),
-      allowNull: false
+      allowNull: false,
     },
     verified: {
       type: DataTypes.INTEGER(1),
-      allowNull: false
+      allowNull: false,
     },
     blocked: {
       type: DataTypes.INTEGER(1),
-      allowNull: false
+      allowNull: false,
     },
     created_at: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
+      defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
     },
     updated_at: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
-    }
+      defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+    },
   }, {
-    tableName: 'users'
+    tableName: 'users',
   });
 };

@@ -53,7 +53,7 @@
                         <form method="post" action="/accounts/data">
                             <div class="form-group">
                                 <label>Nickname</label>
-                                <input type="text" class="form-control" name="nickname" placeholder="Nickname visible to others">
+                                <input type="text" class="form-control" name="nickname" placeholder="Nickname visible to others" value="{{user.nickname}}">
                             </div>
                             <input type="hidden" name="_csrf" value="{{csrf}}" hidden/>
                             <button type="submit" class="btn btn-primary">Change</button>
@@ -68,7 +68,7 @@
                     </div>
                     <div class="card-body">
                         <form method="post" action="/accounts/avatar?_csrf={{csrf}}" enctype="multipart/form-data">
-                            <img src="#" class="img-thumbnail img-fluid mb-4">
+                            <img src="{{user.avatar_url}}" class="img-thumbnail img-fluid mb-4">
                             <div class="form-group">
                                 <label>Update avatar (max 500kB, PNG and JPEG allowed)</label>
                             </div>
@@ -90,7 +90,7 @@
                             <label>Every time when you change email, you must verify it once again</label>
                             <div class="form-group">
                                 <label>Email address</label>
-                                <input type="text" class="form-control" name="email" placeholder="Contact email address">
+                                <input type="text" class="form-control" name="email" placeholder="Contact email address" value="{{user.email}}">
                             </div>
                             <div class="form-group">
                                 <label>Confirm your current password</label>
@@ -111,12 +111,12 @@
                         <form method="post" action="/accounts/agreements">
                             <div class="form-group">
                                 <label>
-                                    <input type="checkbox" name="newsletter"> Send me information about new products and services, deals or recommendations by my mail.
+                                    <input type="checkbox" name="newsletter" {{#if user.newsletter}}checked{{/if}}> Send me information about new products and services, deals or recommendations by my mail.
                                 </label>
                             </div>
                             <div class="form-group">
                                 <label>
-                                    <input type="checkbox" name="marketing"> I accept the sending of advertising material related to relevant third-party products and services, via email.
+                                    <input type="checkbox" name="marketing" {{#if user.marketing}}checked{{/if}}> I accept the sending of advertising material related to relevant third-party products and services, via email.
                                 </label>
                             </div>
                             <input type="hidden" name="_csrf" value="{{csrf}}" hidden/>

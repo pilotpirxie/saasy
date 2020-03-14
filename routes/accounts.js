@@ -1,16 +1,19 @@
 const express = require('express');
+
 const router = express.Router();
-const config = require('../config/config');
 const csrf = require('csurf');
-const csrfProtection = csrf({ cookie: true });
-const validation = require('../util/validation');
+const multer = require('multer');
 const Joi = require('joi');
+
+const csrfProtection = csrf({ cookie: true });
+
+const config = require('../config/config');
+const validation = require('../util/validation');
 const auth = require('../controllers/auth');
 const authorisationMiddleware = require('../util/authorisationMiddleware');
 const reverseAuthorisationMiddleware = require('../util/reverseAuthorisationMiddleware');
-const multer  = require('multer');
 
-const {Users} = require('../models/index');
+const { Users } = require('../models/index');
 
 /**
  * Multer setttins for file transfer
@@ -21,8 +24,8 @@ const upload = multer({
   limits: {
     fileSize: 524288,
     fieldSize: 524288,
-    files: 1
-  }
+    files: 1,
+  },
 });
 
 /**
@@ -34,15 +37,15 @@ router.get('/', [csrfProtection, authorisationMiddleware], async (req, res, next
   try {
     const user = await Users.findOne({
       where: {
-        id: req.session.userData.userId
+        id: req.session.userData.userId,
       },
-      raw: true
+      raw: true,
     });
     res.render('accounts/index', {
-      user: {...user},
+      user: { ...user },
       metadata: config.METADATA,
-      currentYear: (new Date).getFullYear(),
-      csrf: req.csrfToken()
+      currentYear: (new Date()).getFullYear(),
+      csrf: req.csrfToken(),
     });
   } catch (err) {
     next(err);
@@ -55,7 +58,12 @@ router.get('/', [csrfProtection, authorisationMiddleware], async (req, res, next
  * @apiGroup Accounts
  */
 router.get('/login', [csrfProtection, reverseAuthorisationMiddleware], (req, res) => {
-  res.render('accounts/login', {captchaSiteKey: config.CAPTCHA_SITE_KEY, metadata: config.METADATA, currentYear: (new Date).getFullYear(), csrf: req.csrfToken()});
+  res.render('accounts/login', {
+    captchaSiteKey: config.CAPTCHA_SITE_KEY,
+    metadata: config.METADATA,
+    currentYear: (new Date()).getFullYear(),
+    csrf: req.csrfToken(),
+  });
 });
 
 /**
@@ -64,7 +72,12 @@ router.get('/login', [csrfProtection, reverseAuthorisationMiddleware], (req, res
  * @apiGroup Accounts
  */
 router.get('/register', [csrfProtection, reverseAuthorisationMiddleware], (req, res) => {
-  res.render('accounts/register', {captchaSiteKey: config.CAPTCHA_SITE_KEY, metadata: config.METADATA, currentYear: (new Date).getFullYear(), csrf: req.csrfToken()});
+  res.render('accounts/register', {
+    captchaSiteKey: config.CAPTCHA_SITE_KEY,
+    metadata: config.METADATA,
+    currentYear: (new Date()).getFullYear(),
+    csrf: req.csrfToken(),
+  });
 });
 
 
@@ -83,8 +96,8 @@ router.post('/login', [csrfProtection, reverseAuthorisationMiddleware, validatio
     email: Joi.string().email().required(),
     password: Joi.string().required(),
     _csrf: Joi.string().required(),
-    'g-recaptcha-response': Joi.string().required()
-  }
+    'g-recaptcha-response': Joi.string().required(),
+  },
 })], auth.login);
 
 /**
@@ -110,8 +123,8 @@ router.post('/register', [csrfProtection, reverseAuthorisationMiddleware, valida
     _csrf: Joi.string().required(),
     terms: Joi.any().required(),
     newsletter: Joi.any().allow('').optional(),
-    marketing: Joi.any().allow('').optional()
-  }
+    marketing: Joi.any().allow('').optional(),
+  },
 })], auth.register);
 
 /**
@@ -137,7 +150,7 @@ router.post('/password', [csrfProtection, authorisationMiddleware, validation({
     'new-password': Joi.string().required(),
     'repeat-new-password': Joi.string().required(),
     _csrf: Joi.string().required(),
-  }
+  },
 })], auth.changePassword);
 
 /**
@@ -152,7 +165,7 @@ router.post('/data', [csrfProtection, authorisationMiddleware, validation({
   body: {
     nickname: Joi.string().required(),
     _csrf: Joi.string().required(),
-  }
+  },
 })], auth.changeData);
 
 /**
@@ -165,11 +178,11 @@ router.post('/data', [csrfProtection, authorisationMiddleware, validation({
  */
 router.post('/avatar', [csrfProtection, authorisationMiddleware, upload.single('avatar'), validation({
   query: {
-    _csrf: Joi.string().required()
+    _csrf: Joi.string().required(),
   },
   body: {
-    file: Joi.any().allow('')
-  }
+    file: Joi.any().allow(''),
+  },
 })], auth.changeAvatar);
 
 /**
@@ -185,8 +198,8 @@ router.post('/email', [csrfProtection, authorisationMiddleware, validation({
   body: {
     email: Joi.string().email().required(),
     'current-password': Joi.string().required(),
-    _csrf: Joi.string().required()
-  }
+    _csrf: Joi.string().required(),
+  },
 })], auth.changeEmail);
 
 /**
@@ -202,8 +215,8 @@ router.post('/agreements', [csrfProtection, authorisationMiddleware, validation(
   body: {
     newsletter: Joi.any().allow('').optional(),
     marketing: Joi.any().allow('').optional(),
-    _csrf: Joi.string().required()
-  }
+    _csrf: Joi.string().required(),
+  },
 })], auth.changeAgreements);
 
 /**
@@ -219,8 +232,8 @@ router.post('/close', [csrfProtection, authorisationMiddleware, validation({
   body: {
     'current-password': Joi.string().required(),
     confirm: Joi.any().allow('').optional(),
-    _csrf: Joi.string().required()
-  }
+    _csrf: Joi.string().required(),
+  },
 })], auth.closeAccount);
 
 module.exports = router;

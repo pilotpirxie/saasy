@@ -1,5 +1,6 @@
 const FtpClient = require('ftp');
 const path = require('path');
+const url = require('url');
 const uuidv4 = require('uuid/v4');
 
 /**
@@ -12,25 +13,24 @@ const uuidv4 = require('uuid/v4');
  */
 module.exports = function uploadFile(sourceFileName, destinationFileName = false, config) {
   return new Promise((resolve, reject) => {
-
     const ftpClient = new FtpClient();
-    const remoteFileName = destinationFileName ? destinationFileName : `${Date.now()}-${uuidv4()}`;
+    const remoteFileName = destinationFileName || `${Date.now()}-${uuidv4()}`;
     const fullRemoteFileName = path.extname(remoteFileName.toString()) ? remoteFileName : `${remoteFileName}${path.extname(sourceFileName)}`;
 
-    ftpClient.on('ready', function () {
+    ftpClient.on('ready', () => {
       ftpClient.cwd(config.destinationDirectory, (err) => {
         if (err) reject(err);
-        ftpClient.put(sourceFileName, fullRemoteFileName, (err) => {
-          if (err) reject(err);
+        ftpClient.put(sourceFileName, fullRemoteFileName, (putErr) => {
+          if (putErr) reject(putErr);
           ftpClient.end();
           resolve({
             filename: fullRemoteFileName,
-            url: path.join(config.publicUrl, fullRemoteFileName)
+            url: url.resolve(config.publicUrl, fullRemoteFileName),
           });
         });
       });
     });
-    ftpClient.connect({...config});
+    ftpClient.connect({ ...config });
   });
 };
 

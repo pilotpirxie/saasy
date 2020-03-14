@@ -2,29 +2,25 @@ const Joi = require('joi');
 
 const DEFAULT_SCHEMA_OBJECT = {};
 
-const validation = function (schema) {
-  return function (req, res, next) {
-    let _schema = Joi.object(Object.assign({}, DEFAULT_SCHEMA_OBJECT, schema)).unknown();
-    let params = createParamsObject(req);
-    let result = Joi.validate(params, _schema);
+const createParamsObject = (req) => ({
+  query: { ...req.query },
+  params: { ...req.params },
+  body: { ...req.body },
+});
 
-    if (result.error) {
-      console.warn('Blocked request from ' + result.error);
-      return res.status(400).json({
-        error: `Validation error: ${result.error}`
-      });
-    } else {
-      next();
-    }
-  };
-};
+const validation = (schema) => (req, res, next) => {
+  const mixedSchema = Joi.object({ ...DEFAULT_SCHEMA_OBJECT, ...schema }).unknown();
+  const params = createParamsObject(req);
+  const result = Joi.validate(params, mixedSchema);
 
-const createParamsObject = function (req) {
-  return {
-    query: { ...req.query },
-    params: { ...req.params },
-    body: { ...req.body },
-  };
+  if (result.error) {
+    // eslint-disable-next-line no-console
+    console.warn(`Blocked request from ${result.error}`);
+    return res.status(400).json({
+      error: `Validation error: ${result.error}`,
+    });
+  }
+  return next();
 };
 
 module.exports = validation;

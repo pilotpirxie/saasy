@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize');
 const config = require('./config');
+
 const date = new Date();
 
 /**
@@ -18,18 +19,18 @@ const sql = new Sequelize(
       underscored: true,
       charset: 'utf8',
       dialectOptions: {
-        collate: 'utf8_unicode_ci'
+        collate: 'utf8_unicode_ci',
       },
       timestamps: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
     },
     logging: process.env.NODE_ENV === 'production' ? false : (msg, data) => {
-      const dateTime = date.getFullYear() + '-' + ('0' + (date.getMonth()+1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2) + ' ' + date.toLocaleTimeString('pl-PL', { hour12: false });
+      const dateTime = `${date.getFullYear()}-${(`0${date.getMonth() + 1}`).slice(-2)}-${(`0${date.getDate()}`).slice(-2)} ${date.toLocaleTimeString('pl-PL', { hour12: false })}`;
       console.log(dateTime, 'SQL Query:', msg);
       console.log(dateTime, 'SQL Data:', JSON.stringify(data));
-    }
-  }
+    },
+  },
 );
 
 /**
@@ -45,7 +46,7 @@ function testConnection(connection = sql, callback = () => {}) {
   connection.authenticate().then(() => {
     console.info('Connection has been established successfully');
     callback();
-  }).catch(err => {
+  }).catch((err) => {
     console.error(err);
   });
 }
@@ -57,16 +58,16 @@ function testConnection(connection = sql, callback = () => {}) {
  * @param {boolean} showLogs?
  */
 function synchronizeSchema(connection = sql, force = false, showLogs = false) {
-    connection.sync({logging: showLogs && console.log, force}).then(() => {
-        console.info('Schema has been synchronized successfully');
-    }).catch(err => {
-        console.error(err);
-    });
+  connection.sync({ logging: showLogs && console.log, force }).then(() => {
+    console.info('Schema has been synchronized successfully');
+  }).catch((err) => {
+    console.error(err);
+  });
 }
 
 module.exports = {
   connection: sql,
   dataTypes: Sequelize.DataTypes,
   testConnection,
-  synchronizeSchema
+  synchronizeSchema,
 };

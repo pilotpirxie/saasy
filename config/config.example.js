@@ -10,7 +10,7 @@ module.exports = {
     CONTACT_EMAIL: 'contact@company.com',
     URL: 'http://localhost:8080',
     RATING: 'general',
-    COVER_IMAGE: 'https://example.com/images/'
+    COVER_IMAGE: 'https://example.com/images/',
   },
   DEFAULT_PORT: 8080,
   SESSION_SECRET: '4D6E8B5E2B2EEC6C9378A38F82BFD19DB4C53B8F58E558F63B1E73ABA1',
@@ -33,7 +33,7 @@ module.exports = {
     PASS: '',
     HOST: 'localhost',
     PORT: 21,
-    SECURE: false
+    SECURE: false,
   },
   CAPTCHA_SITE_KEY: '',
   CAPTCHA_SECRET: '',
@@ -48,8 +48,8 @@ module.exports = {
     'error-insufficient-funds': 'ERROR - You don\'t have enough money.',
     'error-something-wrong': 'ERROR - Something went wrong, try again later.',
     'error-confirm-password': 'ERROR - There is a mismatch between password and the password confirmation.',
-    'logged': 'SUCCESS - Successfully signed in.',
-    'logout': 'SUCCESS - Successfully logout!',
-    'success': 'SUCCESS - Action performed successfully!',
-  }
+    logged: 'SUCCESS - Successfully signed in.',
+    logout: 'SUCCESS - Successfully logout!',
+    success: 'SUCCESS - Action performed successfully!',
+  },
 };

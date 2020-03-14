@@ -22,5 +22,5 @@ const encodePassword = (password, salt) => crypto.createHash('sha512').update(sa
 module.exports = {
   generatesSalt,
   generateVerificationCode,
-  encodePassword
+  encodePassword,
 };

@@ -1,32 +1,33 @@
 /* jshint indent: 2 */
+/* eslint func-names: 0 */
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   return sequelize.define('groups', {
     id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     name: {
       type: DataTypes.STRING(128),
-      allowNull: false
+      allowNull: false,
     },
     description: {
       type: DataTypes.STRING(256),
-      allowNull: false
+      allowNull: false,
     },
     created_at: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
+      defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
     },
     updated_at: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
-    }
+      defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+    },
   }, {
-    tableName: 'groups'
+    tableName: 'groups',
   });
 };
