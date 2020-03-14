@@ -1,3 +1,4 @@
+/* eslint no-console: 0 */
 const Sequelize = require('sequelize');
 const config = require('./config');
 
@@ -38,7 +39,8 @@ const sql = new Sequelize(
  * To work correctly you must specify host in user database settings
  * e.g. in Panel -> MySQL -> Users -> <user> -> Manage hosts -> Add access from new address
  * and attach new permissions to the database
- * e.g. Panel -> MySQL -> <database> -> Manage -> Grant permissions -> <pick user> -> pick "All hosts belonging to user"
+ * e.g. Panel -> MySQL -> <database> -> Manage ->
+ *   Grant permissions -> <pick user> -> pick "All hosts belonging to user"
  * @param {sequelize} connection
  * @param {function} callback
  */

@@ -1,4 +1,4 @@
-const config = require('./config/config');
+/* eslint no-console: 0 */
 const express = require('express');
 
 const app = express();
@@ -8,6 +8,8 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session');
 const rateLimit = require('express-rate-limit');
+
+const config = require('./config/config');
 const sql = require('./config/sequelize.config');
 const cacheInvalidateMiddleware = require('./util/cacheInvalidateMiddleware');
 
@@ -18,7 +20,7 @@ const hbs = exphbs.create({
   partialsDir: ['views/partials/', 'views/accounts/partials'],
 });
 
-console.log('App is starting...');
+console.info('App is starting...');
 // settings
 app.set('trust proxy', 1);
 app.engine('hbs', hbs.engine);
