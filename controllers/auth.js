@@ -2,6 +2,7 @@ const UAParser = require('ua-parser-js');
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const config = require('../config/config');
 const { Users, Sessions } = require('../models/index');
 const { generatesSalt, generateVerificationCode, encodePassword } = require('../util/helpers');
@@ -12,8 +13,9 @@ const uploadFile = require('../util/asyncFtp');
  * @param {string} userId
  * @param {string} email
  * @param {string} ipAddress
- * @param {string} origin
+ * @param {string} authType
  * @param {object} req
+ * @param {object} res
  * @returns {Promise<*>}
  */
 async function createSession(userId, email, ipAddress, authType, req, res) {
@@ -147,7 +149,7 @@ module.exports = {
         email: req.body.email,
         password: encodePassword(req.body.password, salt),
         auth_type: 0,
-        avatar_url: 'http://localhost/cdn/avatar_default.png',
+        avatar_url: `${config.FILE_SERVER.PUBLIC_URL}/avatar_default.png`,
         salt,
         activation_key: verificationCode,
         verified: config.INITIALLY_VERIFIED ? 1 : 0,
@@ -410,9 +412,13 @@ module.exports = {
       fs.rename(req.file.path, newLocalFilePath, async (err) => {
         if (err) return next(err);
 
+        const fileName = `${crypto.createHmac('sha256', config.HMAC_SECRET)
+          .update(`avatar_${req.session.userData.userId}`)
+          .digest('hex')}x${req.session.userData.userId}`;
+
         let avatarUrl;
         if (config.FILE_SERVER.REMOTE_FTP_UPLOAD) {
-          const file = await uploadFile(newLocalFilePath, `avatar_${req.session.userData.userId}`, {
+          const file = await uploadFile(newLocalFilePath, fileName, {
             host: config.FILE_SERVER.HOST,
             port: config.FILE_SERVER.PORT,
             secure: config.FILE_SERVER.SECURE,
