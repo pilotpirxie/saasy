@@ -44,7 +44,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 sql.testConnection(undefined, () => sql.synchronizeSchema());
 
-
 app.use((req, res, next) => {
   req.setTimeout(config.SERVER_TIMEOUT);
   next();
@@ -61,7 +60,6 @@ app.use('*', require('./lib/status404'));
 
 // catch server errors
 app.use(require('./lib/status500'));
-
 
 app.listen(app.get('port'), () => {
   try {

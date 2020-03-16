@@ -13,7 +13,7 @@ const uploadFile = require('../util/asyncFtp');
  * @param {string} userId
  * @param {string} email
  * @param {string} ipAddress
- * @param {string} authType
+ * @param {number} authType
  * @param {object} req
  * @param {object} res
  * @returns {Promise<*>}
@@ -163,7 +163,8 @@ module.exports = {
         return res.redirect('/register?info=error-something-wrong');
       }
 
-      return await createSession(user.id, user.email, req.headers['x-forwarded-for'] || req.connection.remoteAddress, 0, req, res);
+      const ipAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+      return await createSession(user.id, user.email, ipAddress, 0, req, res);
     } catch (err) {
       return next(err);
     }

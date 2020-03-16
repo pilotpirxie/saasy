@@ -79,13 +79,13 @@ typings/
 
 # FuseBox cache
 .fusebox/
-public/css/
-public/fonts/
-public/img/
-public/js/
+#public/css/
+#public/fonts/
+#public/img/
+#public/js/
 /.idea/yet-another-project-starter.iml
 /.idea/misc.xml
 /.idea/modules.xml
 /.idea/vcs.xml
 /.idea/workspace.xml
-config/config.js
+#config/config.js

@@ -5,8 +5,6 @@ const csrf = require('csurf');
 const multer = require('multer');
 const Joi = require('joi');
 
-const csrfProtection = csrf({ cookie: true });
-
 const config = require('../config/config');
 const validation = require('../util/validation');
 const auth = require('../controllers/auth');
@@ -16,8 +14,15 @@ const reverseAuthorisationMiddleware = require('../util/reverseAuthorisationMidd
 const { Users } = require('../models/index');
 
 /**
+ * CSRF middleware
+ * @type {csrf}
+ */
+const csrfProtection = csrf({ cookie: true });
+
+
+/**
  * Multer setttins for file transfer
- * @type {Multer|undefined}
+ * @type {multer|undefined}
  */
 const upload = multer({
   dest: config.FILE_SERVER.LOCAL_DIRECTORY,
@@ -41,6 +46,7 @@ router.get('/', [csrfProtection, authorisationMiddleware], async (req, res, next
       },
       raw: true,
     });
+
     res.render('accounts/index', {
       user: { ...user },
       metadata: config.METADATA,
