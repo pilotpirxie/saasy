@@ -18,6 +18,7 @@ module.exports = {
   SESSION_TIMEOUT: 172800000,
   INITIALLY_VERIFIED: true,
   INITIALLY_BLOCKED: false,
+  SERVER_TIMEOUT: 8000,
   DB: {
     NAME: 'yapstarter',
     USER: 'root',

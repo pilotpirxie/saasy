@@ -46,7 +46,7 @@ sql.testConnection(undefined, () => sql.synchronizeSchema());
 
 
 app.use((req, res, next) => {
-  req.setTimeout(8000);
+  req.setTimeout(config.SERVER_TIMEOUT);
   next();
 });
 
