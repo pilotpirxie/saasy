@@ -4,24 +4,24 @@
   "main": "app.js",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.19.0",
+    "axios": "^0.21.0",
     "body-parser": "^1.18.3",
-    "chalk": "^3.0.0",
-    "cookie-parser": "^1.4.4",
+    "chalk": "^4.1.0",
+    "cookie-parser": "^1.4.5",
     "cookie-session": "^1.3.3",
     "csurf": "^1.10.0",
     "express": "^4.16.4",
-    "express-handlebars": "^3.0.2",
-    "express-rate-limit": "^5.0.0",
-    "express-session": "^1.15.6",
+    "express-handlebars": "^5.2.0",
+    "express-rate-limit": "^5.1.3",
+    "express-session": "^1.17.1",
     "ftp": "^0.3.10",
-    "joi": "^14.3.1",
+    "joi": "^17.3.0",
     "multer": "^1.4.2",
-    "mysql2": "^2.1.0",
+    "mysql2": "^2.2.5",
     "request": "^2.88.0",
-    "sequelize": "^5.2.9",
-    "ua-parser-js": "^0.7.20",
-    "uuid": "^7.0.2"
+    "sequelize": "^6.3.5",
+    "ua-parser-js": "^0.7.22",
+    "uuid": "^8.3.1"
   },
   "scripts": {
     "start": "nodemon app.js",
@@ -29,8 +29,8 @@
     "fix": "./node_modules/.bin/eslint --fix ."
   },
   "devDependencies": {
-    "eslint": "^6.8.0",
-    "eslint-config-airbnb-base": "^14.1.0",
-    "eslint-plugin-import": "^2.20.1"
+    "eslint": "^7.12.1",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.22.1"
   }
 }
