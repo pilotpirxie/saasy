@@ -1,7 +1,7 @@
 const FtpClient = require('ftp');
 const path = require('path');
 const url = require('url');
-const uuidv4 = require('uuid/v4');
+const {v4} = require('uuid');
 
 /**
  * Upload file to FTP server
@@ -14,7 +14,7 @@ const uuidv4 = require('uuid/v4');
 module.exports = function uploadFile(sourceFileName, destinationFileName = false, config) {
   return new Promise((resolve, reject) => {
     const ftpClient = new FtpClient();
-    const remoteFileName = destinationFileName || `${Date.now()}-${uuidv4()}`;
+    const remoteFileName = destinationFileName || `${Date.now()}-${v4()}`;
     const fullRemoteFileName = path.extname(remoteFileName.toString()) ? remoteFileName : `${remoteFileName}${path.extname(sourceFileName)}`;
 
     ftpClient.on('ready', () => {
