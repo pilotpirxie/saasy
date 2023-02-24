@@ -19,7 +19,7 @@
     "multer": "^1.4.2",
     "mysql2": "^2.2.5",
     "request": "^2.88.0",
-    "sequelize": "^6.3.5",
+    "sequelize": "^6.29.0",
     "ua-parser-js": "^0.7.24",
     "uuid": "^8.3.1"
   },
