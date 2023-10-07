@@ -1,35 +1,18 @@
-# yet-another-project-starter
+# saasy
 
-This boilerplate consists of a few features out-of-the-box, such as connection to the database, sequelize setup, middlewares and routes for flexible work, login & register of users and session handling. It's made for hackathons and side projects where you would have to set up these features anyway. 
+API starter for SaaS applications with Node, Typescript and Express.
 
-### Installation
-1. Import SQL
-```shell script
-util/db.sql
+### Environment variables
+```shell
+NODE_ENV="development"
+
+DATABASE_URL="postgresql://mysecretuser:mysecretpassword@localhost:5432/mydb"
+MAX_BODY_SIZE="128KB"
+
+JWT_SECRET="723d6681-9236-469a-a593-e532bec937e6"
+JWT_TIMEOUT="1h"
+JWT_REFRESH_TIMEOUT="30 days"
 ```
 
-2. Setup FTP
-
-It's required for avatar upload, you can simply turn it off and remove if not necessary.
-
-```
-config/config.js
-```
-
-3. Install dependencies
-```shell script
-# if you don't have yarn, install it first
-# npm install yarn -g
-
-# install nodemon for dev server
-# yarn global add nodemon
-
-# install dependencies
-yarn
-
-# check dependencies for vulnerabilities before running
-yarn audit
-
-# run dev server
-yarn start
-```
+### License
+MIT
