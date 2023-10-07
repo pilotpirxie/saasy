@@ -8,59 +8,59 @@ datasource db {
 }
 
 model audit_log {
-  id         String   @id @db.Uuid
+  id         String   @id @default(uuid()) @db.Uuid
   table_name String   @db.VarChar
   entity_id  String   @db.VarChar
-  old_value  String
-  new_value  String
+  old_value  String   @db.VarChar
+  new_value  String   @db.VarChar
   changed_by String   @db.VarChar
-  created_at DateTime @db.Timestamp(6)
-  updated_at DateTime @db.Timestamp(6)
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamp(6)
 }
 
 model configs {
   key         String   @id @db.VarChar(255)
-  value       String
+  value       String   @db.VarChar
   description String   @db.VarChar
-  created_at  DateTime @db.Timestamp(6)
-  updated_at  DateTime @db.Timestamp(6)
+  created_at  DateTime @default(now()) @db.Timestamp(6)
+  updated_at  DateTime @default(now()) @updatedAt @db.Timestamp(6)
 }
 
 model contact {
-  id         String   @id @db.Uuid
+  id         String   @id @default(uuid()) @db.Uuid
   user_id    String?  @db.Uuid
   email      String   @db.VarChar
   phone      String?  @db.VarChar
-  content    String?
-  created_at DateTime @db.Timestamp(6)
-  updated_at DateTime @db.Timestamp(6)
+  content    String?  @db.VarChar
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamp(6)
   users      users?   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model email_verification {
-  id         String   @id @db.Uuid
+  id         String   @id @default(uuid()) @db.Uuid
   user_id    String   @db.Uuid
   code       String   @db.VarChar
-  created_at DateTime @db.Timestamp(6)
-  updated_at DateTime @db.Timestamp(6)
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamp(6)
   users      users    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model invitations {
-  id         String   @id @db.Uuid
+  id         String   @id @default(uuid()) @db.Uuid
   email      String   @db.VarChar
   invited_by String   @db.Uuid
   team_id    String   @db.Uuid
   code       String   @db.VarChar
   expires_at DateTime @db.Timestamp(6)
-  created_at DateTime @db.Timestamp(6)
-  updated_at DateTime @db.Timestamp(6)
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamp(6)
   users      users    @relation(fields: [invited_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
   teams      teams    @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model orders {
-  id                           String         @id @db.Uuid
+  id                           String         @id @default(uuid()) @db.Uuid
   user_id                      String         @db.Uuid
   product_id                   String         @db.Uuid
   amount                       Decimal        @db.Decimal
@@ -69,8 +69,8 @@ model orders {
   payment_provider_type        String         @db.VarChar
   payment_provider_external_id String         @db.VarChar
   status                       order_status
-  created_at                   DateTime       @db.Timestamp(6)
-  updated_at                   DateTime       @db.Timestamp(6)
+  created_at                   DateTime       @default(now()) @db.Timestamp(6)
+  updated_at                   DateTime       @default(now()) @updatedAt @db.Timestamp(6)
   products                     products       @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   promo_codes                  promo_codes?   @relation(fields: [promo_code_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   users                        users          @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -78,95 +78,93 @@ model orders {
 }
 
 model password_recovery {
-  id         String   @id @db.Uuid
+  id         String   @id @default(uuid()) @db.Uuid
   user_id    String   @db.Uuid
   code       String   @db.VarChar
   expires_at DateTime @db.Timestamp(6)
-  created_at DateTime @db.Timestamp(6)
-  updated_at DateTime @db.Timestamp(6)
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamp(6)
   users      users    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model plans {
-  id            String          @id @db.Uuid
+  id            String          @id @default(uuid()) @db.Uuid
   name          String          @db.VarChar
-  config        Json
+  config        Json            @db.JsonB
   price         Decimal         @db.Decimal
   currency      String          @db.VarChar
-  is_available  Boolean
-  created_at    DateTime        @db.Timestamp(6)
+  is_available  Boolean         @db.Boolean
+  created_at    DateTime        @default(now()) @db.Timestamp(6)
   updated_at    DateTime        @db.Timestamp(6)
   subscriptions subscriptions[]
 }
 
 model products {
-  id           String   @id @db.Uuid
+  id           String   @id @default(uuid()) @db.Uuid
   name         String   @db.VarChar
-  config       Json
+  config       Json     @db.JsonB
   price        Decimal  @db.Decimal
   currency     String   @db.VarChar
-  stock        Int
-  max_stock    Int
-  is_available Boolean
-  created_at   DateTime @db.Timestamp(6)
-  updated_at   DateTime @db.Timestamp(6)
+  stock        Int      @db.Integer
+  max_stock    Int      @db.Integer
+  is_available Boolean  @db.Boolean
+  created_at   DateTime @default(now()) @db.Timestamp(6)
+  updated_at   DateTime @default(now()) @updatedAt @db.Timestamp(6)
   orders       orders[]
 }
 
 model projects {
-  id           String   @id @db.Uuid
+  id           String   @id @default(uuid()) @db.Uuid
   team_id      String   @db.Uuid
   name         String   @db.VarChar
   delete_after DateTime @db.Timestamp(6)
-  created_at   DateTime @db.Timestamp(6)
-  updated_at   DateTime @db.Timestamp(6)
+  created_at   DateTime @default(now()) @db.Timestamp(6)
+  updated_at   DateTime @default(now()) @updatedAt @db.Timestamp(6)
   teams        teams    @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model promo_codes {
-  id            String          @id @db.Uuid
+  id            String          @id @default(uuid()) @db.Uuid
   code          String          @db.VarChar
-  value         Int
+  value         Int             @db.Integer
   type          String          @db.VarChar
-  max_usage     Int
-  current_usage Int
-  created_at    DateTime        @db.Timestamp(6)
-  updated_at    DateTime        @db.Timestamp(6)
+  max_usage     Int             @db.Integer
+  current_usage Int             @db.Integer
+  created_at    DateTime        @default(now()) @db.Timestamp(6)
+  updated_at    DateTime        @default(now()) @updatedAt @db.Timestamp(6)
   orders        orders[]
   subscriptions subscriptions[]
 }
 
 model referrals {
-  id             String          @id @db.Uuid
+  id             String          @id @default(uuid()) @db.Uuid
   user_id        String          @db.Uuid
   transaction_id String          @db.Uuid
   status         referral_status
   fee            Decimal         @db.Decimal
   currency       String          @db.VarChar
-  created_at     DateTime        @db.Timestamp(6)
-  updated_at     DateTime        @db.Timestamp(6)
+  created_at     DateTime        @default(now()) @db.Timestamp(6)
+  updated_at     DateTime        @default(now()) @updatedAt @db.Timestamp(6)
   transactions   transactions    @relation(fields: [transaction_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   users          users           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model sessions {
-  id                 String        @id @db.Uuid
+  id                 String        @id @default(uuid()) @db.Uuid
   user_id            String        @db.Uuid
   auth_provider_type auth_provider
   user_agent         String        @db.VarChar
   ip_address         String        @db.Inet
   refresh_token      String        @db.VarChar
-  exchange_code      String        @db.VarChar
-  exchanged_at       DateTime?     @db.Timestamp(6)
   revoked_at         DateTime?     @db.Timestamp(6)
   expires_at         DateTime      @db.Timestamp(6)
-  created_at         DateTime      @db.Timestamp(6)
-  updated_at         DateTime      @db.Timestamp(6)
+  created_at         DateTime      @default(now()) @db.Timestamp(6)
+  updated_at         DateTime      @default(now()) @updatedAt @db.Timestamp(6)
   users              users         @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model subscriptions {
-  id                           String              @id @db.Uuid
+  id                           String              @id @default(uuid()) @db.Uuid
   team_id                      String              @db.Uuid
   plan_id                      String              @db.Uuid
   amount                       Decimal             @db.Decimal
@@ -177,10 +175,10 @@ model subscriptions {
   status                       subscription_status
   first_billed_at              DateTime            @db.Timestamp(6)
   next_billed_at               DateTime            @db.Timestamp(6)
-  billing_cycle_interval       Int
+  billing_cycle_interval       Int                 @db.Integer
   cancelled_at                 DateTime?           @db.Timestamp(6)
-  created_at                   DateTime            @db.Timestamp(6)
-  updated_at                   DateTime            @db.Timestamp(6)
+  created_at                   DateTime            @default(now()) @db.Timestamp(6)
+  updated_at                   DateTime            @default(now()) @updatedAt @db.Timestamp(6)
   plans                        plans               @relation(fields: [plan_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   promo_codes                  promo_codes?        @relation(fields: [promo_code_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   teams                        teams               @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -188,11 +186,11 @@ model subscriptions {
 }
 
 model teams {
-  id            String          @id @db.Uuid
+  id            String          @id @default(uuid()) @db.Uuid
   name          String          @db.VarChar
   delete_after  DateTime        @db.Timestamp(6)
-  created_at    DateTime        @db.Timestamp(6)
-  updated_at    DateTime        @db.Timestamp(6)
+  created_at    DateTime        @default(now()) @db.Timestamp(6)
+  updated_at    DateTime        @default(now()) @updatedAt @db.Timestamp(6)
   invitations   invitations[]
   projects      projects[]
   subscriptions subscriptions[]
@@ -200,7 +198,7 @@ model teams {
 }
 
 model transactions {
-  id                   String           @id @db.Uuid
+  id                   String           @id @default(uuid()) @db.Uuid
   subscription_id      String?          @db.Uuid
   order_id             String?          @db.Uuid
   method               String           @db.VarChar
@@ -211,20 +209,20 @@ model transactions {
   provider_external_id String           @db.VarChar
   paid_at              DateTime?        @db.Timestamp(6)
   chargeback_at        DateTime?        @db.Timestamp(6)
-  created_at           DateTime         @db.Timestamp(6)
-  updated_at           DateTime         @db.Timestamp(6)
+  created_at           DateTime         @default(now()) @db.Timestamp(6)
+  updated_at           DateTime         @default(now()) @updatedAt @db.Timestamp(6)
   referrals            referrals[]
   orders               orders?          @relation(fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   subscriptions        subscriptions?   @relation(fields: [subscription_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model users {
-  id                            String               @id @db.Uuid
+  id                            String               @id @default(uuid()) @db.Uuid
   email                         String               @unique @db.VarChar
   role                          user_role
   password                      String               @db.VarChar
   salt                          String               @db.VarChar
-  iterations                    Int
+  iterations                    Int                  @db.Integer
   auth_provider_external_id     String?              @db.VarChar
   auth_provider_type            auth_provider
   register_ip                   String               @db.Inet
@@ -235,13 +233,13 @@ model users {
   country                       String?              @db.VarChar
   fullname                      String?              @db.VarChar
   display_name                  String               @db.VarChar
-  avatar_url                    String
-  newsletter_consent_granted_at DateTime             @db.Timestamp(6)
-  marketing_consent_granted_at  DateTime             @db.Timestamp(6)
+  avatar_url                    String?              @db.VarChar
+  newsletter_consent_granted_at DateTime?            @db.Timestamp(6)
+  marketing_consent_granted_at  DateTime?            @db.Timestamp(6)
   verified_at                   DateTime?            @db.Timestamp(6)
   disabled_at                   DateTime?            @db.Timestamp(6)
-  created_at                    DateTime             @db.Timestamp(6)
-  updated_at                    DateTime             @db.Timestamp(6)
+  created_at                    DateTime             @default(now()) @db.Timestamp(6)
+  updated_at                    DateTime             @default(now()) @updatedAt @db.Timestamp(6)
   contact                       contact[]
   email_verification            email_verification[]
   invitations                   invitations[]
@@ -255,12 +253,12 @@ model users {
 }
 
 model users_teams {
-  id         String    @id @db.Uuid
+  id         String    @id @default(uuid()) @db.Uuid
   user_id    String?   @db.Uuid
   team_id    String?   @db.Uuid
   role       team_role
-  created_at DateTime  @db.Timestamp(6)
-  updated_at DateTime  @db.Timestamp(6)
+  created_at DateTime  @default(now()) @db.Timestamp(6)
+  updated_at DateTime  @default(now()) @updatedAt @db.Timestamp(6)
   teams      teams?    @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   users      users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
@@ -275,6 +273,7 @@ enum auth_provider {
   github
   gitlab
   bitbucket
+  apple
 }
 
 enum order_status {
