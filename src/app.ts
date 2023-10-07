@@ -3,11 +3,11 @@ import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import NodeCache from "node-cache";
 import cors from "cors";
-import { errorHandler } from "./middlewares/errors";
+import { errorHandler } from "./modules/shared/middlewares/errors";
 import { checkPrismaConnection } from "./data/prismaConnectionTest";
 import { usePrismaClientFactory } from "./data/prismaClientFactory";
 import { NodeCacheAdapter } from "./data/cacheStore";
-import getAuthController from "./modules/auth/auth.controller";
+import getAuthController from "./modules/auth/controllers/authController";
 
 dotenv.config();
 

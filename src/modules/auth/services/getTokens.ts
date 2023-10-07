@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { JwtInfo } from "./jwtInfo";
+import { JwtInfo } from "../model/jwtInfo";
 
 export function getTokens({
   userId,

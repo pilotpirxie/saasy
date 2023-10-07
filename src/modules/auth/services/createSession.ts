@@ -3,7 +3,7 @@ import crypto from "crypto";
 import dayjs from "dayjs";
 import ms from "ms";
 import { getTokens } from "./getTokens";
-import { JwtInfo } from "./jwtInfo";
+import { JwtInfo } from "../model/jwtInfo";
 
 export async function createSession({
   prisma,
