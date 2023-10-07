@@ -1,24 +1,21 @@
-import express, { Express } from 'express';
 import dotenv from 'dotenv';
-import bodyParser from 'body-parser';
 import NodeCache from 'node-cache';
-import cors from 'cors';
-import { errorHandler } from './middlewares/errors';
 import { checkPrismaConnection } from './data/prismaConnectionTest';
 import { usePrismaClientFactory } from './data/prismaClientFactory';
 import { NodeCacheAdapter } from './data/cacheStore';
 import getBasicController from './controllers/basic';
+import fastify from 'fastify';
+import fastifyCors from '@fastify/cors';
 
 dotenv.config();
 
-const port = process.env.PORT || 3000;
-const app: Express = express();
+const app = fastify({
+  bodyLimit: Number(process.env.MAX_BODY_SIZE || 1024),
+  logger: true
+});
 
-app.set('trust proxy', true);
-app.disable('x-powered-by');
+app.register(fastifyCors);
 
-app.use(bodyParser.json({ limit: process.env.MAX_BODY_SIZE || '1KB' }));
-app.use(cors());
 const prisma = usePrismaClientFactory({
   isDevelopment: process.env.NODE_ENV === 'development',
 });
@@ -34,9 +31,9 @@ const cache = new NodeCacheAdapter({
   nodeCache,
 });
 
-app.get('/api/health', async (req, res) => res.sendStatus(200));
+app.get('/api/health', async (request, reply) => reply.status(200));
 
-app.use(getBasicController({
+app.register(getBasicController({
   config: {
     jwtInfo: {
       secret: process.env.JWT_SECRET || '',
@@ -46,12 +43,31 @@ app.use(getBasicController({
   },
   cache,
   prisma,
-}));  
+}), {
+  prefix: '/api/basic',
+});
 
+app.setErrorHandler(function (error, request, reply) {
+  if (error.statusCode && error.statusCode > 499) {
+    this.log.error(error);
+    reply.status(500);
+    return {
+      error: 'Internal Server Error',
+    };
+  } else {
+    reply.status(error.statusCode || 500);
+    return {
+      error: error.message,
+    };
+  }
+});
 
-app.use(errorHandler);
+app.listen({
+  port: Number(process.env.PORT || 3000),
+}).then(() => {
+  const address = app.server.address();
+  const port = typeof address === 'string' ? address : address?.port;
 
-app.listen(port, () => {
   console.info({
     mode: process.env.NODE_ENV,
     sdk: process.version,
@@ -59,4 +75,8 @@ app.listen(port, () => {
     service: process.env.SERVICE,
   });
   console.info(`Server is running on port ${port}`);
+
+}).catch((error) => {
+  console.error(error);
+  process.exit(1);
 });
