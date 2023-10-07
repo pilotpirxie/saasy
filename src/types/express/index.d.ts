@@ -38,8 +38,7 @@ type PayloadDictionary<T> = {
 
 export interface TypedRequest<A extends RequestPayload> extends Request {
   body: Required<PayloadDictionary<A["body"]>>;
-  params: Required<PayloadDictionary<A["params"]>> &
-    Omit<ParamsDictionary, never>;
+  params: Required<PayloadDictionary<A["params"]>> & Omit<ParamsDictionary, never>;
   query: Required<PayloadDictionary<A["query"]>> & Omit<Query, never>;
 }
 

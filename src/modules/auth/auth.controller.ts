@@ -1,104 +1,15 @@
 import { PrismaClient } from "@prisma/client";
-import { Request, Router } from "express";
-import { TypedRequest } from "../../types/express";
+import { Router } from "express";
 import Joi from "joi";
-import validation from "../../middlewares/validation";
 import crypto, { pbkdf2Sync } from "crypto";
 import totp from "totp-generator";
 import jwt from "jsonwebtoken";
-import ms from "ms";
 import dayjs from "dayjs";
-
-type JwtInfo = {
-  secret: string;
-  timeout: string;
-  refreshTokenTimeout: string;
-};
-
-function getIp(req: Request): string {
-  return (
-    req.headers["x-forwarded-for"] ||
-    req.connection.remoteAddress ||
-    ""
-  ).toString();
-}
-
-function getTokens({
-  userId,
-  jwtInfo,
-  session,
-}: {
-  userId: string;
-  session: {
-    id: string;
-    refresh_token: string;
-  };
-  jwtInfo: JwtInfo;
-}) {
-  const jwtToken = jwt.sign(
-    {
-      sub: userId,
-    },
-    jwtInfo.secret,
-    {
-      expiresIn: jwtInfo.timeout,
-    },
-  );
-
-  const jwtRefreshToken = jwt.sign(
-    {
-      sub: userId,
-      jti: session.id,
-    },
-    session.refresh_token,
-    {
-      expiresIn: jwtInfo.refreshTokenTimeout,
-    },
-  );
-
-  return { jwtToken, jwtRefreshToken };
-}
-
-async function createSession({
-  prisma,
-  userId,
-  ip,
-  jwtInfo,
-  userAgent,
-  authProviderType,
-}: {
-  prisma: PrismaClient;
-  userId: string;
-  ip: string;
-  userAgent: string;
-  authProviderType:
-    | "twitter"
-    | "github"
-    | "facebook"
-    | "google"
-    | "gitlab"
-    | "bitbucket"
-    | "email"
-    | "apple";
-  jwtInfo: JwtInfo;
-}): Promise<{ jwtToken: string; jwtRefreshToken: string }> {
-  const session = await prisma.sessions.create({
-    data: {
-      user_id: userId,
-      ip_address: ip,
-      refresh_token: crypto.randomBytes(32).toString("hex"),
-      user_agent: userAgent,
-      expires_at: dayjs().add(ms(jwtInfo.timeout), "millisecond").toDate(),
-      auth_provider_type: authProviderType,
-    },
-  });
-
-  return getTokens({
-    userId,
-    session,
-    jwtInfo,
-  });
-}
+import validation from "../../middlewares/validation";
+import { TypedRequest } from "../../types/express";
+import { createSession } from "./createSession";
+import { getIp } from "./getIp";
+import { JwtInfo } from "./jwtInfo";
 
 export default function getAuthController({
   config,

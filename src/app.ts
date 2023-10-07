@@ -34,21 +34,24 @@ const cache = new NodeCacheAdapter({
   nodeCache,
 });
 
-app.get("/api/health", async (req, res) => res.sendStatus(200));
-
-app.use(
-  "/api/auth",
-  getAuthController({
-    config: {
-      jwtInfo: {
-        secret: process.env.JWT_SECRET || "",
-        refreshTokenTimeout: process.env.JWT_REFRESH_TOKEN_TIMEOUT || "1d",
-        timeout: process.env.JWT_TIMEOUT || "1h",
-      },
-    },
-    prisma,
-  }),
+app.get(
+  "/api/health",
+  async (req, res) => {
+    const data = await prisma.$executeRaw`SELECT 1`;
+    return res.sendStatus(data ? 200 : 500);
+  },
 );
+
+app.use("/api/auth", getAuthController({
+  config: {
+    jwtInfo: {
+      secret: process.env.JWT_SECRET || "",
+      refreshTokenTimeout: process.env.JWT_REFRESH_TOKEN_TIMEOUT || "1d",
+      timeout: process.env.JWT_TIMEOUT || "1h",
+    },
+  },
+  prisma,
+}));
 
 app.use(errorHandler);
 
