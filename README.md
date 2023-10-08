@@ -9,6 +9,7 @@ Features:
 * login, register, forgot password, reset password
 * social login with Google, GitHub
 * authentication with JWT
+* SMTP email service
 * teams management with roles
 * invitations to teams
 * project management

@@ -345,6 +345,7 @@ export default function getAuthController({
           data: {
             user_id: user.id,
             code: crypto.randomBytes(32).toString("hex"),
+            email,
           },
         });
 
@@ -359,6 +360,96 @@ export default function getAuthController({
         });
 
         return res.sendStatus(201);
+      } catch (error) {
+        return next(error);
+      }
+    },
+  );
+
+  const verifyEmailSchema = {
+    body: {
+      user_id: Joi.string().required(),
+      code: Joi.string().required(),
+    },
+  };
+
+  router.post(
+    "/verify",
+    validation(verifyEmailSchema),
+    async (req: TypedRequest<typeof verifyEmailSchema>, res, next) => {
+      try {
+        const { code, user_id } = req.body;
+
+        const verificationCode = await prisma.email_verification.findFirst({
+          where: {
+            code,
+            user_id,
+          },
+        });
+
+        if (!verificationCode) {
+          return res.sendStatus(404);
+        }
+
+        await prisma.users.update({
+          data: {
+            verified_at: dayjs().toDate(),
+          },
+          where: {
+            id: verificationCode.user_id,
+          },
+        });
+
+        return res.sendStatus(200);
+      } catch (error) {
+        return next(error);
+      }
+    },
+  );
+
+  const resendVerification = {
+    body: {
+      email: Joi.string().required(),
+    },
+  };
+
+  router.post(
+    "/resend-verify",
+    validation(resendVerification),
+    async (req: TypedRequest<typeof resendVerification>, res, next) => {
+      try {
+        const { email } = req.body;
+
+        const user = await prisma.users.findFirst({
+          where: {
+            email,
+            verified_at: null,
+          },
+        });
+
+        if (!user) {
+          return res.sendStatus(400);
+        }
+
+        const emailVerification = await prisma.email_verification.create({
+          data: {
+            user_id: user.id,
+            code: crypto.randomBytes(32).toString("hex"),
+            email,
+          },
+        });
+
+        emailService.sendEmail({
+          to: email,
+          subject: "Verify your email",
+          html: emailTemplatesService.getVerifyEmailTemplate({
+            code: emailVerification.code,
+            username: user.display_name,
+            userId: user.id,
+          }),
+        });
+
+        return res.sendStatus(200);
       } catch (error) {
         return next(error);
       }
