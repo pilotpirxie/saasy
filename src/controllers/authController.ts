@@ -95,6 +95,24 @@ export async function createSession({
   });
 }
 
+function getHashedPassword({
+  password,
+  salt,
+  iterations,
+}: {
+  password: string;
+  salt: string;
+  iterations: number;
+}) {
+  return pbkdf2Sync(
+    password,
+    salt,
+    iterations,
+    64,
+    "sha512",
+  ).toString("hex");
+}
+
 export default function getAuthController({
   jwtInfo,
   prisma,
@@ -131,6 +149,7 @@ export default function getAuthController({
             iterations: true,
             totpAddedAt: true,
             totpToken: true,
+            authProviderType: true,
           },
           where: {
             email,
@@ -141,19 +160,21 @@ export default function getAuthController({
           return res.sendStatus(404);
         }
 
-        const hashedPassword = pbkdf2Sync(
-          user.password,
-          user.salt,
-          user.iterations,
-          64,
-          "sha512",
-        ).toString("hex");
-
-        if (hashedPassword !== password) {
+        if (user.authProviderType !== "email") {
           return res.sendStatus(401);
         }
 
-        if (user.totpAddedAt && user.totpToken) {
+        const hashedPassword = getHashedPassword({
+          password,
+          salt: user.salt,
+          iterations: user.iterations,
+        });
+
+        if (hashedPassword !== user.password) {
+          return res.sendStatus(401);
+        }
+
+        if (user.totpAddedAt !== null && user.totpToken) {
           if (!totpCode) {
             return res.sendStatus(401);
           }
@@ -380,13 +401,11 @@ export default function getAuthController({
 
         const salt = crypto.randomBytes(16).toString("hex");
         const iterations = 600000;
-        const hashedPassword = pbkdf2Sync(
+        const hashedPassword = getHashedPassword({
           password,
           salt,
           iterations,
-          64,
-          "sha512",
-        ).toString("hex");
+        });
 
         const user = await prisma.user.create({
           data: {
@@ -464,6 +483,12 @@ export default function getAuthController({
           },
         });
 
+        await prisma.emailVerification.delete({
+          where: {
+            id: verificationCode.id,
+          },
+        });
+
         return res.sendStatus(200);
       } catch (error) {
         return next(error);
@@ -498,6 +523,12 @@ export default function getAuthController({
         if (!user) {
           return res.sendStatus(400);
         }
+
+        await prisma.emailVerification.deleteMany({
+          where: {
+            userId: user.id,
+          },
+        });
 
         const emailVerification = await prisma.emailVerification.create({
           data: {
