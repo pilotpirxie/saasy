@@ -34,6 +34,9 @@ SMTP_USER="your.user@smtp"
 SMTP_PASSWORD="password"
 SMTP_REJECT_UNAUTHORIZED="false"
 SMTP_SECURE="false"
+
+GOOGLE_CLIENT_ID=""
+GOOGLE_CLIENT_SECRET=""
 ```
 
 ### License

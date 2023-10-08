@@ -6,6 +6,7 @@ import totp from "totp-generator";
 import jwt from "jsonwebtoken";
 import dayjs from "dayjs";
 import ms from "ms";
+import url from "url";
 import validation from "../middlewares/validation";
 import { TypedRequest } from "../types/express";
 import { getIp } from "../utils/getIp";
@@ -118,11 +119,20 @@ export default function getAuthController({
   prisma,
   emailService,
   emailTemplatesService,
+  socialAuthProviders,
+  baseUrl,
 }: {
   jwtInfo: JwtInfo;
   prisma: PrismaClient;
   emailService: EmailService;
   emailTemplatesService: EmailTemplates;
+  socialAuthProviders: {
+    google: {
+      clientId: string;
+      clientSecret: string;
+    }
+  };
+  baseUrl: string;
 }): Router {
   const router = Router();
 
@@ -674,6 +684,32 @@ export default function getAuthController({
         });
 
         return res.sendStatus(200);
+      } catch (error) {
+        return next(error);
+      }
+    },
+  );
+
+  router.get(
+    "/login-with-google",
+
+    async (req, res, next) => {
+      try {
+        const urlToRedirect = url.format({
+          protocol: "https",
+          host: "accounts.google.com",
+          pathname: "/o/oauth2/v2/auth",
+          query: {
+            client_id: socialAuthProviders.google.clientId,
+            redirect_uri: `${baseUrl}/api/auth/google/callback`,
+            response_type: "code",
+            scope: "email",
+            access_type: "offline",
+            prompt: "consent",
+          },
+        });
+
+        return res.redirect(urlToRedirect);
       } catch (error) {
         return next(error);
       }

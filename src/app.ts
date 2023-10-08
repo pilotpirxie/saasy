@@ -74,6 +74,13 @@ app.use("/api/auth", getAuthController({
   emailService,
   emailTemplatesService: emailTemplates,
   prisma,
+  baseUrl: "http://localhost:3000",
+  socialAuthProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+    },
+  },
 }));
 
 app.use(errorHandler);
