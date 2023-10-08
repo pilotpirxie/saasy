@@ -1,12 +1,12 @@
 import * as handlebars from "handlebars";
-import fs from "fs";
+import * as fs from "fs";
 import path from "path";
 import { EmailTemplates } from "./emailTemplates";
 
 export class EmailTemplatesService implements EmailTemplates {
-  private companyName: string;
+  private readonly companyName: string;
 
-  private baseUrl: string;
+  private readonly baseUrl: string;
 
   constructor({
     companyName,
@@ -31,6 +31,15 @@ export class EmailTemplatesService implements EmailTemplates {
 
   getVerifyEmailTemplate(options: { username: string; userId: string, code: string }): string {
     const invoiceTemplate = fs.readFileSync(path.join(__dirname, "../emailTemplates/verify.hbs"), "utf8");
+    return handlebars.compile(invoiceTemplate)({
+      baseUrl: this.baseUrl,
+      companyName: this.companyName,
+      ...options,
+    });
+  }
+
+  getPasswordResetTemplate(options: { username: string; userId: string; code: string }): string {
+    const invoiceTemplate = fs.readFileSync(path.join(__dirname, "../emailTemplates/passwordReset.hbs"), "utf8");
     return handlebars.compile(invoiceTemplate)({
       baseUrl: this.baseUrl,
       companyName: this.companyName,

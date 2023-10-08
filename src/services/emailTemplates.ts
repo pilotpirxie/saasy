@@ -5,6 +5,12 @@ export type EmailTemplates = {
     code: string
   }): string;
 
+  getPasswordResetTemplate(options: {
+    username: string,
+    userId: string,
+    code: string
+  }): string;
+
   getInvoiceEmailTemplate(options: {
     username: string,
     invoiceId: string,

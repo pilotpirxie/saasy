@@ -555,5 +555,130 @@ export default function getAuthController({
     },
   );
 
+  const forgotPasswordSchema = {
+    body: {
+      email: Joi.string().email().required(),
+    },
+  };
+
+  router.post(
+    "/forgot-password",
+    validation(forgotPasswordSchema),
+    async (req: TypedRequest<typeof forgotPasswordSchema>, res, next) => {
+      try {
+        const { email } = req.body;
+
+        const user = await prisma.user.findFirst({
+          select: {
+            id: true,
+            displayName: true,
+          },
+          where: {
+            email,
+          },
+        });
+
+        if (!user) {
+          return res.sendStatus(400);
+        }
+
+        await prisma.passwordRecovery.deleteMany({
+          where: {
+            userId: user.id,
+          },
+        });
+
+        const passwordReset = await prisma.passwordRecovery.create({
+          data: {
+            userId: user.id,
+            code: crypto.randomBytes(32).toString("hex"),
+            expiresAt: dayjs().add(1, "hour").toDate(),
+          },
+        });
+
+        emailService.sendEmail({
+          to: email,
+          subject: "Reset your password",
+          html: emailTemplatesService.getPasswordResetTemplate({
+            code: passwordReset.code,
+            username: user.displayName,
+            userId: user.id,
+          }),
+        });
+
+        return res.sendStatus(200);
+      } catch (error) {
+        return next(error);
+      }
+    },
+  );
+
+  const passwordResetSchema = {
+    body: {
+      userId: Joi.string().required(),
+      code: Joi.string().required(),
+      password: Joi.string().required(),
+    },
+  };
+
+  router.post(
+    "/reset-password",
+    validation(passwordResetSchema),
+    async (req: TypedRequest<typeof passwordResetSchema>, res, next) => {
+      try {
+        const { code, userId, password } = req.body;
+
+        const passwordReset = await prisma.passwordRecovery.findFirst({
+          select: {
+            id: true,
+            userId: true,
+            expiresAt: true,
+          },
+          where: {
+            code,
+            userId,
+          },
+        });
+
+        if (!passwordReset) {
+          return res.sendStatus(404);
+        }
+
+        if (dayjs(passwordReset.expiresAt).isBefore(dayjs())) {
+          return res.sendStatus(400);
+        }
+
+        const salt = crypto.randomBytes(16).toString("hex");
+        const iterations = 600000;
+        const hashedPassword = getHashedPassword({
+          password,
+          salt,
+          iterations,
+        });
+
+        await prisma.user.update({
+          data: {
+            password: hashedPassword,
+            salt,
+            iterations,
+          },
+          where: {
+            id: passwordReset.userId,
+          },
+        });
+
+        await prisma.passwordRecovery.delete({
+          where: {
+            id: passwordReset.id,
+          },
+        });
+
+        return res.sendStatus(200);
+      } catch (error) {
+        return next(error);
+      }
+    },
+  );
+
   return router;
 }
