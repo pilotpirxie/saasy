@@ -124,6 +124,14 @@ export default function getAuthController({
         const { email, password, totpCode } = req.body;
 
         const user = await prisma.users.findFirst({
+          select: {
+            id: true,
+            password: true,
+            salt: true,
+            iterations: true,
+            totp_added_at: true,
+            totp_token: true,
+          },
           where: {
             email,
           },
@@ -197,6 +205,12 @@ export default function getAuthController({
         };
 
         const session = await prisma.sessions.findFirst({
+          select: {
+            id: true,
+            refresh_token: true,
+            revoked_at: true,
+            user_id: true,
+          },
           where: {
             id: decoded.jti,
             user_id: decoded.sub,
@@ -218,6 +232,9 @@ export default function getAuthController({
         }
 
         const user = await prisma.users.findFirst({
+          select: {
+            id: true,
+          },
           where: {
             id: session.user_id,
           },
@@ -267,6 +284,12 @@ export default function getAuthController({
         };
 
         const session = await prisma.sessions.findFirst({
+          select: {
+            id: true,
+            refresh_token: true,
+            revoked_at: true,
+            user_id: true,
+          },
           where: {
             id: decoded.jti,
             user_id: decoded.sub,
@@ -309,6 +332,9 @@ export default function getAuthController({
         const { email, password } = req.body;
 
         const possibleUser = await prisma.users.findFirst({
+          select: {
+            id: true,
+          },
           where: {
             email,
           },
@@ -381,6 +407,10 @@ export default function getAuthController({
         const { code, user_id } = req.body;
 
         const verificationCode = await prisma.email_verification.findFirst({
+          select: {
+            id: true,
+            user_id: true,
+          },
           where: {
             code,
             user_id,
@@ -421,6 +451,10 @@ export default function getAuthController({
         const { email } = req.body;
 
         const user = await prisma.users.findFirst({
+          select: {
+            id: true,
+            display_name: true,
+          },
           where: {
             email,
             verified_at: null,
