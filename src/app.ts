@@ -10,6 +10,7 @@ import { NodeCacheAdapter } from "./data/cacheStore";
 import getAuthController from "./controllers/authController";
 import { NodemailerEmailService } from "./services/nodemailerEmailService";
 import { EmailTemplatesService } from "./services/emailTemplatesService";
+import getSocialAuthController from "./controllers/socialAuthController";
 
 dotenv.config();
 
@@ -74,12 +75,25 @@ app.use("/api/auth", getAuthController({
   emailService,
   emailTemplatesService: emailTemplates,
   prisma,
+}));
+
+app.use("/api/auth", getSocialAuthController({
+  jwtInfo: {
+    secret: process.env.JWT_SECRET || "",
+    refreshTokenTimeout: process.env.JWT_REFRESH_TOKEN_TIMEOUT || "1d",
+    timeout: process.env.JWT_TIMEOUT || "1h",
+  },
+  prisma,
   baseUrl: "http://localhost:3000",
   callbackUrl: "http://localhost:3000/oauth/callback",
   socialAuthProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+    },
+    github: {
+      clientId: process.env.GITHUB_CLIENT_ID || "",
+      clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
     },
   },
 }));

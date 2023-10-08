@@ -6,7 +6,6 @@ import totp from "totp-generator";
 import jwt from "jsonwebtoken";
 import dayjs from "dayjs";
 import ms from "ms";
-import url from "url";
 import validation from "../middlewares/validation";
 import { TypedRequest } from "../types/express";
 import { getIp } from "../utils/getIp";
@@ -119,22 +118,11 @@ export default function getAuthController({
   prisma,
   emailService,
   emailTemplatesService,
-  socialAuthProviders,
-  baseUrl,
-  callbackUrl,
 }: {
   jwtInfo: JwtInfo;
   prisma: PrismaClient;
   emailService: EmailService;
   emailTemplatesService: EmailTemplates;
-  socialAuthProviders: {
-    google: {
-      clientId: string;
-      clientSecret: string;
-    }
-  };
-  baseUrl: string;
-  callbackUrl: string;
 }): Router {
   const router = Router();
 
@@ -165,10 +153,11 @@ export default function getAuthController({
           },
           where: {
             email,
+            authProviderType: "email",
           },
         });
 
-        if (!user) {
+        if (!user || !user.password || !user.salt || !user.iterations) {
           return res.sendStatus(404);
         }
 
@@ -239,6 +228,7 @@ export default function getAuthController({
           },
           where: {
             email,
+            authProviderType: "email",
           },
         });
 
@@ -529,6 +519,7 @@ export default function getAuthController({
           where: {
             email,
             verifiedAt: null,
+            authProviderType: "email",
           },
         });
 
@@ -587,6 +578,7 @@ export default function getAuthController({
           },
           where: {
             email,
+            authProviderType: "email",
           },
         });
 
@@ -686,250 +678,6 @@ export default function getAuthController({
         });
 
         return res.sendStatus(200);
-      } catch (error) {
-        return next(error);
-      }
-    },
-  );
-
-  router.get(
-    "/login-with-google",
-    async (req, res, next) => {
-      try {
-        const urlToRedirect = url.format({
-          protocol: "https",
-          host: "accounts.google.com",
-          pathname: "/o/oauth2/v2/auth",
-          query: {
-            client_id: socialAuthProviders.google.clientId,
-            redirect_uri: `${baseUrl}/api/auth/google/callback`,
-            response_type: "code",
-            scope: "email",
-            access_type: "offline",
-            prompt: "consent",
-            include_granted_scopes: "true",
-          },
-        });
-
-        return res.redirect(urlToRedirect);
-      } catch (error) {
-        return next(error);
-      }
-    },
-  );
-
-  const googleCallbackSchema = {
-    query: {
-      code: Joi.string().required(),
-      scope: Joi.string().required(),
-      authuser: Joi.string().required(),
-      prompt: Joi.string().required(),
-    },
-  };
-
-  router.get(
-    "/google/callback",
-    validation(googleCallbackSchema, "/login"),
-    async (req: TypedRequest<typeof googleCallbackSchema>, res, next) => {
-      try {
-        const { code } = req.query;
-
-        const authorizationToken = await fetch("https://oauth2.googleapis.com/token", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: new URLSearchParams({
-            code,
-            client_id: socialAuthProviders.google.clientId,
-            client_secret: socialAuthProviders.google.clientSecret,
-            redirect_uri: `${baseUrl}/api/auth/google/callback`,
-            grant_type: "authorization_code",
-          }),
-        });
-
-        const data = await authorizationToken.json() as {
-          access_token: string;
-          expires_in: number;
-          refresh_token: string;
-          scope: string;
-          token_type: string;
-          id_token: string;
-        };
-
-        const userInfo = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
-          headers: {
-            Authorization: `Bearer ${data.access_token}`,
-          },
-        });
-
-        const userData = await userInfo.json() as {
-          sub: string;
-          picture: string;
-          email: string;
-          email_verified: boolean;
-        };
-
-        const searchForUser = await prisma.user.findFirst({
-          select: {
-            id: true,
-          },
-          where: {
-            email: userData.email,
-          },
-        });
-
-        if (!searchForUser) {
-          await prisma.user.create({
-            data: {
-              email: userData.email,
-              displayName: userData.email.split("@")[0],
-              role: "user",
-              authProviderType: "google",
-              authProviderExternalId: userData.sub,
-              password: crypto.randomBytes(32).toString("hex"),
-              iterations: 600000,
-              salt: crypto.randomBytes(16).toString("hex"),
-              registerIp: getIp(req),
-              avatarUrl: userData.picture,
-            },
-          });
-        }
-
-        const user = await prisma.user.findFirst({
-          select: {
-            id: true,
-            authProviderType: true,
-          },
-          where: {
-            email: userData.email,
-          },
-        });
-
-        if (!user) {
-          return res.sendStatus(404);
-        }
-
-        if (user.authProviderType !== "google") {
-          return res.sendStatus(401);
-        }
-
-        const authorizationCode = await prisma.authorizationCode.create({
-          data: {
-            userId: user.id,
-            authProviderType: "google",
-            expiresAt: dayjs().add(5, "minutes").toDate(),
-          },
-        });
-
-        const urlToRedirect = new URL(callbackUrl);
-        urlToRedirect.searchParams.append("code", authorizationCode.id);
-
-        return res.redirect(urlToRedirect.toString());
-      } catch (error) {
-        return next(error);
-      }
-    },
-  );
-
-  router.get(
-    "/login-with-github",
-    async (req, res, next) => {
-      try {
-        const urlToRedirect = url.format({
-          protocol: "https",
-          host: "accounts.google.com",
-          pathname: "/o/oauth2/v2/auth",
-          query: {
-            client_id: socialAuthProviders.google.clientId,
-            redirect_uri: `${baseUrl}/api/auth/google/callback`,
-            response_type: "code",
-            scope: "email",
-            access_type: "offline",
-            prompt: "consent",
-            include_granted_scopes: "true",
-          },
-        });
-
-        return res.redirect(urlToRedirect);
-      } catch (error) {
-        return next(error);
-      }
-    },
-  );
-
-  const exchangeCodeSchema = {
-    body: {
-      code: Joi.string().required(),
-    },
-  };
-
-  router.post(
-    "/exchange-code",
-    validation(exchangeCodeSchema),
-    async (req: TypedRequest<typeof exchangeCodeSchema>, res, next) => {
-      try {
-        const { code } = req.body;
-
-        const authorizationCode = await prisma.authorizationCode.findFirst({
-          select: {
-            id: true,
-            userId: true,
-            authProviderType: true,
-            expiresAt: true,
-          },
-          where: {
-            id: code,
-          },
-        });
-
-        if (!authorizationCode) {
-          return res.sendStatus(404);
-        }
-
-        if (dayjs(authorizationCode.expiresAt).isBefore(dayjs())) {
-          return res.sendStatus(400);
-        }
-
-        const user = await prisma.user.findFirst({
-          select: {
-            id: true,
-            authProviderType: true,
-          },
-          where: {
-            id: authorizationCode.userId,
-          },
-        });
-
-        if (!user) {
-          return res.sendStatus(404);
-        }
-
-        if (user.authProviderType !== authorizationCode.authProviderType) {
-          return res.sendStatus(401);
-        }
-
-        const ip = getIp(req);
-
-        await prisma.authorizationCode.delete({
-          where: {
-            id: authorizationCode.id,
-          },
-        });
-
-        const { jwtToken, jwtRefreshToken } = await createSession({
-          prisma,
-          userId: user.id,
-          ip,
-          jwtInfo,
-          userAgent: req.headers["user-agent"] || "",
-          authProviderType: user.authProviderType,
-        });
-
-        return res.json({
-          accessToken: jwtToken,
-          refreshToken: jwtRefreshToken,
-        });
       } catch (error) {
         return next(error);
       }

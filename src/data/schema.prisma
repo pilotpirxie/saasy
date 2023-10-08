@@ -276,11 +276,11 @@ model Transaction {
 
 model User {
   id                         String              @id @default(uuid()) @map("id") @db.Uuid
-  email                      String              @unique @map("email") @db.VarChar
+  email                      String?             @unique @map("email") @db.VarChar
   role                       UserGlobalRole      @default(user) @map("role")
-  password                   String              @map("password") @db.VarChar
-  salt                       String              @map("salt") @db.VarChar
-  iterations                 Int                 @map("iterations") @db.Integer
+  password                   String?             @map("password") @db.VarChar
+  salt                       String?             @map("salt") @db.VarChar
+  iterations                 Int?                @map("iterations") @db.Integer
   authProviderExternalId     String?             @map("auth_provider_external_id") @db.VarChar
   authProviderType           AuthProvider        @map("auth_provider_type")
   registerIp                 String              @map("register_ip") @db.Inet
