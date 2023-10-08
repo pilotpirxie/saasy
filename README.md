@@ -1,6 +1,6 @@
 # saasy
 
-API starter for SaaS applications. Made with Typescript, Node, Express, React and Vite. 
+API starter for SaaS applications. Made with Node, TypeScript, Express and Postgres on the server side and React and Vite on the client side. 
 Starter provides out of the box authentication, teams management and billing.
 
 Every user can create a team and invite other users to join the team. Each team has a role assigned to each user.
