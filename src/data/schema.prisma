@@ -7,318 +7,393 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model audit_log {
-  id         String   @id @default(uuid()) @db.Uuid
-  table_name String   @db.VarChar
-  entity_id  String   @db.VarChar
-  old_value  String   @db.VarChar
-  new_value  String   @db.VarChar
-  changed_by String   @db.VarChar
-  created_at DateTime @default(now()) @db.Timestamp(6)
-  updated_at DateTime @default(now()) @updatedAt @db.Timestamp(6)
+model AuditLog {
+  id        String   @id @default(uuid()) @map("id") @db.Uuid
+  tableName String   @map("table_name") @db.VarChar
+  entityId  String   @map("entity_id") @db.VarChar
+  oldValue  String   @map("old_value") @db.VarChar
+  newValue  String   @map("new_value") @db.VarChar
+  changedBy String   @map("changed_by") @db.VarChar
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  @@index([tableName, entityId])
+  @@map("audit_logs")
 }
 
-model configs {
-  key         String   @id @db.VarChar(255)
-  value       String   @db.VarChar
-  description String   @db.VarChar
-  created_at  DateTime @default(now()) @db.Timestamp(6)
-  updated_at  DateTime @default(now()) @updatedAt @db.Timestamp(6)
+model Config {
+  key         String   @id @map("key") @db.VarChar(255)
+  value       String   @map("value") @db.VarChar
+  description String   @map("description") @db.VarChar
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  @@map("configs")
 }
 
-model contact {
-  id         String   @id @default(uuid()) @db.Uuid
-  user_id    String?  @db.Uuid
-  email      String   @db.VarChar
-  phone      String?  @db.VarChar
-  content    String?  @db.VarChar
-  created_at DateTime @default(now()) @db.Timestamp(6)
-  updated_at DateTime @default(now()) @updatedAt @db.Timestamp(6)
-  users      users?   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model Contact {
+  id        String   @id @default(uuid()) @map("id") @db.Uuid
+  userId    String?  @map("user_id") @db.Uuid
+  email     String   @map("email") @db.VarChar
+  phone     String?  @map("phone") @db.VarChar
+  content   String   @map("content") @db.VarChar
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([userId])
+  @@map("contacts")
 }
 
-model email_verification {
-  id         String   @id @default(uuid()) @db.Uuid
-  user_id    String   @db.Uuid
-  code       String   @db.VarChar
-  email      String   @default("")
-  created_at DateTime @default(now()) @db.Timestamp(6)
-  updated_at DateTime @default(now()) @updatedAt @db.Timestamp(6)
-  users      users    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model EmailVerification {
+  id        String   @id @default(uuid()) @map("id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  code      String   @map("code") @db.VarChar
+  email     String   @default("") @map("email") @db.VarChar
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([userId, code])
+  @@map("email_verification")
 }
 
-model invitations {
-  id         String   @id @default(uuid()) @db.Uuid
-  email      String   @db.VarChar
-  invited_by String   @db.Uuid
-  team_id    String   @db.Uuid
-  code       String   @db.VarChar
-  expires_at DateTime @db.Timestamp(6)
-  created_at DateTime @default(now()) @db.Timestamp(6)
-  updated_at DateTime @default(now()) @updatedAt @db.Timestamp(6)
-  users      users    @relation(fields: [invited_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  teams      teams    @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model Invitation {
+  id        String   @id @default(uuid()) @map("id") @db.Uuid
+  email     String   @map("email") @db.VarChar
+  invitedBy String   @map("invited_by") @db.Uuid
+  teamId    String   @map("team_id") @db.Uuid
+  code      String   @map("code") @db.VarChar
+  expiresAt DateTime @map("expires_at") @db.Timestamp(6)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  user      User     @relation(fields: [invitedBy], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([invitedBy, teamId, code])
+  @@map("invitations")
 }
 
-model orders {
-  id                           String         @id @default(uuid()) @db.Uuid
-  user_id                      String         @db.Uuid
-  product_id                   String         @db.Uuid
-  amount                       Decimal        @db.Decimal
-  currency                     String         @db.VarChar
-  promo_code_id                String?        @db.Uuid
-  payment_provider_type        String         @db.VarChar
-  payment_provider_external_id String         @db.VarChar
-  status                       order_status
-  created_at                   DateTime       @default(now()) @db.Timestamp(6)
-  updated_at                   DateTime       @default(now()) @updatedAt @db.Timestamp(6)
-  products                     products       @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  promo_codes                  promo_codes?   @relation(fields: [promo_code_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  users                        users          @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  transactions                 transactions[]
+model Order {
+  id                        String        @id @default(uuid()) @map("id") @db.Uuid
+  userId                    String        @map("user_id") @db.Uuid
+  productId                 String        @map("product_id") @db.Uuid
+  amount                    Decimal       @map("amount") @db.Decimal
+  currency                  Currency      @map("currency")
+  promoCodeId               String?       @map("promo_code_id") @db.Uuid
+  paymentProviderType       String        @map("payment_provider_type") @db.VarChar
+  paymentProviderExternalId String        @map("payment_provider_external_id") @db.VarChar
+  status                    OrderStatus   @map("status")
+  createdAt                 DateTime      @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt                 DateTime      @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  product                   Product       @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  promoCode                 PromoCode?    @relation(fields: [promoCodeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user                      User          @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  transactions              Transaction[]
+
+  @@index([userId])
+  @@map("orders")
 }
 
-model password_recovery {
-  id         String   @id @default(uuid()) @db.Uuid
-  user_id    String   @db.Uuid
-  code       String   @db.VarChar
-  expires_at DateTime @db.Timestamp(6)
-  created_at DateTime @default(now()) @db.Timestamp(6)
-  updated_at DateTime @default(now()) @updatedAt @db.Timestamp(6)
-  users      users    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model PasswordRecovery {
+  id        String   @id @default(uuid()) @map("id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  code      String   @map("code") @db.VarChar
+  expiresAt DateTime @map("expires_at") @db.Timestamp(6)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([userId])
+  @@map("password_recovery")
 }
 
-model plans {
-  id            String          @id @default(uuid()) @db.Uuid
-  name          String          @db.VarChar
-  config        Json            @db.JsonB
-  price         Decimal         @db.Decimal
-  currency      String          @db.VarChar
-  is_available  Boolean         @db.Boolean
-  created_at    DateTime        @default(now()) @db.Timestamp(6)
-  updated_at    DateTime        @db.Timestamp(6)
-  subscriptions subscriptions[]
+model Plan {
+  id            String         @id @default(uuid()) @map("id") @db.Uuid
+  name          String         @map("name") @db.VarChar
+  config        Json           @map("config") @db.JsonB
+  price         Decimal        @map("price") @db.Decimal
+  currency      Currency       @map("currency")
+  isAvailable   Boolean        @map("is_available") @db.Boolean
+  createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime       @map("updated_at") @db.Timestamp(6)
+  subscriptions Subscription[]
+
+  @@map("plans")
 }
 
-model products {
-  id           String   @id @default(uuid()) @db.Uuid
-  name         String   @db.VarChar
-  config       Json     @db.JsonB
-  price        Decimal  @db.Decimal
-  currency     String   @db.VarChar
-  stock        Int      @db.Integer
-  max_stock    Int      @db.Integer
-  is_available Boolean  @db.Boolean
-  created_at   DateTime @default(now()) @db.Timestamp(6)
-  updated_at   DateTime @default(now()) @updatedAt @db.Timestamp(6)
-  orders       orders[]
+model Product {
+  id          String   @id @default(uuid()) @map("id") @db.Uuid
+  name        String   @map("name") @db.VarChar
+  config      Json     @map("config") @db.JsonB
+  price       Decimal  @map("price") @db.Decimal
+  currency    Currency @map("currency")
+  stock       Int      @map("stock") @db.Integer
+  maxStock    Int      @map("max_stock") @db.Integer
+  isAvailable Boolean  @map("is_available") @db.Boolean
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  orders      Order[]
+
+  @@map("products")
 }
 
-model projects {
-  id           String   @id @default(uuid()) @db.Uuid
-  team_id      String   @db.Uuid
-  name         String   @db.VarChar
-  delete_after DateTime @db.Timestamp(6)
-  created_at   DateTime @default(now()) @db.Timestamp(6)
-  updated_at   DateTime @default(now()) @updatedAt @db.Timestamp(6)
-  teams        teams    @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model Project {
+  id          String   @id @default(uuid()) @map("id") @db.Uuid
+  teamId      String   @map("team_id") @db.Uuid
+  name        String   @map("name") @db.VarChar
+  deleteAfter DateTime @map("delete_after") @db.Timestamp(6)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([teamId])
+  @@map("projects")
 }
 
-model promo_codes {
-  id            String          @id @default(uuid()) @db.Uuid
-  code          String          @db.VarChar
-  value         Int             @db.Integer
-  type          String          @db.VarChar
-  max_usage     Int             @db.Integer
-  current_usage Int             @db.Integer
-  created_at    DateTime        @default(now()) @db.Timestamp(6)
-  updated_at    DateTime        @default(now()) @updatedAt @db.Timestamp(6)
-  orders        orders[]
-  subscriptions subscriptions[]
+model PromoCode {
+  id            String         @id @default(uuid()) @map("id") @db.Uuid
+  code          String         @map("code") @db.VarChar
+  value         Int            @map("value") @db.Integer
+  type          String         @map("type") @db.VarChar
+  maxUsage      Int            @map("max_usage") @db.Integer
+  currentUsage  Int            @map("current_usage") @db.Integer
+  createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime       @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  orders        Order[]
+  subscriptions Subscription[]
+
+  @@index([code])
+  @@map("promo_codes")
 }
 
-model referrals {
-  id             String          @id @default(uuid()) @db.Uuid
-  user_id        String          @db.Uuid
-  transaction_id String          @db.Uuid
-  status         referral_status
-  fee            Decimal         @db.Decimal
-  currency       String          @db.VarChar
-  created_at     DateTime        @default(now()) @db.Timestamp(6)
-  updated_at     DateTime        @default(now()) @updatedAt @db.Timestamp(6)
-  transactions   transactions    @relation(fields: [transaction_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  users          users           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model Referral {
+  id            String         @id @default(uuid()) @map("id") @db.Uuid
+  userId        String         @map("user_id") @db.Uuid
+  transactionId String         @map("transaction_id") @db.Uuid
+  status        ReferralStatus @map("status")
+  fee           Decimal        @map("fee") @db.Decimal
+  currency      Currency       @map("currency")
+  createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime       @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  transaction   Transaction    @relation(fields: [transactionId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([userId])
+  @@map("referrals")
 }
 
-model sessions {
-  id                 String        @id @default(uuid()) @db.Uuid
-  user_id            String        @db.Uuid
-  auth_provider_type auth_provider
-  user_agent         String        @db.VarChar
-  ip_address         String        @db.Inet
-  refresh_token      String        @db.VarChar
-  revoked_at         DateTime?     @db.Timestamp(6)
-  expires_at         DateTime      @db.Timestamp(6)
-  created_at         DateTime      @default(now()) @db.Timestamp(6)
-  updated_at         DateTime      @default(now()) @updatedAt @db.Timestamp(6)
-  users              users         @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model Session {
+  id                    String       @id @default(uuid()) @map("id") @db.Uuid
+  userId                String       @map("user_id") @db.Uuid
+  authProviderType      AuthProvider @map("auth_provider_type")
+  userAgent             String       @map("user_agent") @db.VarChar
+  ipAddress             String       @map("ip_address") @db.Inet
+  refreshTokenSecretKey String       @map("refresh_token_secret_key") @db.VarChar
+  revokedAt             DateTime?    @map("revoked_at") @db.Timestamp(6)
+  expiresAt             DateTime     @map("expires_at") @db.Timestamp(6)
+  createdAt             DateTime     @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt             DateTime     @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  user                  User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([userId])
+  @@map("sessions")
 }
 
-model subscriptions {
-  id                           String              @id @default(uuid()) @db.Uuid
-  team_id                      String              @db.Uuid
-  plan_id                      String              @db.Uuid
-  amount                       Decimal             @db.Decimal
-  currency                     String              @db.VarChar
-  promo_code_id                String?             @db.Uuid
-  payment_provider_type        String              @db.VarChar
-  payment_provider_external_id String              @db.VarChar
-  status                       subscription_status
-  first_billed_at              DateTime            @db.Timestamp(6)
-  next_billed_at               DateTime            @db.Timestamp(6)
-  billing_cycle_interval       Int                 @db.Integer
-  cancelled_at                 DateTime?           @db.Timestamp(6)
-  created_at                   DateTime            @default(now()) @db.Timestamp(6)
-  updated_at                   DateTime            @default(now()) @updatedAt @db.Timestamp(6)
-  plans                        plans               @relation(fields: [plan_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  promo_codes                  promo_codes?        @relation(fields: [promo_code_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  teams                        teams               @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  transactions                 transactions[]
+model Subscription {
+  id                        String             @id @default(uuid()) @map("id") @db.Uuid
+  teamId                    String             @map("team_id") @db.Uuid
+  planId                    String             @map("plan_id") @db.Uuid
+  amount                    Decimal            @map("amount") @db.Decimal
+  currency                  Currency           @map("currency")
+  promoCodeId               String?            @map("promo_code_id") @db.Uuid
+  paymentProviderType       String             @map("payment_provider_type") @db.VarChar
+  paymentProviderExternalId String             @map("payment_provider_external_id") @db.VarChar
+  status                    SubscriptionStatus @map("status")
+  firstBilledAt             DateTime           @map("first_billed_at") @db.Timestamp(6)
+  nextBilledAt              DateTime           @map("next_billed_at") @db.Timestamp(6)
+  billingCycleInterval      Int                @map("billing_cycle_interval") @db.Integer
+  cancelledAt               DateTime?          @map("cancelled_at") @db.Timestamp(6)
+  createdAt                 DateTime           @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt                 DateTime           @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  plans                     Plan               @relation(fields: [planId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  promoCode                 PromoCode?         @relation(fields: [promoCodeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  team                      Team               @relation(fields: [teamId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  transactions              Transaction[]
+
+  @@index([teamId])
+  @@map("subscriptions")
 }
 
-model teams {
-  id            String          @id @default(uuid()) @db.Uuid
-  name          String          @db.VarChar
-  delete_after  DateTime        @db.Timestamp(6)
-  created_at    DateTime        @default(now()) @db.Timestamp(6)
-  updated_at    DateTime        @default(now()) @updatedAt @db.Timestamp(6)
-  invitations   invitations[]
-  projects      projects[]
-  subscriptions subscriptions[]
-  users_teams   users_teams[]
+model Team {
+  id            String         @id @default(uuid()) @map("id") @db.Uuid
+  name          String         @map("name") @db.VarChar
+  deleteAfter   DateTime       @map("delete_after") @db.Timestamp(6)
+  createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime       @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  invitations   Invitation[]
+  projects      Project[]
+  subscriptions Subscription[]
+  usersTeams    UserTeam[]
+
+  @@map("teams")
 }
 
-model transactions {
-  id                   String           @id @default(uuid()) @db.Uuid
-  subscription_id      String?          @db.Uuid
-  order_id             String?          @db.Uuid
-  method               String           @db.VarChar
-  amount               Decimal          @db.Decimal
-  currency             String           @db.VarChar
-  status               payment_status
-  provider_type        payment_provider
-  provider_external_id String           @db.VarChar
-  paid_at              DateTime?        @db.Timestamp(6)
-  chargeback_at        DateTime?        @db.Timestamp(6)
-  created_at           DateTime         @default(now()) @db.Timestamp(6)
-  updated_at           DateTime         @default(now()) @updatedAt @db.Timestamp(6)
-  referrals            referrals[]
-  orders               orders?          @relation(fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  subscriptions        subscriptions?   @relation(fields: [subscription_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model Transaction {
+  id                 String          @id @default(uuid()) @map("id") @db.Uuid
+  subscriptionId     String?         @map("subscription_id") @db.Uuid
+  orderId            String?         @map("order_id") @db.Uuid
+  method             String          @map("method") @db.VarChar
+  amount             Decimal         @map("amount") @db.Decimal
+  currency           Currency        @map("currency")
+  status             PaymentStatus   @map("status")
+  providerType       PaymentProvider @map("provider_type")
+  providerExternalId String          @map("provider_external_id") @db.VarChar
+  paidAt             DateTime?       @map("paid_at") @db.Timestamp(6)
+  chargebackAt       DateTime?       @map("chargeback_at") @db.Timestamp(6)
+  createdAt          DateTime        @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt          DateTime        @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  referrals          Referral[]
+  order              Order?          @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subscription       Subscription?   @relation(fields: [subscriptionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([orderId, subscriptionId])
+  @@map("transactions")
 }
 
-model users {
-  id                            String               @id @default(uuid()) @db.Uuid
-  email                         String               @unique @db.VarChar
-  role                          user_role
-  password                      String               @db.VarChar
-  salt                          String               @db.VarChar
-  iterations                    Int                  @db.Integer
-  auth_provider_external_id     String?              @db.VarChar
-  auth_provider_type            auth_provider
-  register_ip                   String               @db.Inet
-  totp_added_at                 DateTime?            @db.Timestamp(6)
-  totp_token                    String?              @db.VarChar
-  address                       String?              @db.VarChar
-  phone                         String?              @db.VarChar
-  country                       String?              @db.VarChar
-  fullname                      String?              @db.VarChar
-  display_name                  String               @db.VarChar
-  avatar_url                    String?              @db.VarChar
-  newsletter_consent_granted_at DateTime?            @db.Timestamp(6)
-  marketing_consent_granted_at  DateTime?            @db.Timestamp(6)
-  verified_at                   DateTime?            @db.Timestamp(6)
-  disabled_at                   DateTime?            @db.Timestamp(6)
-  created_at                    DateTime             @default(now()) @db.Timestamp(6)
-  updated_at                    DateTime             @default(now()) @updatedAt @db.Timestamp(6)
-  contact                       contact[]
-  email_verification            email_verification[]
-  invitations                   invitations[]
-  orders                        orders[]
-  password_recovery             password_recovery[]
-  referrals                     referrals[]
-  sessions                      sessions[]
-  users_teams                   users_teams[]
+model User {
+  id                         String              @id @default(uuid()) @map("id") @db.Uuid
+  email                      String              @unique @map("email") @db.VarChar
+  role                       UserGlobalRole      @default(user) @map("role")
+  password                   String              @map("password") @db.VarChar
+  salt                       String              @map("salt") @db.VarChar
+  iterations                 Int                 @map("iterations") @db.Integer
+  authProviderExternalId     String?             @map("auth_provider_external_id") @db.VarChar
+  authProviderType           AuthProvider        @map("auth_provider_type")
+  registerIp                 String              @map("register_ip") @db.Inet
+  totpAddedAt                DateTime?           @map("totp_added_at") @db.Timestamp(6)
+  totpToken                  String?             @map("totp_token") @db.VarChar
+  address                    String?             @map("address") @db.VarChar
+  phone                      String?             @map("phone") @db.VarChar
+  country                    String?             @map("country") @db.VarChar
+  fullname                   String?             @map("fullname") @db.VarChar
+  displayName                String              @map("display_name") @db.VarChar
+  avatarUrl                  String?             @map("avatar_url") @db.VarChar
+  newsletterConsentGrantedAt DateTime?           @map("newsletter_consent_granted_at") @db.Timestamp(6)
+  marketingConsentGrantedAt  DateTime?           @map("marketing_consent_granted_at") @db.Timestamp(6)
+  verifiedAt                 DateTime?           @map("verified_at") @db.Timestamp(6)
+  disabledAt                 DateTime?           @map("disabled_at") @db.Timestamp(6)
+  createdAt                  DateTime            @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt                  DateTime            @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  contact                    Contact[]
+  emailVerification          EmailVerification[]
+  invitations                Invitation[]
+  orders                     Order[]
+  passwordRecovery           PasswordRecovery[]
+  referrals                  Referral[]
+  sessions                   Session[]
+  user_teams                 UserTeam[]
 
-  @@unique([auth_provider_external_id, auth_provider_type])
+  @@unique([authProviderExternalId, authProviderType])
+  @@index([email])
+  @@map("users")
 }
 
-model users_teams {
-  id         String    @id @default(uuid()) @db.Uuid
-  user_id    String?   @db.Uuid
-  team_id    String?   @db.Uuid
-  role       team_role
-  created_at DateTime  @default(now()) @db.Timestamp(6)
-  updated_at DateTime  @default(now()) @updatedAt @db.Timestamp(6)
-  teams      teams?    @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  users      users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model UserTeam {
+  // id        String       @id @default(uuid()) @map("id") @db.Uuid
+  userId    String       @map("user_id") @db.Uuid
+  teamId    String       @map("team_id") @db.Uuid
+  role      UserTeamRole @map("role")
+  createdAt DateTime     @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime     @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  team      Team?        @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user      User?        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@unique([user_id, team_id])
+  @@id([userId, teamId])
+  // @@unique([userId, teamId])
+  // @@index([userId, teamId])
+  @@map("users_teams")
 }
 
-enum auth_provider {
-  email
-  facebook
-  google
-  twitter
-  github
-  gitlab
-  bitbucket
-  apple
+enum AuthProvider {
+  email     @map("email")
+  facebook  @map("facebook")
+  google    @map("google")
+  twitter   @map("twitter")
+  github    @map("github")
+  gitlab    @map("gitlab")
+  bitbucket @map("bitbucket")
+  apple     @map("apple")
+
+  @@map("auth_provider")
 }
 
-enum order_status {
-  pending
-  completed
-  cancelled
-  failed
+enum OrderStatus {
+  pending   @map("pending")
+  completed @map("completed")
+  cancelled @map("cancelled")
+  failed    @map("failed")
+
+  @@map("order_status")
 }
 
-enum payment_provider {
-  paddle
-  stripe
-  przelewy24
-  hotpay
-  paypal
+enum PaymentProvider {
+  paddle     @map("paddle")
+  stripe     @map("stripe")
+  przelewy24 @map("przelewy24")
+  hotpay     @map("hotpay")
+  paypal     @map("paypal")
+
+  @@map("payment_provider")
 }
 
-enum payment_status {
-  pending
-  paid
-  failed
-  chargeback
+enum PaymentStatus {
+  pending    @map("pending")
+  paid       @map("paid")
+  failed     @map("failed")
+  chargeback @map("chargeback")
+
+  @@map("payment_status")
 }
 
-enum referral_status {
-  pending
-  accepted
-  rejected
+enum ReferralStatus {
+  pending  @map("pending")
+  accepted @map("accepted")
+  rejected @map("rejected")
+
+  @@map("referral_status")
 }
 
-enum subscription_status {
-  active
-  cancelled
-  failed
+enum SubscriptionStatus {
+  active    @map("active")
+  cancelled @map("cancelled")
+  failed    @map("failed")
+
+  @@map("subscription_status")
 }
 
-enum team_role {
-  owner
-  editor
-  viewer
+enum UserTeamRole {
+  owner  @map("owner")
+  editor @map("editor")
+  viewer @map("viewer")
+
+  @@map("user_team_role")
 }
 
-enum user_role {
-  user
-  moderator
-  admin
+enum UserGlobalRole {
+  user      @map("user")
+  moderator @map("moderator")
+  admin     @map("admin")
+
+  @@map("user_global_role")
+}
+
+enum Currency {
+  pln @map("pln")
+  usd @map("usd")
+  eur @map("eur")
+  gbp @map("gbp")
+  chf @map("chf")
+
+  @@map("currency")
 }

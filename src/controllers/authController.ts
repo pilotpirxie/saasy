@@ -26,7 +26,7 @@ export function getTokens({
   userId: string;
   session: {
     id: string;
-    refresh_token: string;
+    refreshTokenSecretKey: string;
   };
   jwtInfo: JwtInfo;
 }) {
@@ -45,7 +45,7 @@ export function getTokens({
       sub: userId,
       jti: session.id,
     },
-    session.refresh_token,
+    session.refreshTokenSecretKey,
     {
       expiresIn: jwtInfo.refreshTokenTimeout,
     },
@@ -77,14 +77,14 @@ export async function createSession({
     | "apple";
   jwtInfo: JwtInfo;
 }): Promise<{ jwtToken: string; jwtRefreshToken: string }> {
-  const session = await prisma.sessions.create({
+  const session = await prisma.session.create({
     data: {
-      user_id: userId,
-      ip_address: ip,
-      refresh_token: crypto.randomBytes(32).toString("hex"),
-      user_agent: userAgent,
-      expires_at: dayjs().add(ms(jwtInfo.timeout), "millisecond").toDate(),
-      auth_provider_type: authProviderType,
+      userId,
+      ipAddress: ip,
+      refreshTokenSecretKey: crypto.randomBytes(32).toString("hex"),
+      userAgent,
+      expiresAt: dayjs().add(ms(jwtInfo.timeout), "millisecond").toDate(),
+      authProviderType,
     },
   });
 
@@ -116,21 +116,21 @@ export default function getAuthController({
     },
   };
 
-  router.get(
+  router.post(
     "/login",
     validation(loginSchema),
     async (req: TypedRequest<typeof loginSchema>, res, next) => {
       try {
         const { email, password, totpCode } = req.body;
 
-        const user = await prisma.users.findFirst({
+        const user = await prisma.user.findFirst({
           select: {
             id: true,
             password: true,
             salt: true,
             iterations: true,
-            totp_added_at: true,
-            totp_token: true,
+            totpAddedAt: true,
+            totpToken: true,
           },
           where: {
             email,
@@ -153,12 +153,12 @@ export default function getAuthController({
           return res.sendStatus(401);
         }
 
-        if (user.totp_added_at && user.totp_token) {
+        if (user.totpAddedAt && user.totpToken) {
           if (!totpCode) {
             return res.sendStatus(401);
           }
 
-          const expectedTotpCode = totp(user.totp_token);
+          const expectedTotpCode = totp(user.totpToken);
 
           if (expectedTotpCode !== totpCode) {
             return res.sendStatus(401);
@@ -177,8 +177,44 @@ export default function getAuthController({
         });
 
         return res.json({
-          access_token: jwtToken,
-          refresh_token: jwtRefreshToken,
+          accessToken: jwtToken,
+          refreshToken: jwtRefreshToken,
+        });
+      } catch (error) {
+        return next(error);
+      }
+    },
+  );
+
+  const totpStatusSchema = {
+    body: {
+      email: Joi.string().email().required(),
+    },
+  };
+
+  router.post(
+    "/totp-status",
+    validation(totpStatusSchema),
+    async (req: TypedRequest<typeof totpStatusSchema>, res, next) => {
+      try {
+        const { email } = req.body;
+
+        const user = await prisma.user.findFirst({
+          select: {
+            id: true,
+            totpAddedAt: true,
+          },
+          where: {
+            email,
+          },
+        });
+
+        if (!user) {
+          return res.sendStatus(404);
+        }
+
+        return res.json({
+          enabled: !!user.totpAddedAt,
         });
       } catch (error) {
         return next(error);
@@ -188,7 +224,7 @@ export default function getAuthController({
 
   const refreshSchema = {
     body: {
-      refresh_token: Joi.string().required(),
+      refreshToken: Joi.string().required(),
     },
   };
 
@@ -197,23 +233,22 @@ export default function getAuthController({
     validation(refreshSchema),
     async (req: TypedRequest<typeof refreshSchema>, res, next) => {
       try {
-        const { refresh_token } = req.body;
+        const { refreshToken } = req.body;
 
-        const decoded = jwt.decode(refresh_token) as {
+        const decoded = jwt.decode(refreshToken) as {
           sub: string;
           jti: string;
         };
 
-        const session = await prisma.sessions.findFirst({
+        const session = await prisma.session.findFirst({
           select: {
             id: true,
-            refresh_token: true,
-            revoked_at: true,
-            user_id: true,
+            refreshTokenSecretKey: true,
+            revokedAt: true,
           },
           where: {
             id: decoded.jti,
-            user_id: decoded.sub,
+            userId: decoded.sub,
           },
         });
 
@@ -221,22 +256,22 @@ export default function getAuthController({
           return res.sendStatus(401);
         }
 
-        if (session.revoked_at) {
+        if (session.revokedAt) {
           return res.sendStatus(401);
         }
 
         try {
-          jwt.verify(refresh_token, session.refresh_token);
+          jwt.verify(refreshToken, session.refreshTokenSecretKey);
         } catch (error) {
           return res.sendStatus(401);
         }
 
-        const user = await prisma.users.findFirst({
+        const user = await prisma.user.findFirst({
           select: {
             id: true,
           },
           where: {
-            id: session.user_id,
+            id: decoded.sub,
           },
         });
 
@@ -256,8 +291,8 @@ export default function getAuthController({
         });
 
         return res.json({
-          access_token: jwtToken,
-          refresh_token: jwtRefreshToken,
+          accessToken: jwtToken,
+          refreshToken: jwtRefreshToken,
         });
       } catch (error) {
         return next(error);
@@ -267,7 +302,7 @@ export default function getAuthController({
 
   const logoutSchema = {
     body: {
-      refresh_token: Joi.string().required(),
+      refreshToken: Joi.string().required(),
     },
   };
 
@@ -276,23 +311,22 @@ export default function getAuthController({
     validation(logoutSchema),
     async (req: TypedRequest<typeof logoutSchema>, res, next) => {
       try {
-        const { refresh_token } = req.body;
+        const { refreshToken } = req.body;
 
-        const decoded = jwt.decode(refresh_token) as {
+        const decoded = jwt.decode(refreshToken) as {
           sub: string;
           jti: string;
         };
 
-        const session = await prisma.sessions.findFirst({
+        const session = await prisma.session.findFirst({
           select: {
             id: true,
-            refresh_token: true,
-            revoked_at: true,
-            user_id: true,
+            refreshTokenSecretKey: true,
+            revokedAt: true,
           },
           where: {
             id: decoded.jti,
-            user_id: decoded.sub,
+            userId: decoded.sub,
           },
         });
 
@@ -300,13 +334,13 @@ export default function getAuthController({
           return res.sendStatus(401);
         }
 
-        await prisma.sessions.update({
+        await prisma.session.update({
           data: {
-            revoked_at: dayjs().toDate(),
+            revokedAt: dayjs().toDate(),
           },
           where: {
             id: session.id,
-            user_id: session.user_id,
+            userId: decoded.sub,
           },
         });
 
@@ -331,7 +365,7 @@ export default function getAuthController({
       try {
         const { email, password } = req.body;
 
-        const possibleUser = await prisma.users.findFirst({
+        const possibleUser = await prisma.user.findFirst({
           select: {
             id: true,
           },
@@ -345,7 +379,7 @@ export default function getAuthController({
         }
 
         const salt = crypto.randomBytes(16).toString("hex");
-        const iterations = 600_000;
+        const iterations = 600000;
         const hashedPassword = pbkdf2Sync(
           password,
           salt,
@@ -354,22 +388,22 @@ export default function getAuthController({
           "sha512",
         ).toString("hex");
 
-        const user = await prisma.users.create({
+        const user = await prisma.user.create({
           data: {
             email,
             password: hashedPassword,
             salt,
             iterations,
-            display_name: email.split("@")[0],
+            displayName: email.split("@")[0],
             role: "user",
-            register_ip: getIp(req),
-            auth_provider_type: "email",
+            registerIp: getIp(req),
+            authProviderType: "email",
           },
         });
 
-        const emailVerification = await prisma.email_verification.create({
+        const emailVerification = await prisma.emailVerification.create({
           data: {
-            user_id: user.id,
+            userId: user.id,
             code: crypto.randomBytes(32).toString("hex"),
             email,
           },
@@ -380,7 +414,7 @@ export default function getAuthController({
           subject: "Verify your email",
           html: emailTemplatesService.getVerifyEmailTemplate({
             code: emailVerification.code,
-            username: user.display_name,
+            username: user.displayName,
             userId: user.id,
           }),
         });
@@ -394,7 +428,7 @@ export default function getAuthController({
 
   const verifyEmailSchema = {
     body: {
-      user_id: Joi.string().required(),
+      userId: Joi.string().required(),
       code: Joi.string().required(),
     },
   };
@@ -404,16 +438,16 @@ export default function getAuthController({
     validation(verifyEmailSchema),
     async (req: TypedRequest<typeof verifyEmailSchema>, res, next) => {
       try {
-        const { code, user_id } = req.body;
+        const { code, userId } = req.body;
 
-        const verificationCode = await prisma.email_verification.findFirst({
+        const verificationCode = await prisma.emailVerification.findFirst({
           select: {
             id: true,
-            user_id: true,
+            userId: true,
           },
           where: {
             code,
-            user_id,
+            userId,
           },
         });
 
@@ -421,12 +455,12 @@ export default function getAuthController({
           return res.sendStatus(404);
         }
 
-        await prisma.users.update({
+        await prisma.user.update({
           data: {
-            verified_at: dayjs().toDate(),
+            verifiedAt: dayjs().toDate(),
           },
           where: {
-            id: verificationCode.user_id,
+            id: verificationCode.userId,
           },
         });
 
@@ -439,7 +473,7 @@ export default function getAuthController({
 
   const resendVerification = {
     body: {
-      email: Joi.string().required(),
+      email: Joi.string().email().required(),
     },
   };
 
@@ -450,14 +484,14 @@ export default function getAuthController({
       try {
         const { email } = req.body;
 
-        const user = await prisma.users.findFirst({
+        const user = await prisma.user.findFirst({
           select: {
             id: true,
-            display_name: true,
+            displayName: true,
           },
           where: {
             email,
-            verified_at: null,
+            verifiedAt: null,
           },
         });
 
@@ -465,9 +499,9 @@ export default function getAuthController({
           return res.sendStatus(400);
         }
 
-        const emailVerification = await prisma.email_verification.create({
+        const emailVerification = await prisma.emailVerification.create({
           data: {
-            user_id: user.id,
+            userId: user.id,
             code: crypto.randomBytes(32).toString("hex"),
             email,
           },
@@ -478,7 +512,7 @@ export default function getAuthController({
           subject: "Verify your email",
           html: emailTemplatesService.getVerifyEmailTemplate({
             code: emailVerification.code,
-            username: user.display_name,
+            username: user.displayName,
             userId: user.id,
           }),
         });
