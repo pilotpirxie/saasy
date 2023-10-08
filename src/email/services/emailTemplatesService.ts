@@ -25,12 +25,12 @@ export class EmailTemplatesService implements EmailTemplates {
     invoiceUrl: string;
     description: string
   }): string {
-    const invoiceTemplate = fs.readFileSync(path.join(__dirname, "../emailTemplates/invoice.hbs"), "utf8");
+    const invoiceTemplate = fs.readFileSync(path.join(__dirname, "../templates/invoice.hbs"), "utf8");
     return handlebars.compile(invoiceTemplate)(options);
   }
 
   getVerifyEmailTemplate(options: { username: string; userId: string, code: string }): string {
-    const invoiceTemplate = fs.readFileSync(path.join(__dirname, "../emailTemplates/verify.hbs"), "utf8");
+    const invoiceTemplate = fs.readFileSync(path.join(__dirname, "../templates/verify.hbs"), "utf8");
     return handlebars.compile(invoiceTemplate)({
       baseUrl: this.baseUrl,
       companyName: this.companyName,

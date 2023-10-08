@@ -41,11 +41,3 @@ export interface TypedRequest<A extends RequestPayload> extends Request {
   params: Required<PayloadDictionary<A["params"]>> & Omit<ParamsDictionary, never>;
   query: Required<PayloadDictionary<A["query"]>> & Omit<Query, never>;
 }
-
-declare global {
-  namespace Express {
-    interface Request {
-      userId?: number;
-    }
-  }
-}

@@ -3,36 +3,14 @@ import { Router } from "express";
 import Joi from "joi";
 import dayjs from "dayjs";
 import url from "url";
-import validation from "../middlewares/validation";
-import { TypedRequest } from "../types/express";
-import { getIp } from "../utils/getIp";
-import { createSession, JwtInfo } from "./authController";
+import validation from "../../shared/middlewares/validation";
+import { TypedRequest } from "../../shared/types/express";
+import { getIp } from "../../shared/utils/getIp";
+import { JwtInfo } from "../utils/jwtInfo";
+import { createSession } from "../utils/sessionManager";
+import { redirectWithCode, redirectWithError } from "../utils/redirectManager";
 
-function redirectWithCode({
-  callbackUrl,
-  code,
-}: {
-  callbackUrl: string;
-  code: string;
-}) {
-  const urlToRedirect = new URL(callbackUrl);
-  urlToRedirect.searchParams.append("code", code);
-  return urlToRedirect.toString();
-}
-
-function redirectWithError({
-  callbackUrl,
-  error,
-}: {
-  callbackUrl: string;
-  error: string;
-}) {
-  const urlToRedirect = new URL(callbackUrl);
-  urlToRedirect.searchParams.append("error", error);
-  return urlToRedirect.toString();
-}
-
-export default function getSocialAuthController({
+export default function getSocialController({
   jwtInfo,
   prisma,
   socialAuthProviders,
@@ -346,10 +324,10 @@ export default function getSocialAuthController({
           },
         });
 
-        const urlToRedirect = new URL(callbackUrl);
-        urlToRedirect.searchParams.append("code", authorizationCode.id);
-
-        return res.redirect(urlToRedirect.toString());
+        return res.redirect(redirectWithCode({
+          callbackUrl,
+          code: authorizationCode.id,
+        }));
       } catch (error) {
         return next(error);
       }

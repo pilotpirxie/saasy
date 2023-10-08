@@ -3,14 +3,13 @@ import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import NodeCache from "node-cache";
 import cors from "cors";
-import { errorHandler } from "./middlewares/errors";
+import { errorHandler } from "./shared/middlewares/errors";
 import { checkPrismaConnection } from "./data/prismaConnectionTest";
 import { usePrismaClientFactory } from "./data/prismaClientFactory";
 import { NodeCacheAdapter } from "./data/cacheStore";
-import getAuthController from "./controllers/authController";
-import { NodemailerEmailService } from "./services/nodemailerEmailService";
-import { EmailTemplatesService } from "./services/emailTemplatesService";
-import getSocialAuthController from "./controllers/socialAuthController";
+import initializeAuthController from "./auth/controllers";
+import { NodemailerEmailService } from "./email/services/nodemailerEmailService";
+import { EmailTemplatesService } from "./email/services/emailTemplatesService";
 
 dotenv.config();
 
@@ -66,7 +65,7 @@ app.get(
   },
 );
 
-app.use("/api/auth", getAuthController({
+app.use("/api/auth", initializeAuthController({
   jwtInfo: {
     secret: process.env.JWT_SECRET || "",
     refreshTokenTimeout: process.env.JWT_REFRESH_TOKEN_TIMEOUT || "1d",
@@ -74,15 +73,6 @@ app.use("/api/auth", getAuthController({
   },
   emailService,
   emailTemplatesService: emailTemplates,
-  prisma,
-}));
-
-app.use("/api/auth", getSocialAuthController({
-  jwtInfo: {
-    secret: process.env.JWT_SECRET || "",
-    refreshTokenTimeout: process.env.JWT_REFRESH_TOKEN_TIMEOUT || "1d",
-    timeout: process.env.JWT_TIMEOUT || "1h",
-  },
   prisma,
   baseUrl: "http://localhost:3000",
   callbackUrl: "http://localhost:3000/oauth/callback",
