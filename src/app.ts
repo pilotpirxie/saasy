@@ -8,6 +8,8 @@ import { checkPrismaConnection } from "./data/prismaConnectionTest";
 import { usePrismaClientFactory } from "./data/prismaClientFactory";
 import { NodeCacheAdapter } from "./data/cacheStore";
 import getAuthController from "./controllers/authController";
+import { NodemailerEmailService } from "./services/nodemailerEmailService";
+import { EmailTemplatesService } from "./services/emailTemplatesService";
 
 dotenv.config();
 
@@ -34,6 +36,27 @@ const cache = new NodeCacheAdapter({
   nodeCache,
 });
 
+const emailService = new NodemailerEmailService({
+  smtpConfig: {
+    host: process.env.SMTP_HOST || "",
+    port: parseInt(process.env.SMTP_PORT || "0", 10),
+    auth: {
+      user: process.env.SMTP_USER || "",
+      password: process.env.SMTP_PASSWORD || "",
+    },
+    tls: {
+      rejectUnauthorized: process.env.SMTP_REJECT_UNAUTHORIZED === "true",
+    },
+    secure: process.env.SMTP_SECURE === "true",
+  },
+  from: "Company Name <company@example.com>",
+});
+
+const emailTemplates = new EmailTemplatesService({
+  baseUrl: "http://localhost:3000",
+  companyName: "Company Name",
+});
+
 app.get(
   "/api/health",
   async (req, res) => {
@@ -43,13 +66,13 @@ app.get(
 );
 
 app.use("/api/auth", getAuthController({
-  config: {
-    jwtInfo: {
-      secret: process.env.JWT_SECRET || "",
-      refreshTokenTimeout: process.env.JWT_REFRESH_TOKEN_TIMEOUT || "1d",
-      timeout: process.env.JWT_TIMEOUT || "1h",
-    },
+  jwtInfo: {
+    secret: process.env.JWT_SECRET || "",
+    refreshTokenTimeout: process.env.JWT_REFRESH_TOKEN_TIMEOUT || "1d",
+    timeout: process.env.JWT_TIMEOUT || "1h",
   },
+  emailService,
+  emailTemplatesService: emailTemplates,
   prisma,
 }));
 

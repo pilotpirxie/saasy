@@ -9,6 +9,8 @@ import ms from "ms";
 import validation from "../middlewares/validation";
 import { TypedRequest } from "../types/express";
 import { getIp } from "../utils/getIp";
+import { EmailService } from "../services/emailService";
+import { EmailTemplates } from "../services/emailTemplates";
 
 export type JwtInfo = {
   secret: string;
@@ -94,13 +96,15 @@ export async function createSession({
 }
 
 export default function getAuthController({
-  config,
+  jwtInfo,
   prisma,
+  emailService,
+  emailTemplatesService,
 }: {
-  config: {
-    jwtInfo: JwtInfo;
-  };
+  jwtInfo: JwtInfo;
   prisma: PrismaClient;
+  emailService: EmailService;
+  emailTemplatesService: EmailTemplates;
 }): Router {
   const router = Router();
 
@@ -159,7 +163,7 @@ export default function getAuthController({
           prisma,
           userId: user.id,
           ip,
-          jwtInfo: config.jwtInfo,
+          jwtInfo,
           userAgent: req.headers["user-agent"] || "",
           authProviderType: "email",
         });
@@ -229,7 +233,7 @@ export default function getAuthController({
           prisma,
           userId: user.id,
           ip,
-          jwtInfo: config.jwtInfo,
+          jwtInfo,
           userAgent: req.headers["user-agent"] || "",
           authProviderType: "email",
         });
@@ -337,11 +341,21 @@ export default function getAuthController({
           },
         });
 
-        await prisma.email_verification.create({
+        const emailVerification = await prisma.email_verification.create({
           data: {
             user_id: user.id,
             code: crypto.randomBytes(32).toString("hex"),
           },
+        });
+
+        emailService.sendEmail({
+          to: email,
+          subject: "Verify your email",
+          html: emailTemplatesService.getVerifyEmailTemplate({
+            code: emailVerification.code,
+            username: user.display_name,
+            userId: user.id,
+          }),
         });
 
         return res.sendStatus(201);
