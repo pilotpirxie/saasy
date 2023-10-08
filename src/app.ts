@@ -75,6 +75,7 @@ app.use("/api/auth", getAuthController({
   emailTemplatesService: emailTemplates,
   prisma,
   baseUrl: "http://localhost:3000",
+  callbackUrl: "http://localhost:3000/oauth/callback",
   socialAuthProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID || "",
