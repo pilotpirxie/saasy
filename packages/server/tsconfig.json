@@ -11,5 +11,7 @@
     "strictPropertyInitialization": false,
     "outDir": "./dist"
   },
-  "include": ["src/**/*"],
+  "include": [
+    "server/src/**/*"
+  ],
 }
