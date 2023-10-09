@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
 import Joi from "joi";
 import crypto from "crypto";
+import dayjs from "dayjs";
 import { EmailService } from "../../email/services/emailService";
 import { EmailTemplates } from "../../email/services/emailTemplates";
 import jwtVerify from "../../shared/middlewares/jwt";
@@ -127,22 +128,6 @@ export default function getAccountController({
       try {
         const { newEmail } = req.body;
 
-        const possibleUser = await prisma.user.findFirst({
-          select: {
-            id: true,
-          },
-          where: {
-            email: newEmail,
-          },
-        });
-
-        if (possibleUser) {
-          return res.status(409).json({
-            message: "Email already exists",
-            error: "EmailAlreadyExists",
-          });
-        }
-
         const user = await prisma.user.findFirst({
           select: {
             id: true,
@@ -172,11 +157,26 @@ export default function getAccountController({
           });
         }
 
+        const possibleUser = await prisma.user.findFirst({
+          select: {
+            id: true,
+          },
+          where: {
+            email: newEmail,
+          },
+        });
+
+        if (possibleUser) {
+          return res.status(409).json({
+            message: "Email already exists",
+            error: "EmailAlreadyExists",
+          });
+        }
+
         const emailVerification = await prisma.emailVerification.create({
           data: {
             userId: user.id,
             email: newEmail,
-            code: crypto.randomBytes(32).toString("hex"),
           },
         });
 
@@ -184,7 +184,7 @@ export default function getAccountController({
           to: newEmail,
           subject: "Verify your email",
           html: emailTemplatesService.getVerifyEmailTemplate({
-            code: emailVerification.code,
+            code: emailVerification.id,
             username: user.displayName,
             userId: user.id,
           }),
@@ -211,6 +211,58 @@ export default function getAccountController({
         return res.sendStatus(204);
       } catch (error) {
         return next(error);
+      }
+    },
+  );
+
+  const updateConsentsSchema = {
+    body: {
+      isNewsletterConsentGranted: Joi.boolean().required(),
+      isMarketingConsentGranted: Joi.boolean().required(),
+    },
+  };
+
+  router.put(
+    "/consents",
+    jwtVerify(jwtSecret),
+    validation(updateConsentsSchema),
+    async (req: TypedRequest<typeof updateConsentsSchema>, res, next) => {
+      try {
+        const { isNewsletterConsentGranted, isMarketingConsentGranted } = req.body;
+
+        await prisma.user.update({
+          where: {
+            id: req.userId,
+          },
+          data: {
+            newsletterConsentGrantedAt: isNewsletterConsentGranted ? dayjs().toDate() : null,
+            marketingConsentGrantedAt: isMarketingConsentGranted ? dayjs().toDate() : null,
+          },
+        });
+
+        return res.sendStatus(204);
+      } catch (error) {
+        return next(error);
+      }
+    },
+  );
+
+  router.get(
+    "/invitations",
+    jwtVerify(jwtSecret),
+    async (req, res, next) => {
+      try {
+        const { teamId } = req.params;
+
+        const invitations = await prisma.invitation.findMany({
+          where: {
+            teamId,
+          },
+        });
+
+        return res.json(invitations);
+      } catch (error) {
+        next(error);
       }
     },
   );

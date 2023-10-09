@@ -5,6 +5,8 @@ export type EmailTemplates = {
     code: string
   }): string;
 
+  getInvitationEmail(): string;
+
   getVerifyEmailTemplate(options: {
     username: string,
     userId: string,

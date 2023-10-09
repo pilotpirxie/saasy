@@ -11,6 +11,7 @@ import initializeAuthController from "./auth/controllers";
 import { NodemailerEmailService } from "./email/services/nodemailerEmailService";
 import { EmailTemplatesService } from "./email/services/emailTemplatesService";
 import initializeUserControllers from "./user/controllers";
+import initializeTeamControllers from "./teams/controllers";
 
 dotenv.config();
 
@@ -89,7 +90,14 @@ app.use("/api/auth", initializeAuthController({
   },
 }));
 
-app.use("/api/user", initializeUserControllers({
+app.use("/api/users", initializeUserControllers({
+  jwtSecret: process.env.JWT_SECRET || "",
+  emailService,
+  emailTemplatesService,
+  prisma,
+}));
+
+app.use("/api/teams", initializeTeamControllers({
   jwtSecret: process.env.JWT_SECRET || "",
   emailService,
   emailTemplatesService,

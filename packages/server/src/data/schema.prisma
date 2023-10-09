@@ -48,29 +48,31 @@ model Contact {
 model EmailVerification {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
   userId    String   @map("user_id") @db.Uuid
-  code      String   @map("code") @db.VarChar
-  email     String   @default("") @map("email") @db.VarChar
+  email     String   @map("email") @db.VarChar
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@index([userId, code])
+  @@index([userId])
   @@map("email_verification")
 }
 
 model Invitation {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
-  email     String   @map("email") @db.VarChar
-  invitedBy String   @map("invited_by") @db.Uuid
-  teamId    String   @map("team_id") @db.Uuid
-  code      String   @map("code") @db.VarChar
-  expiresAt DateTime @map("expires_at") @db.Timestamp(6)
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
-  user      User     @relation(fields: [invitedBy], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id         String       @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
+  email      String       @map("email") @db.VarChar
+  invitedBy  String       @map("invited_by") @db.Uuid
+  teamId     String       @map("team_id") @db.Uuid
+  role       UserTeamRole @map("role")
+  acceptedAt DateTime?    @map("accepted") @db.Timestamp(6)
+  expiresAt  DateTime     @map("expires_at") @db.Timestamp(6)
+  createdAt  DateTime     @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt  DateTime     @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  user       User         @relation(fields: [invitedBy], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  team       Team         @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@index([invitedBy, teamId, code])
+  @@index([id, teamId])
+  @@index([teamId])
+  @@index([email])
   @@map("invitations")
 }
 
@@ -98,7 +100,6 @@ model Order {
 model PasswordRecovery {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
   userId    String   @map("user_id") @db.Uuid
-  code      String   @map("code") @db.VarChar
   expiresAt DateTime @map("expires_at") @db.Timestamp(6)
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
@@ -139,13 +140,13 @@ model Product {
 }
 
 model Project {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
-  teamId      String   @map("team_id") @db.Uuid
-  name        String   @map("name") @db.VarChar
-  deleteAfter DateTime @map("delete_after") @db.Timestamp(6)
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
-  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
+  teamId      String    @map("team_id") @db.Uuid
+  name        String    @map("name") @db.VarChar
+  deleteAfter DateTime? @map("delete_after") @db.Timestamp(6)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  team        Team      @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([teamId])
   @@map("projects")
@@ -241,7 +242,7 @@ model Subscription {
 model Team {
   id            String         @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
   name          String         @map("name") @db.VarChar
-  deleteAfter   DateTime       @map("delete_after") @db.Timestamp(6)
+  deleteAfter   DateTime?      @map("delete_after") @db.Timestamp(6)
   createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt     DateTime       @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
   invitations   Invitation[]

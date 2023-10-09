@@ -63,7 +63,6 @@ export default function getPasswordController({
         const passwordReset = await prisma.passwordRecovery.create({
           data: {
             userId: user.id,
-            code: crypto.randomBytes(32).toString("hex"),
             expiresAt: dayjs().add(1, "hour").toDate(),
           },
         });
@@ -72,7 +71,7 @@ export default function getPasswordController({
           to: email,
           subject: "Reset your password",
           html: emailTemplatesService.getPasswordResetTemplate({
-            code: passwordReset.code,
+            code: passwordReset.id,
             username: user.displayName,
             userId: user.id,
           }),
@@ -107,7 +106,7 @@ export default function getPasswordController({
             expiresAt: true,
           },
           where: {
-            code,
+            id: code,
             userId,
           },
         });

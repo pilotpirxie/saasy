@@ -55,4 +55,12 @@ export class EmailTemplatesService implements EmailTemplates {
       ...options,
     });
   }
+
+  getInvitationEmail(): string {
+    const invoiceTemplate = fs.readFileSync(path.join(__dirname, "../templates/invitation.hbs"), "utf8");
+    return handlebars.compile(invoiceTemplate)({
+      baseUrl: this.baseUrl,
+      companyName: this.companyName,
+    });
+  }
 }

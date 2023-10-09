@@ -242,7 +242,6 @@ export default function getEmailController({
         const emailVerification = await prisma.emailVerification.create({
           data: {
             userId: user.id,
-            code: crypto.randomBytes(32).toString("hex"),
             email,
           },
         });
@@ -251,7 +250,7 @@ export default function getEmailController({
           to: email,
           subject: "Verify your email",
           html: emailTemplatesService.getRegisterVerifyTemplate({
-            code: emailVerification.code,
+            code: emailVerification.id,
             username: user.displayName,
             userId: user.id,
           }),
@@ -265,18 +264,18 @@ export default function getEmailController({
   );
 
   const verifyEmailSchema = {
-    params: {
+    body: {
       userId: Joi.string().required(),
       code: Joi.string().required(),
     },
   };
 
   router.post(
-    "/verify/:userId/:code",
+    "/verify",
     validation(verifyEmailSchema),
     async (req: TypedRequest<typeof verifyEmailSchema>, res, next) => {
       try {
-        const { code, userId } = req.params;
+        const { code, userId } = req.body;
 
         const verificationCode = await prisma.emailVerification.findFirst({
           select: {
@@ -285,8 +284,8 @@ export default function getEmailController({
             email: true,
           },
           where: {
-            code,
             userId,
+            id: code,
           },
         });
 
@@ -308,7 +307,7 @@ export default function getEmailController({
           },
         });
 
-        if (possibleUser) {
+        if (possibleUser && possibleUser.id !== verificationCode.userId) {
           return errorResponse({
             response: res,
             message: "Email already in use",
@@ -377,7 +376,6 @@ export default function getEmailController({
         const emailVerification = await prisma.emailVerification.create({
           data: {
             userId: user.id,
-            code: crypto.randomBytes(32).toString("hex"),
             email,
           },
         });
@@ -386,7 +384,7 @@ export default function getEmailController({
           to: email,
           subject: "Verify your email",
           html: emailTemplatesService.getRegisterVerifyTemplate({
-            code: emailVerification.code,
+            code: emailVerification.id,
             username: user.displayName,
             userId: user.id,
           }),
