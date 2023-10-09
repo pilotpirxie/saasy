@@ -8,10 +8,11 @@ import { checkPrismaConnection } from "./data/prismaConnectionTest";
 import { usePrismaClientFactory } from "./data/prismaClientFactory";
 import { NodeCacheAdapter } from "./data/cacheStore";
 import initializeAuthController from "./modules/auth/controllers";
-import { NodemailerEmailService } from "./modules/email/services/nodemailerEmailService";
-import { EmailTemplatesService } from "./modules/email/services/emailTemplatesService";
-import initializeUserControllers from "./modules/user/controllers";
-import initializeTeamControllers from "./modules/teams/controllers";
+import { NodemailerEmailService } from "./modules/emails/services/nodemailerEmailService";
+import { EmailTemplatesService } from "./modules/emails/services/emailTemplatesService";
+import initializeUsersControllers from "./modules/users/controllers";
+import initializeTeamsControllers from "./modules/teams/controllers";
+import initializeInvitationsControllers from "./modules/invitations/controllers";
 
 dotenv.config();
 
@@ -90,14 +91,19 @@ app.use("/api/auth", initializeAuthController({
   },
 }));
 
-app.use("/api/users", initializeUserControllers({
+app.use("/api/users", initializeUsersControllers({
   jwtSecret: process.env.JWT_SECRET || "",
   emailService,
   emailTemplatesService,
   prisma,
 }));
 
-app.use("/api/teams", initializeTeamControllers({
+app.use("/api/teams", initializeTeamsControllers({
+  jwtSecret: process.env.JWT_SECRET || "",
+  prisma,
+}));
+
+app.use("/api/invitations", initializeInvitationsControllers({
   jwtSecret: process.env.JWT_SECRET || "",
   emailService,
   emailTemplatesService,

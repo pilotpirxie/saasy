@@ -6,8 +6,8 @@ import dayjs from "dayjs";
 import errorResponse from "../../shared/utils/errorResponse";
 import validation from "../../shared/middlewares/validation";
 import { TypedRequest } from "../../shared/types/express";
-import { EmailService } from "../../email/services/emailService";
-import { EmailTemplates } from "../../email/services/emailTemplates";
+import { EmailService } from "../../emails/services/emailService";
+import { EmailTemplates } from "../../emails/services/emailTemplates";
 import { getHashedPassword } from "../utils/passwordManager";
 
 export default function getPasswordController({

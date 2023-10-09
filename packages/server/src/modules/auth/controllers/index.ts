@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
-import { EmailService } from "../../email/services/emailService";
-import { EmailTemplates } from "../../email/services/emailTemplates";
+import { EmailService } from "../../emails/services/emailService";
+import { EmailTemplates } from "../../emails/services/emailTemplates";
 import { JwtInfo } from "../utils/jwtInfo";
 import getEmailController from "./emailController";
 import getSessionController from "./sessionController";

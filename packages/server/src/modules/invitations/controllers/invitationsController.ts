@@ -2,15 +2,15 @@ import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
 import Joi from "joi";
 import dayjs from "dayjs";
-import { EmailService } from "../../email/services/emailService";
-import { EmailTemplates } from "../../email/services/emailTemplates";
+import { EmailService } from "../../emails/services/emailService";
+import { EmailTemplates } from "../../emails/services/emailTemplates";
 import jwtVerify from "../../shared/middlewares/jwt";
 import verifyUserTeamRole, { UserTeamRole } from "../../teams/middlewares/verifyUserTeamRole";
 import validation from "../../shared/middlewares/validation";
 import { TypedRequest } from "../../shared/types/express";
 import errorResponse from "../../shared/utils/errorResponse";
 
-export default function getInvitationController({
+export default function getInvitationsController({
   prisma,
   jwtSecret,
   emailService,

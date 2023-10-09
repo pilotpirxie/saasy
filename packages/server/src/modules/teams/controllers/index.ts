@@ -1,41 +1,27 @@
 import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
-import { EmailService } from "../../email/services/emailService";
-import { EmailTemplates } from "../../email/services/emailTemplates";
-import getTeamController from "./teamController";
-import getRoleController from "./roleController";
-import getInvitationController from "./invitationController";
+import getTeamsController from "./teamController";
+import getRolesController from "./roleController";
 
 type UserControllersConfig = {
   jwtSecret: string;
   prisma: PrismaClient;
-  emailService: EmailService;
-  emailTemplatesService: EmailTemplates;
 }
 
 export default function initializeTeamControllers({
   jwtSecret,
   prisma,
-  emailService,
-  emailTemplatesService,
 }: UserControllersConfig): Router {
   const router = Router();
 
-  router.use(getTeamController({
+  router.use(getTeamsController({
     jwtSecret,
     prisma,
   }));
 
-  router.use(getRoleController({
+  router.use(getRolesController({
     jwtSecret,
     prisma,
-  }));
-
-  router.use(getInvitationController({
-    jwtSecret,
-    prisma,
-    emailService,
-    emailTemplatesService,
   }));
 
   return router;
