@@ -3,15 +3,15 @@ import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import NodeCache from "node-cache";
 import cors from "cors";
-import { errorHandler } from "./shared/middlewares/errors";
+import { errorHandler } from "./modules/shared/middlewares/errors";
 import { checkPrismaConnection } from "./data/prismaConnectionTest";
 import { usePrismaClientFactory } from "./data/prismaClientFactory";
 import { NodeCacheAdapter } from "./data/cacheStore";
-import initializeAuthController from "./auth/controllers";
-import { NodemailerEmailService } from "./email/services/nodemailerEmailService";
-import { EmailTemplatesService } from "./email/services/emailTemplatesService";
-import initializeUserControllers from "./user/controllers";
-import initializeTeamControllers from "./teams/controllers";
+import initializeAuthController from "./modules/auth/controllers";
+import { NodemailerEmailService } from "./modules/email/services/nodemailerEmailService";
+import { EmailTemplatesService } from "./modules/email/services/emailTemplatesService";
+import initializeUserControllers from "./modules/user/controllers";
+import initializeTeamControllers from "./modules/teams/controllers";
 
 dotenv.config();
 

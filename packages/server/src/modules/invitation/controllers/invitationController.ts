@@ -5,10 +5,10 @@ import dayjs from "dayjs";
 import { EmailService } from "../../email/services/emailService";
 import { EmailTemplates } from "../../email/services/emailTemplates";
 import jwtVerify from "../../shared/middlewares/jwt";
+import verifyUserTeamRole, { UserTeamRole } from "../../teams/middlewares/verifyUserTeamRole";
 import validation from "../../shared/middlewares/validation";
-import errorResponse from "../../shared/utils/errorResponse";
-import verifyUserTeamRole, { UserTeamRole } from "../middlewares/verifyUserTeamRole";
 import { TypedRequest } from "../../shared/types/express";
+import errorResponse from "../../shared/utils/errorResponse";
 
 export default function getInvitationController({
   prisma,
@@ -23,25 +23,67 @@ export default function getInvitationController({
 }): Router {
   const router = Router();
 
-  const inviteUserSchema = {
-    params: {
-      teamId: Joi.string().required(),
+  router.get(
+    "/",
+    jwtVerify(jwtSecret),
+    async (req, res, next) => {
+      try {
+        const user = await prisma.user.findFirst({
+          where: {
+            id: req.userId,
+          },
+          select: {
+            email: true,
+          },
+        });
+
+        if (!user) {
+          return errorResponse({
+            error: "UserNotFound",
+            message: "User not found",
+            response: res,
+            status: 404,
+          });
+        }
+
+        if (!user.email) {
+          return errorResponse({
+            error: "UserEmailNotSet",
+            message: "User email not set",
+            response: res,
+            status: 400,
+          });
+        }
+
+        const invitations = await prisma.invitation.findMany({
+          where: {
+            email: user.email,
+          },
+        });
+
+        return res.json(invitations);
+      } catch (error) {
+        next(error);
+      }
     },
+  );
+
+  const inviteUserSchema = {
     body: {
+      teamId: Joi.string().required(),
       email: Joi.string().email().required(),
       role: Joi.string().valid("owner", "editor", "viewer").required(),
     },
   };
 
   router.post(
-    "/:teamId/invitations",
+    "/",
     jwtVerify(jwtSecret),
     verifyUserTeamRole(prisma, ["owner"]),
     validation(inviteUserSchema),
     async (req: TypedRequest<typeof inviteUserSchema>, res, next) => {
       try {
-        const { email, role } = req.body;
-        const { teamId } = req.params;
+        const { email, role, teamId } = req.body;
 
         const user = await prisma.user.findFirst({
           where: {
@@ -110,22 +152,20 @@ export default function getInvitationController({
 
   const acceptInvitationSchema = {
     params: {
-      teamId: Joi.string().required(),
       code: Joi.string().required(),
     },
   };
 
-  router.get(
-    "/:teamId/invitations/:code",
+  router.post(
+    "/:code",
     validation(acceptInvitationSchema),
     async (req, res, next) => {
       try {
-        const { teamId, code } = req.params;
+        const { code } = req.params;
 
         const invitation = await prisma.invitation.findFirst({
           where: {
             id: code,
-            teamId,
             acceptedAt: null,
           },
         });
@@ -151,7 +191,6 @@ export default function getInvitationController({
         await prisma.invitation.update({
           where: {
             id: code,
-            teamId,
           },
           data: {
             acceptedAt: dayjs().toDate(),
@@ -161,12 +200,55 @@ export default function getInvitationController({
         await prisma.userTeam.create({
           data: {
             userId: req.userId,
-            teamId,
+            teamId: invitation.teamId,
             role: invitation.role,
           },
         });
 
         return res.sendStatus(200);
+      } catch (error) {
+        next(error);
+      }
+    },
+  );
+
+  const deleteInvitationSchema = {
+    params: {
+      code: Joi.string().required(),
+    },
+  };
+
+  router.delete(
+    "/:code",
+    jwtVerify(jwtSecret),
+    validation(deleteInvitationSchema),
+    async (req, res, next) => {
+      try {
+        const { code } = req.params;
+
+        const invitation = await prisma.invitation.findFirst({
+          where: {
+            id: code,
+            acceptedAt: null,
+          },
+        });
+
+        if (!invitation) {
+          return errorResponse({
+            error: "InvitationNotFound",
+            message: "Invitation not found",
+            response: res,
+            status: 404,
+          });
+        }
+
+        await prisma.invitation.delete({
+          where: {
+            id: code,
+          },
+        });
+
+        return res.sendStatus(204);
       } catch (error) {
         next(error);
       }

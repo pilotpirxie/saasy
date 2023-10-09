@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { CacheStore } from "../../data/cacheStore";
+import { CacheStore } from "../../../data/cacheStore";
 
 const cache = (cacheStore: CacheStore) => (req: Request, res: Response, next: NextFunction) => {
   const key = req.originalUrl;
