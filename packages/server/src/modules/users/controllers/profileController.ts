@@ -4,6 +4,7 @@ import Joi from "joi";
 import jwtVerify from "../../shared/middlewares/jwt";
 import validation from "../../shared/middlewares/validation";
 import { TypedRequest } from "../../shared/types/express";
+import errorResponse from "../../shared/utils/errorResponse";
 
 export default function getProfileController({
   prisma,
@@ -33,6 +34,15 @@ export default function getProfileController({
           },
         });
 
+        if (!user) {
+          return errorResponse({
+            response: res,
+            status: 404,
+            message: "User not found",
+            error: "UserNotFound",
+          });
+        }
+
         return res.json(user);
       } catch (error) {
         return next(error);
@@ -60,6 +70,24 @@ export default function getProfileController({
         const {
           displayName, avatarUrl, country, address, phone, fullName,
         } = req.body;
+
+        const user = await prisma.user.findFirst({
+          where: {
+            id: req.userId,
+          },
+          select: {
+            id: true,
+          },
+        });
+
+        if (!user) {
+          return errorResponse({
+            response: res,
+            status: 404,
+            message: "User not found",
+            error: "UserNotFound",
+          });
+        }
 
         await prisma.user.update({
           where: {

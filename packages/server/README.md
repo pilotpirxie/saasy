@@ -19,6 +19,7 @@ SMTP_USER="your.user@smtp"
 SMTP_PASSWORD="password"
 SMTP_REJECT_UNAUTHORIZED="false"
 SMTP_SECURE="false"
+SMTP_FROM="Company Name <company@example.com>"
 
 GOOGLE_CLIENT_ID=""
 GOOGLE_CLIENT_SECRET=""

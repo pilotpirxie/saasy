@@ -1,15 +1,15 @@
-import express, {Express} from "express";
+import express, { Express } from "express";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import NodeCache from "node-cache";
 import cors from "cors";
-import {errorHandler} from "./modules/shared/middlewares/errors";
-import {checkPrismaConnection} from "./data/prismaConnectionTest";
-import {usePrismaClientFactory} from "./data/prismaClientFactory";
-import {NodeCacheAdapter} from "./data/cacheStore";
+import { errorHandler } from "./modules/shared/middlewares/errors";
+import { checkPrismaConnection } from "./data/prismaConnectionTest";
+import { usePrismaClientFactory } from "./data/prismaClientFactory";
+import { NodeCacheAdapter } from "./data/cacheStore";
 import initializeAuthController from "./modules/auth/controllers";
-import {NodemailerEmailService} from "./modules/emails/services/nodemailerEmailService";
-import {EmailTemplatesService} from "./modules/emails/services/emailTemplatesService";
+import { NodemailerEmailService } from "./modules/emails/services/nodemailerEmailService";
+import { EmailTemplatesService } from "./modules/emails/services/emailTemplatesService";
 import initializeUsersControllers from "./modules/users/controllers";
 import initializeTeamsControllers from "./modules/teams/controllers";
 import initializeInvitationsControllers from "./modules/invitations/controllers";
@@ -52,7 +52,7 @@ const emailService = new NodemailerEmailService({
     },
     secure: process.env.SMTP_SECURE === "true",
   },
-  from: "Company Name <company@example.com>",
+  from: process.env.SMTP_FROM || "",
 });
 
 const emailTemplatesService = new EmailTemplatesService({
