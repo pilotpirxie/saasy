@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
-import getTeamsController from "./teamController";
-import getRolesController from "./roleController";
+import getTeamsController from "./teamsController";
+import getRolesController from "./rolesController";
 
 type UserControllersConfig = {
   jwtSecret: string;
