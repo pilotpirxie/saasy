@@ -51,6 +51,7 @@ export default function getEmailController({
             totpAddedAt: true,
             totpToken: true,
             authProviderType: true,
+            emailVerifiedAt: true,
           },
           where: {
             email,
@@ -73,6 +74,15 @@ export default function getEmailController({
             message: "Invalid auth provider",
             status: 400,
             error: "InvalidAuthProvider",
+          });
+        }
+
+        if (!user.emailVerifiedAt) {
+          return errorResponse({
+            response: res,
+            message: "Email not verified",
+            status: 400,
+            error: "EmailNotVerified",
           });
         }
 
