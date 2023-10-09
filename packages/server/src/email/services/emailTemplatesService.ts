@@ -19,6 +19,15 @@ export class EmailTemplatesService implements EmailTemplates {
     this.baseUrl = baseUrl;
   }
 
+  getRegisterVerifyTemplate(options: { username: string; userId: string; code: string; }): string {
+    const registerVerifyTemplate = fs.readFileSync(path.join(__dirname, "../templates/registerVerify.hbs"), "utf8");
+    return handlebars.compile(registerVerifyTemplate)({
+      baseUrl: this.baseUrl,
+      companyName: this.companyName,
+      ...options,
+    });
+  }
+
   getInvoiceEmailTemplate(options: {
     username: string;
     invoiceId: string;
@@ -30,7 +39,7 @@ export class EmailTemplatesService implements EmailTemplates {
   }
 
   getVerifyEmailTemplate(options: { username: string; userId: string, code: string }): string {
-    const invoiceTemplate = fs.readFileSync(path.join(__dirname, "../templates/verify.hbs"), "utf8");
+    const invoiceTemplate = fs.readFileSync(path.join(__dirname, "../templates/emailVerify.hbs"), "utf8");
     return handlebars.compile(invoiceTemplate)({
       baseUrl: this.baseUrl,
       companyName: this.companyName,

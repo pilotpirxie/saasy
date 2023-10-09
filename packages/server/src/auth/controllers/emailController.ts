@@ -240,7 +240,7 @@ export default function getEmailController({
         emailService.sendEmail({
           to: email,
           subject: "Verify your email",
-          html: emailTemplatesService.getVerifyEmailTemplate({
+          html: emailTemplatesService.getRegisterVerifyTemplate({
             code: emailVerification.code,
             username: user.displayName,
             userId: user.id,
@@ -255,23 +255,24 @@ export default function getEmailController({
   );
 
   const verifyEmailSchema = {
-    body: {
+    params: {
       userId: Joi.string().required(),
       code: Joi.string().required(),
     },
   };
 
   router.post(
-    "/verify",
+    "/verify/:userId/:code",
     validation(verifyEmailSchema),
     async (req: TypedRequest<typeof verifyEmailSchema>, res, next) => {
       try {
-        const { code, userId } = req.body;
+        const { code, userId } = req.params;
 
         const verificationCode = await prisma.emailVerification.findFirst({
           select: {
             id: true,
             userId: true,
+            email: true,
           },
           where: {
             code,
@@ -288,18 +289,37 @@ export default function getEmailController({
           });
         }
 
+        const possibleUser = await prisma.user.findFirst({
+          select: {
+            id: true,
+          },
+          where: {
+            email: verificationCode.email,
+          },
+        });
+
+        if (possibleUser) {
+          return errorResponse({
+            response: res,
+            message: "Email already in use",
+            status: 409,
+            error: "EmailAlreadyInUse",
+          });
+        }
+
         await prisma.user.update({
           data: {
             emailVerifiedAt: dayjs().toDate(),
+            email: verificationCode.email,
           },
           where: {
             id: verificationCode.userId,
           },
         });
 
-        await prisma.emailVerification.delete({
+        await prisma.emailVerification.deleteMany({
           where: {
-            id: verificationCode.id,
+            userId: verificationCode.userId,
           },
         });
 
@@ -344,12 +364,6 @@ export default function getEmailController({
           });
         }
 
-        await prisma.emailVerification.deleteMany({
-          where: {
-            userId: user.id,
-          },
-        });
-
         const emailVerification = await prisma.emailVerification.create({
           data: {
             userId: user.id,
@@ -361,7 +375,7 @@ export default function getEmailController({
         emailService.sendEmail({
           to: email,
           subject: "Verify your email",
-          html: emailTemplatesService.getVerifyEmailTemplate({
+          html: emailTemplatesService.getRegisterVerifyTemplate({
             code: emailVerification.code,
             username: user.displayName,
             userId: user.id,

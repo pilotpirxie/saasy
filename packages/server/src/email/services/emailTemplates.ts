@@ -1,4 +1,10 @@
 export type EmailTemplates = {
+  getRegisterVerifyTemplate(options: {
+    username: string,
+    userId: string,
+    code: string
+  }): string;
+
   getVerifyEmailTemplate(options: {
     username: string,
     userId: string,
