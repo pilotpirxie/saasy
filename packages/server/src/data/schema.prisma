@@ -8,7 +8,7 @@ datasource db {
 }
 
 model AuditLog {
-  id        String   @id @default(uuid()) @map("id") @db.Uuid
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
   tableName String   @map("table_name") @db.VarChar
   entityId  String   @map("entity_id") @db.VarChar
   oldValue  String   @map("old_value") @db.VarChar
@@ -32,7 +32,7 @@ model Config {
 }
 
 model Contact {
-  id        String   @id @default(uuid()) @map("id") @db.Uuid
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
   userId    String?  @map("user_id") @db.Uuid
   email     String   @map("email") @db.VarChar
   phone     String?  @map("phone") @db.VarChar
@@ -46,7 +46,7 @@ model Contact {
 }
 
 model EmailVerification {
-  id        String   @id @default(uuid()) @map("id") @db.Uuid
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
   userId    String   @map("user_id") @db.Uuid
   code      String   @map("code") @db.VarChar
   email     String   @default("") @map("email") @db.VarChar
@@ -59,7 +59,7 @@ model EmailVerification {
 }
 
 model Invitation {
-  id        String   @id @default(uuid()) @map("id") @db.Uuid
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
   email     String   @map("email") @db.VarChar
   invitedBy String   @map("invited_by") @db.Uuid
   teamId    String   @map("team_id") @db.Uuid
@@ -75,7 +75,7 @@ model Invitation {
 }
 
 model Order {
-  id                        String        @id @default(uuid()) @map("id") @db.Uuid
+  id                        String        @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
   userId                    String        @map("user_id") @db.Uuid
   productId                 String        @map("product_id") @db.Uuid
   amount                    Decimal       @map("amount") @db.Decimal
@@ -96,7 +96,7 @@ model Order {
 }
 
 model PasswordRecovery {
-  id        String   @id @default(uuid()) @map("id") @db.Uuid
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
   userId    String   @map("user_id") @db.Uuid
   code      String   @map("code") @db.VarChar
   expiresAt DateTime @map("expires_at") @db.Timestamp(6)
@@ -109,7 +109,7 @@ model PasswordRecovery {
 }
 
 model Plan {
-  id            String         @id @default(uuid()) @map("id") @db.Uuid
+  id            String         @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
   name          String         @map("name") @db.VarChar
   config        Json           @map("config") @db.JsonB
   price         Decimal        @map("price") @db.Decimal
@@ -123,7 +123,7 @@ model Plan {
 }
 
 model Product {
-  id          String   @id @default(uuid()) @map("id") @db.Uuid
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
   name        String   @map("name") @db.VarChar
   config      Json     @map("config") @db.JsonB
   price       Decimal  @map("price") @db.Decimal
@@ -139,7 +139,7 @@ model Product {
 }
 
 model Project {
-  id          String   @id @default(uuid()) @map("id") @db.Uuid
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
   teamId      String   @map("team_id") @db.Uuid
   name        String   @map("name") @db.VarChar
   deleteAfter DateTime @map("delete_after") @db.Timestamp(6)
@@ -152,7 +152,7 @@ model Project {
 }
 
 model PromoCode {
-  id            String         @id @default(uuid()) @map("id") @db.Uuid
+  id            String         @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
   code          String         @map("code") @db.VarChar
   value         Int            @map("value") @db.Integer
   type          String         @map("type") @db.VarChar
@@ -168,7 +168,7 @@ model PromoCode {
 }
 
 model Referral {
-  id            String         @id @default(uuid()) @map("id") @db.Uuid
+  id            String         @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
   userId        String         @map("user_id") @db.Uuid
   transactionId String         @map("transaction_id") @db.Uuid
   status        ReferralStatus @map("status")
@@ -184,7 +184,7 @@ model Referral {
 }
 
 model Session {
-  id                    String       @id @default(uuid()) @map("id") @db.Uuid
+  id                    String       @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
   userId                String       @map("user_id") @db.Uuid
   authProviderType      AuthProvider @map("auth_provider_type")
   userAgent             String       @map("user_agent") @db.VarChar
@@ -201,7 +201,7 @@ model Session {
 }
 
 model AuthorizationCode {
-  id               String       @id @default(uuid()) @map("id") @db.Uuid
+  id               String       @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
   userId           String       @map("user_id") @db.Uuid
   expiresAt        DateTime     @map("expires_at") @db.Timestamp(6)
   authProviderType AuthProvider @map("auth_provider_type")
@@ -214,7 +214,7 @@ model AuthorizationCode {
 }
 
 model Subscription {
-  id                        String             @id @default(uuid()) @map("id") @db.Uuid
+  id                        String             @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
   teamId                    String             @map("team_id") @db.Uuid
   planId                    String             @map("plan_id") @db.Uuid
   amount                    Decimal            @map("amount") @db.Decimal
@@ -239,7 +239,7 @@ model Subscription {
 }
 
 model Team {
-  id            String         @id @default(uuid()) @map("id") @db.Uuid
+  id            String         @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
   name          String         @map("name") @db.VarChar
   deleteAfter   DateTime       @map("delete_after") @db.Timestamp(6)
   createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamp(6)
@@ -253,7 +253,7 @@ model Team {
 }
 
 model Transaction {
-  id                 String          @id @default(uuid()) @map("id") @db.Uuid
+  id                 String          @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
   subscriptionId     String?         @map("subscription_id") @db.Uuid
   orderId            String?         @map("order_id") @db.Uuid
   method             String          @map("method") @db.VarChar
@@ -275,7 +275,7 @@ model Transaction {
 }
 
 model User {
-  id                         String              @id @default(uuid()) @map("id") @db.Uuid
+  id                         String              @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
   email                      String?             @unique @map("email") @db.VarChar
   role                       UserGlobalRole      @default(user) @map("role")
   password                   String?             @map("password") @db.VarChar
@@ -289,12 +289,12 @@ model User {
   address                    String?             @map("address") @db.VarChar
   phone                      String?             @map("phone") @db.VarChar
   country                    String?             @map("country") @db.VarChar
-  fullname                   String?             @map("fullname") @db.VarChar
+  fullName                   String?             @map("fullname") @db.VarChar
   displayName                String              @map("display_name") @db.VarChar
   avatarUrl                  String?             @map("avatar_url") @db.VarChar
   newsletterConsentGrantedAt DateTime?           @map("newsletter_consent_granted_at") @db.Timestamp(6)
   marketingConsentGrantedAt  DateTime?           @map("marketing_consent_granted_at") @db.Timestamp(6)
-  verifiedAt                 DateTime?           @map("verified_at") @db.Timestamp(6)
+  emailVerifiedAt            DateTime?           @map("email_verified_at") @db.Timestamp(6)
   disabledAt                 DateTime?           @map("disabled_at") @db.Timestamp(6)
   createdAt                  DateTime            @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt                  DateTime            @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
@@ -314,7 +314,7 @@ model User {
 }
 
 model UserTeam {
-  // id        String       @id @default(uuid()) @map("id") @db.Uuid
+  // id        String       @id @default(dbgenerated("gen_random_uuid()")) @map("id") @db.Uuid
   userId    String       @map("user_id") @db.Uuid
   teamId    String       @map("team_id") @db.Uuid
   role      UserTeamRole @map("role")

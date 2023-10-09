@@ -1,5 +1,6 @@
-import { NextFunction, Request, Response } from 'express';
-import Joi from 'joi';
+import { NextFunction, Request, Response } from "express";
+import Joi from "joi";
+import errorResponse from "../utils/errorResponse";
 
 const createParamsObject = (req: Request) => ({
   query: { ...req.query },
@@ -13,19 +14,21 @@ export type ValidationSchema = {
   body?: object;
 };
 
-const validation = (schema: ValidationSchema, redirectUrl = '') => (req: Request, res: Response, next: NextFunction) => {
+const validation = (schema: ValidationSchema, redirectUrl = "") => (req: Request, res: Response, next: NextFunction) => {
   const mixedSchema = Joi.object(schema).unknown();
   const params = createParamsObject(req);
   const result = mixedSchema.validate(params);
 
   if (result.error) {
-    // eslint-disable-next-line no-console
     console.warn(`Validation error: ${result.error.message}`);
     if (redirectUrl.length > 0) {
       return res.redirect(redirectUrl);
     }
-    return res.status(400).json({
-      error: `Validation error: ${result.error.message}`,
+    return errorResponse({
+      response: res,
+      message: `Validation error: ${result.error.message}`,
+      status: 400,
+      error: "ValidationError",
     });
   }
   return next();

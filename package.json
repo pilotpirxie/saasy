@@ -11,7 +11,8 @@
   ],
   "scripts": {
     "client": "yarn workspace @saasy/client dev",
-    "server": "yarn workspace @saasy/server dev"
+    "server": "yarn workspace @saasy/server dev",
+    "migrate:dev": "yarn workspace @saasy/server migrate:dev"
   },
   "devDependencies": {
     "typescript": "^5.2.2"

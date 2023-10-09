@@ -1,27 +1,51 @@
-import { NextFunction, Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
+import { NextFunction, Request, Response } from "express";
+import jwt from "jsonwebtoken";
+import errorResponse from "../utils/errorResponse";
 
-export const jwtVerify = (jwtSecret: string) => (req: Request, res: Response, next: NextFunction) => {
+const jwtVerify = (jwtSecret: string) => (req: Request, res: Response, next: NextFunction) => {
   if (!req.headers.authorization) {
-    return res.status(401).json({ error: 'Missing Authorization Header' });
+    return errorResponse({
+      response: res,
+      message: "Missing authorization header",
+      status: 400,
+      error: "MissingAuthorizationHeader",
+    });
   }
 
-  if (req.headers.authorization.split(' ')[0] !== 'Bearer') {
-    return res.status(401).json({ error: 'Invalid Authorization Header' });
+  if (req.headers.authorization.split(" ")[0] !== "Bearer") {
+    return errorResponse({
+      response: res,
+      message: "Invalid authorization header",
+      status: 400,
+      error: "InvalidAuthorizationHeader",
+    });
   }
 
-  const token = req.headers.authorization?.split(' ')[1];
+  const token = req.headers.authorization?.split(" ")[1];
   if (!token) {
-    return res.status(401).json({
-      error: 'Unauthorized',
+    return errorResponse({
+      response: res,
+      message: "Missing token",
+      status: 401,
+      error: "Unauthorized",
     });
   }
 
   try {
     const decoded = jwt.verify(token, jwtSecret);
-    req.userId = Number(decoded.sub);
+    if (!decoded || typeof decoded !== "object" || !decoded.sub) {
+      return errorResponse({
+        response: res,
+        message: "Invalid token",
+        status: 401,
+        error: "Unauthorized",
+      });
+    }
+    req.userId = decoded.sub;
     return next();
   } catch (err) {
     return res.sendStatus(401);
   }
 };
+
+export default jwtVerify;

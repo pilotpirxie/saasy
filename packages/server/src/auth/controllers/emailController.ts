@@ -4,6 +4,7 @@ import Joi from "joi";
 import crypto from "crypto";
 import totp from "totp-generator";
 import dayjs from "dayjs";
+import errorResponse from "../../shared/utils/errorResponse";
 import validation from "../../shared/middlewares/validation";
 import { TypedRequest } from "../../shared/types/express";
 import { getIp } from "../../shared/utils/getIp";
@@ -58,11 +59,21 @@ export default function getEmailController({
         });
 
         if (!user || !user.password || !user.salt || !user.iterations) {
-          return res.sendStatus(404);
+          return errorResponse({
+            response: res,
+            message: "User not found",
+            status: 404,
+            error: "UserNotFound",
+          });
         }
 
         if (user.authProviderType !== "email") {
-          return res.sendStatus(401);
+          return errorResponse({
+            response: res,
+            message: "Invalid auth provider",
+            status: 400,
+            error: "InvalidAuthProvider",
+          });
         }
 
         const hashedPassword = getHashedPassword({
@@ -72,18 +83,33 @@ export default function getEmailController({
         });
 
         if (hashedPassword !== user.password) {
-          return res.sendStatus(401);
+          return errorResponse({
+            response: res,
+            message: "Invalid credentials",
+            status: 401,
+            error: "InvalidCredentials",
+          });
         }
 
         if (user.totpAddedAt !== null && user.totpToken) {
           if (!totpCode) {
-            return res.sendStatus(401);
+            return errorResponse({
+              response: res,
+              message: "TOTP code is required",
+              status: 400,
+              error: "TotpCodeRequired",
+            });
           }
 
           const expectedTotpCode = totp(user.totpToken);
 
           if (expectedTotpCode !== totpCode) {
-            return res.sendStatus(401);
+            return errorResponse({
+              response: res,
+              message: "Invalid TOTP code",
+              status: 401,
+              error: "InvalidTotpCode",
+            });
           }
         }
 
@@ -115,7 +141,7 @@ export default function getEmailController({
   };
 
   router.post(
-    "/totp-status",
+    "/totp",
     validation(totpStatusSchema),
     async (req: TypedRequest<typeof totpStatusSchema>, res, next) => {
       try {
@@ -133,7 +159,12 @@ export default function getEmailController({
         });
 
         if (!user) {
-          return res.sendStatus(404);
+          return errorResponse({
+            response: res,
+            message: "User not found",
+            status: 404,
+            error: "UserNotFound",
+          });
         }
 
         return res.json({
@@ -169,7 +200,12 @@ export default function getEmailController({
         });
 
         if (possibleUser) {
-          return res.sendStatus(409);
+          return errorResponse({
+            response: res,
+            message: "User already exists",
+            status: 409,
+            error: "UserAlreadyExists",
+          });
         }
 
         const salt = crypto.randomBytes(16).toString("hex");
@@ -244,12 +280,17 @@ export default function getEmailController({
         });
 
         if (!verificationCode) {
-          return res.sendStatus(404);
+          return errorResponse({
+            response: res,
+            message: "Verification code not found",
+            status: 404,
+            error: "VerificationCodeNotFound",
+          });
         }
 
         await prisma.user.update({
           data: {
-            verifiedAt: dayjs().toDate(),
+            emailVerifiedAt: dayjs().toDate(),
           },
           where: {
             id: verificationCode.userId,
@@ -289,13 +330,18 @@ export default function getEmailController({
           },
           where: {
             email,
-            verifiedAt: null,
+            emailVerifiedAt: null,
             authProviderType: "email",
           },
         });
 
         if (!user) {
-          return res.sendStatus(400);
+          return errorResponse({
+            response: res,
+            message: "User not found",
+            status: 404,
+            error: "UserNotFound",
+          });
         }
 
         await prisma.emailVerification.deleteMany({

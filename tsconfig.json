@@ -9,11 +9,6 @@
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
-    "target": "ES2020",
-    "paths": {
-      "@saasy/*": [
-        "packages/*"
-      ]
-    }
+    "target": "ES2020"
   }
 }

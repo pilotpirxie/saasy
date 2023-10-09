@@ -3,12 +3,86 @@ import { Router } from "express";
 import Joi from "joi";
 import dayjs from "dayjs";
 import url from "url";
+import errorResponse from "../../shared/utils/errorResponse";
 import validation from "../../shared/middlewares/validation";
 import { TypedRequest } from "../../shared/types/express";
 import { getIp } from "../../shared/utils/getIp";
 import { JwtInfo } from "../utils/jwtInfo";
 import { createSession } from "../utils/sessionManager";
-import { redirectWithCode, redirectWithError } from "../utils/redirectManager";
+import { redirectWithCode, redirectWithError } from "../../shared/utils/redirectManager";
+
+async function authenticate({
+  prisma,
+  email,
+  authProviderType,
+  authProviderExternalId,
+  displayName,
+  registerIp,
+  avatarUrl,
+}: {
+  prisma: PrismaClient;
+  authProviderExternalId: string,
+  authProviderType: "google" | "github",
+  registerIp: string,
+  displayName: string,
+  email?: string,
+  avatarUrl?: string,
+}): Promise<string> {
+  let user = await prisma.user.findFirst({
+    select: {
+      id: true,
+      authProviderType: true,
+    },
+    where: {
+      authProviderType,
+      authProviderExternalId,
+    },
+  });
+
+  if (!user) {
+    let useEmail = false;
+
+    const emailAlreadyExists = await prisma.user.findFirst({
+      select: {
+        id: true,
+      },
+      where: {
+        email,
+      },
+    });
+
+    if (!emailAlreadyExists) {
+      useEmail = true;
+    }
+
+    user = await prisma.user.create({
+      data: {
+        email: useEmail ? email : null,
+        emailVerifiedAt: useEmail ? dayjs().toDate() : null,
+        displayName,
+        role: "user",
+        authProviderType,
+        authProviderExternalId,
+        registerIp,
+        avatarUrl,
+      },
+      select: {
+        id: true,
+        authProviderType: true,
+      },
+    });
+  }
+
+  const authorizationCode = await prisma.authorizationCode.create({
+    data: {
+      userId: user.id,
+      authProviderType,
+      expiresAt: dayjs().add(5, "minutes").toDate(),
+    },
+  });
+
+  return authorizationCode.id;
+}
 
 export default function getSocialController({
   jwtInfo,
@@ -35,7 +109,7 @@ export default function getSocialController({
   const router = Router();
 
   router.get(
-    "/login-with-google",
+    "/google",
     async (req, res, next) => {
       try {
         const urlToRedirect = url.format({
@@ -112,77 +186,19 @@ export default function getSocialController({
           email_verified: boolean;
         };
 
-        const searchForUser = await prisma.user.findFirst({
-          select: {
-            id: true,
-            authProviderType: true,
-          },
-          where: {
-            email: userData.email,
-          },
+        const authorizationCode = await authenticate({
+          authProviderExternalId: userData.sub,
+          authProviderType: "google",
+          email: userData.email,
+          displayName: userData.email && userData.email_verified ? userData.email.split("@")[0] : "Unknown",
+          registerIp: getIp(req),
+          avatarUrl: userData.picture,
+          prisma,
         });
-
-        if (searchForUser && searchForUser.authProviderType !== "google") {
-          return res.redirect(redirectWithError({
-            callbackUrl,
-            error: "user_already_exists",
-          }));
-        }
-
-        if (!searchForUser) {
-          await prisma.user.create({
-            data: {
-              email: userData.email || null,
-              verifiedAt: userData.email_verified ? dayjs().toDate() : null,
-              displayName: userData.email.split("@")[0],
-              role: "user",
-              authProviderType: "google",
-              authProviderExternalId: userData.sub,
-              registerIp: getIp(req),
-              avatarUrl: userData.picture,
-            },
-          });
-        }
-
-        const user = await prisma.user.findFirst({
-          select: {
-            id: true,
-            authProviderType: true,
-          },
-          where: {
-            authProviderType: "google",
-            authProviderExternalId: userData.sub,
-          },
-        });
-
-        if (!user) {
-          return res.redirect(redirectWithError({
-            callbackUrl,
-            error: "user_not_found",
-          }));
-        }
-
-        if (user.authProviderType !== "google") {
-          return res.redirect(redirectWithError({
-            callbackUrl,
-            error: "invalid_provider",
-          }));
-        }
-
-        const authorizationCode = await prisma.authorizationCode.create({
-          data: {
-            userId: user.id,
-            authProviderType: "google",
-            expiresAt: dayjs().add(5, "minutes").toDate(),
-          },
-        });
-
-        const urlToRedirect = new URL(callbackUrl);
-        urlToRedirect.searchParams.append("code", authorizationCode.id);
 
         return res.redirect(redirectWithCode({
           callbackUrl,
-          code: authorizationCode.id,
+          code: authorizationCode,
         }));
       } catch (error) {
         return next(error);
@@ -191,7 +207,7 @@ export default function getSocialController({
   );
 
   router.get(
-    "/login-with-github",
+    "/github",
     async (req, res, next) => {
       try {
         const urlToRedirect = url.format({
@@ -259,74 +275,19 @@ export default function getSocialController({
           email?: string
         };
 
-        const searchForUser = await prisma.user.findFirst({
-          select: {
-            id: true,
-            authProviderType: true,
-          },
-          where: {
-            email: userData.email || "",
-          },
-        });
-
-        if (searchForUser && searchForUser.authProviderType !== "github") {
-          return res.redirect(redirectWithError({
-            callbackUrl,
-            error: "user_already_exists",
-          }));
-        }
-
-        if (!searchForUser) {
-          await prisma.user.create({
-            data: {
-              email: userData.email || null,
-              verifiedAt: userData.email ? dayjs().toDate() : null,
-              displayName: userData.login,
-              role: "user",
-              authProviderType: "github",
-              authProviderExternalId: userData.id.toString(),
-              registerIp: getIp(req),
-              avatarUrl: userData.avatar_url,
-            },
-          });
-        }
-
-        const user = await prisma.user.findFirst({
-          select: {
-            id: true,
-            authProviderType: true,
-          },
-          where: {
-            authProviderType: "github",
-            authProviderExternalId: userData.id.toString(),
-          },
-        });
-
-        if (!user) {
-          return res.redirect(redirectWithError({
-            callbackUrl,
-            error: "user_not_found",
-          }));
-        }
-
-        if (user.authProviderType !== "github") {
-          return res.redirect(redirectWithError({
-            callbackUrl,
-            error: "invalid_provider",
-          }));
-        }
-
-        const authorizationCode = await prisma.authorizationCode.create({
-          data: {
-            userId: user.id,
-            authProviderType: "github",
-            expiresAt: dayjs().add(5, "minutes").toDate(),
-          },
+        const authorizationCode = await authenticate({
+          authProviderExternalId: userData.id.toString(),
+          authProviderType: "github",
+          email: userData.email,
+          displayName: userData.name || userData.login,
+          registerIp: getIp(req),
+          avatarUrl: userData.avatar_url,
+          prisma,
         });
 
         return res.redirect(redirectWithCode({
           callbackUrl,
-          code: authorizationCode.id,
+          code: authorizationCode,
         }));
       } catch (error) {
         return next(error);
@@ -341,7 +302,7 @@ export default function getSocialController({
   };
 
   router.post(
-    "/exchange-code",
+    "/exchange",
     validation(exchangeCodeSchema),
     async (req: TypedRequest<typeof exchangeCodeSchema>, res, next) => {
       try {
@@ -360,11 +321,21 @@ export default function getSocialController({
         });
 
         if (!authorizationCode) {
-          return res.sendStatus(404);
+          return errorResponse({
+            response: res,
+            message: "Authorization code not found",
+            status: 404,
+            error: "AuthorizationCodeNotFound",
+          });
         }
 
         if (dayjs(authorizationCode.expiresAt).isBefore(dayjs())) {
-          return res.sendStatus(400);
+          return errorResponse({
+            response: res,
+            message: "Authorization code expired",
+            status: 400,
+            error: "AuthorizationCodeExpired",
+          });
         }
 
         const user = await prisma.user.findFirst({
@@ -378,11 +349,21 @@ export default function getSocialController({
         });
 
         if (!user) {
-          return res.sendStatus(404);
+          return errorResponse({
+            response: res,
+            message: "User not found",
+            status: 404,
+            error: "UserNotFound",
+          });
         }
 
         if (user.authProviderType !== authorizationCode.authProviderType) {
-          return res.sendStatus(401);
+          return errorResponse({
+            response: res,
+            message: "Invalid provider",
+            status: 400,
+            error: "InvalidProvider",
+          });
         }
 
         const ip = getIp(req);

@@ -3,6 +3,7 @@ import { Router } from "express";
 import Joi from "joi";
 import crypto from "crypto";
 import dayjs from "dayjs";
+import errorResponse from "../../shared/utils/errorResponse";
 import validation from "../../shared/middlewares/validation";
 import { TypedRequest } from "../../shared/types/express";
 import { EmailService } from "../../email/services/emailService";
@@ -45,7 +46,12 @@ export default function getPasswordController({
         });
 
         if (!user) {
-          return res.sendStatus(400);
+          return errorResponse({
+            response: res,
+            message: "User not found",
+            status: 404,
+            error: "UserNotFound",
+          });
         }
 
         await prisma.passwordRecovery.deleteMany({
@@ -107,11 +113,21 @@ export default function getPasswordController({
         });
 
         if (!passwordReset) {
-          return res.sendStatus(404);
+          return errorResponse({
+            response: res,
+            message: "Password reset not found",
+            status: 404,
+            error: "PasswordResetNotFound",
+          });
         }
 
         if (dayjs(passwordReset.expiresAt).isBefore(dayjs())) {
-          return res.sendStatus(400);
+          return errorResponse({
+            response: res,
+            message: "Password reset has expired",
+            status: 400,
+            error: "PasswordResetExpired",
+          });
         }
 
         const salt = crypto.randomBytes(16).toString("hex");

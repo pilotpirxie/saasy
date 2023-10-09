@@ -3,6 +3,7 @@ import { Router } from "express";
 import Joi from "joi";
 import jwt from "jsonwebtoken";
 import dayjs from "dayjs";
+import errorResponse from "../../shared/utils/errorResponse";
 import validation from "../../shared/middlewares/validation";
 import { TypedRequest } from "../../shared/types/express";
 import { getIp } from "../../shared/utils/getIp";
@@ -36,6 +37,15 @@ export default function getSessionController({
           jti: string;
         };
 
+        if (!decoded || !decoded.sub || !decoded.jti) {
+          return errorResponse({
+            response: res,
+            message: "Refresh token is invalid",
+            status: 401,
+            error: "InvalidRefreshToken",
+          });
+        }
+
         const session = await prisma.session.findFirst({
           select: {
             id: true,
@@ -49,17 +59,32 @@ export default function getSessionController({
         });
 
         if (!session) {
-          return res.sendStatus(401);
+          return errorResponse({
+            response: res,
+            message: "Session to refresh not found",
+            status: 404,
+            error: "SessionNotFound",
+          });
         }
 
         if (session.revokedAt) {
-          return res.sendStatus(401);
+          return errorResponse({
+            response: res,
+            message: "Session to refresh is revoked",
+            status: 401,
+            error: "SessionRevoked",
+          });
         }
 
         try {
           jwt.verify(refreshToken, session.refreshTokenSecretKey);
         } catch (error) {
-          return res.sendStatus(401);
+          return errorResponse({
+            response: res,
+            message: "Refresh token is invalid",
+            status: 401,
+            error: "InvalidRefreshToken",
+          });
         }
 
         const user = await prisma.user.findFirst({
@@ -72,7 +97,12 @@ export default function getSessionController({
         });
 
         if (!user) {
-          return res.sendStatus(401);
+          return errorResponse({
+            response: res,
+            message: "User not found",
+            status: 404,
+            error: "UserNotFound",
+          });
         }
 
         const ip = getIp(req);
@@ -114,6 +144,15 @@ export default function getSessionController({
           jti: string;
         };
 
+        if (!decoded || !decoded.sub || !decoded.jti) {
+          return errorResponse({
+            response: res,
+            message: "Refresh token is invalid",
+            status: 401,
+            error: "InvalidRefreshToken",
+          });
+        }
+
         const session = await prisma.session.findFirst({
           select: {
             id: true,
@@ -127,7 +166,12 @@ export default function getSessionController({
         });
 
         if (!session) {
-          return res.sendStatus(401);
+          return errorResponse({
+            response: res,
+            message: "Session to revoke not found",
+            status: 404,
+            error: "SessionNotFound",
+          });
         }
 
         await prisma.session.update({

@@ -10,6 +10,7 @@ import { NodeCacheAdapter } from "./data/cacheStore";
 import initializeAuthController from "./auth/controllers";
 import { NodemailerEmailService } from "./email/services/nodemailerEmailService";
 import { EmailTemplatesService } from "./email/services/emailTemplatesService";
+import initializeUserControllers from "./user/controllers";
 
 dotenv.config();
 
@@ -52,7 +53,7 @@ const emailService = new NodemailerEmailService({
   from: "Company Name <company@example.com>",
 });
 
-const emailTemplates = new EmailTemplatesService({
+const emailTemplatesService = new EmailTemplatesService({
   baseUrl: "http://localhost:3000",
   companyName: "Company Name",
 });
@@ -61,7 +62,7 @@ app.get(
   "/api/health",
   async (req, res) => {
     const data = await prisma.$executeRaw`SELECT 1`;
-    return res.sendStatus(data ? 200 : 500);
+    return res.sendStatus(data === 1 ? 200 : 500);
   },
 );
 
@@ -72,7 +73,7 @@ app.use("/api/auth", initializeAuthController({
     timeout: process.env.JWT_TIMEOUT || "1h",
   },
   emailService,
-  emailTemplatesService: emailTemplates,
+  emailTemplatesService,
   prisma,
   baseUrl: "http://localhost:3000",
   callbackUrl: "http://localhost:3000/oauth/callback",
@@ -88,6 +89,13 @@ app.use("/api/auth", initializeAuthController({
   },
 }));
 
+app.use("/api/user", initializeUserControllers({
+  jwtSecret: process.env.JWT_SECRET || "",
+  emailService,
+  emailTemplatesService,
+  prisma,
+}));
+
 app.use(errorHandler);
 
 app.listen(port, () => {
@@ -95,7 +103,6 @@ app.listen(port, () => {
     mode: process.env.NODE_ENV,
     sdk: process.version,
     datetime: new Date().toISOString(),
-    service: process.env.SERVICE,
   });
   console.info(`Server is running on port ${port}`);
 });
