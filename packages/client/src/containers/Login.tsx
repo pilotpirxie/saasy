@@ -1,20 +1,20 @@
-import { useState } from "react";
+import { FormEvent, useState } from "react";
+import { login } from "../data/sessions/thunks.ts";
+import { useAppDispatch, useAppSelector } from "../store.ts";
 
 export function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+  const sessionsState = useAppSelector((state) => state.sessions);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    try {
-      throw new Error("Not implemented");
-
-      setError(null);
-    } catch (err) {
-      setError("Something went wrong");
-    }
+    dispatch(login({
+      email,
+      password
+    }));
   };
 
   return (
@@ -27,8 +27,8 @@ export function Login() {
                 <h1 className="fw-bold text-center">Log In 🔐</h1>
               </div>
 
-              {error && <div className="alert alert-danger" role="alert">
-                {error}
+              {sessionsState.error && <div className="alert alert-danger" role="alert">
+                {sessionsState.error}
               </div>}
 
               <div className="mb-3 d-flex flex-column">

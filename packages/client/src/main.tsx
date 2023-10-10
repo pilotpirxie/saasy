@@ -8,6 +8,9 @@ import "remixicon/fonts/remixicon.css";
 import { Register } from "./containers/Register.tsx";
 import { ForgotPassword } from "./containers/ForgotPassword.tsx";
 import { ResetPassword } from "./containers/ResetPassword.tsx";
+import { LoginProviderHandler } from "./containers/LoginProviderHandler.tsx";
+import { Provider } from "react-redux";
+import { store } from "./store.ts";
 
 const router = createBrowserRouter([
   {
@@ -25,11 +28,17 @@ const router = createBrowserRouter([
   {
     path: "reset-password",
     element: <ResetPassword />
+  },
+  {
+    path: "login-provider-callback",
+    element: <LoginProviderHandler />
   }
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
   </React.StrictMode>,
 );
