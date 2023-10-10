@@ -15,22 +15,16 @@ export function Login() {
   const dispatch = useAppDispatch();
   const sessionsState = useAppSelector((state) => state.sessions);
 
-  const getTotpStatus = async (emailToCheck: string) => {
-    const response = await axiosInstance.post<{enabled: boolean}>("/api/auth/totp", {
-      email: emailToCheck,
-    });
-
-    return response.data.enabled;
-  };
-
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setTotpError(null);
 
     try {
-      const isTotpEnabled = await getTotpStatus(email);
+      const response = await axiosInstance.post<{enabled: boolean}>("/api/auth/totp", {
+        email,
+      });
 
-      if (isTotpEnabled && !totp) {
+      if (response.data.enabled && !totp) {
         setShowTotpInput(true);
         return;
       }
@@ -38,7 +32,7 @@ export function Login() {
       dispatch(login({
         email,
         password,
-        totCode: totp, // assuming you want to send TOTP code when it's available
+        totp,
       }));
     } catch (error) {
       if (isAxiosError(error) && error.response?.data?.error) {

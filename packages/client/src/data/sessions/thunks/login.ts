@@ -6,7 +6,7 @@ import { errorMessages, genericErrorMessage } from "../../utils/errorMessages.ts
 type Payload = {
   email: string;
   password: string;
-  totCode?: string;
+  totp?: string;
 }
 
 type Returned = {
@@ -25,7 +25,7 @@ export const login = createAsyncThunk<Returned, Payload, ThunkArg>(
       const response = await axiosInstance.post<Returned>("/api/auth/login", {
         email: payload.email,
         password: payload.password,
-        totpCode: payload.totCode || undefined,
+        totpCode: payload.totp || undefined,
       });
 
       localStorage.setItem("accessToken", response.data.accessToken);
