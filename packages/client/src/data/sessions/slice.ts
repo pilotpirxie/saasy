@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
-import ReduxStatuses from "../statuses/statuses.ts";
-import { login } from "./thunks.ts";
+import ReduxStatuses from "../utils/statuses.ts";
+import { login } from "./thunks/login.ts";
+import { genericErrorMessage } from "../utils/errorMessages.ts";
 
 
 export type SessionsState = {
@@ -30,7 +31,7 @@ const sessionsSlice = createSlice({
       state.refreshToken = action.payload.refreshToken;
       state.status = ReduxStatuses.SUCCESS;
     }).addCase(login.rejected, (state, action) => {
-      state.error = action.error.message || "";
+      state.error = action.payload || genericErrorMessage;
       state.status = ReduxStatuses.FAILURE;
       state.accessToken = "";
       state.refreshToken = "";

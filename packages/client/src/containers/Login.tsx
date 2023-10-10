@@ -1,20 +1,52 @@
 import { FormEvent, useState } from "react";
-import { login } from "../data/sessions/thunks.ts";
 import { useAppDispatch, useAppSelector } from "../store.ts";
+import axiosInstance from "../utils/httpClient.ts";
+import { login } from "../data/sessions/thunks/login.ts";
+import { isAxiosError } from "axios";
+import { errorMessages, genericErrorMessage } from "../data/utils/errorMessages.ts";
 
 export function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [totp, setTotp] = useState("");
+  const [showTotpInput, setShowTotpInput] = useState(false);
+  const [totpError, setTotpError] = useState<string | null>(null);
+
   const dispatch = useAppDispatch();
   const sessionsState = useAppSelector((state) => state.sessions);
 
+  const getTotpStatus = async (emailToCheck: string) => {
+    const response = await axiosInstance.post<{enabled: boolean}>("/api/auth/totp", {
+      email: emailToCheck,
+    });
+
+    return response.data.enabled;
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setTotpError(null);
 
-    dispatch(login({
-      email,
-      password
-    }));
+    try {
+      const isTotpEnabled = await getTotpStatus(email);
+
+      if (isTotpEnabled && !totp) {
+        setShowTotpInput(true);
+        return;
+      }
+
+      dispatch(login({
+        email,
+        password,
+        totCode: totp, // assuming you want to send TOTP code when it's available
+      }));
+    } catch (error) {
+      if (isAxiosError(error) && error.response?.data?.error) {
+        setTotpError(errorMessages[error.response.data.error] || genericErrorMessage);
+      } else {
+        setTotpError("Something went wrong, please try again later");
+      }
+    }
   };
 
   return (
@@ -27,8 +59,8 @@ export function Login() {
                 <h1 className="fw-bold text-center">Log In 🔐</h1>
               </div>
 
-              {sessionsState.error && <div className="alert alert-danger" role="alert">
-                {sessionsState.error}
+              {(totpError || sessionsState.error) && <div className="alert alert-danger" role="alert">
+                {totpError || sessionsState.error}
               </div>}
 
               <div className="mb-3 d-flex flex-column">
@@ -85,6 +117,17 @@ export function Login() {
                     <a className="fs-xs" href="/forgot-password">Forgot password?</a>
                   </div>
                 </div>
+
+                {showTotpInput && <div className="mb-3">
+                  <label htmlFor="totp" className="form-label">
+                    Two-factor code
+                  </label>
+                  <input type="text" className="form-control" id="totp"
+                    value={totp}
+                    onChange={(e) => setTotp(e.target.value)}
+                    required
+                  />
+                </div>}
 
                 <button type="submit" className="mb-3 btn btn-primary form-control btn-lg">
                   Log In
