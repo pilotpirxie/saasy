@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export function Register() {
   const [email, setEmail] = useState("");
@@ -21,12 +22,7 @@ export function Register() {
     <>
       <div className="container-fluid h-100">
         <div className="row h-100">
-          <div className="d-none d-lg-flex col-lg-6 bg-neutral-20"
-          // style={{
-          //   backgroundImage: "url('/img/pawel-czerwinski-NTYYL9Eb9y8-unsplash.jpeg')",
-          //   backgroundSize: "cover",
-          // }}
-          >
+          <div className="d-none d-lg-flex col-lg-6 bg-neutral-20">
             <div className="d-flex h-100 w-100 justify-content-center align-items-center">
               <div className="px-5">
                 <h1 className="fw-bold text-center">Welcome to the App 🚀</h1>
@@ -126,13 +122,13 @@ export function Register() {
 
               <div>
                 <p className="fs-sm text-center">
-                  Already have an account? <a href="/login" className="fw-bold">Log in</a>
+                  Already have an account? <Link to="/login" className="fw-bold">Log in</Link>
                 </p>
               </div>
 
               <div className="mt-5">
                 <p className="fs-xs text-center text-muted opacity-75">
-                  By signing up, you agree to our <a href="/terms" className="fw-bold">Terms of Service</a> and <a href="/privacy" className="fw-bold">Privacy Policy</a>.
+                  By signing up, you agree to our <Link to="/terms" className="fw-bold">Terms of Service</Link> and <Link to="/privacy" className="fw-bold">Privacy Policy</Link>.
                 </p>
                 <p className="fs-xs text-center text-muted opacity-75">
                   This page is protected by Google reCAPTCHA, and subject to the

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export function ResetPassword() {
   const [email, setEmail] = useState("");
@@ -54,7 +55,7 @@ export function ResetPassword() {
 
               <div>
                 <p className="fs-sm text-center">
-                  Don't want to change password? <a href="/login" className="fw-bold">Back to login</a>
+                  Don't want to change password? <Link to="/login" className="fw-bold">Back to login</Link>
                 </p>
               </div>
 

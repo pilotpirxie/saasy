@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -54,7 +55,7 @@ export function ForgotPassword() {
 
               <div>
                 <p className="fs-sm text-center">
-                  Remember your password? <a href="/login" className="fw-bold">Back to login</a>
+                  Remember your password? <Link to="/login" className="fw-bold">Back to login</Link>
                 </p>
               </div>
 

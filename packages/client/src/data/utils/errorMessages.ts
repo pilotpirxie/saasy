@@ -6,6 +6,13 @@ export const errorMessages: Record<string, string> = {
   EmailNotVerified: "Email not verified",
   TotpCodeRequired: "TOTP code required to login",
   InvalidTotpCode: "Invalid TOTP code. Check your code and try again",
+  GenericError: "Something went wrong, try again later",
 };
 
-export const genericErrorMessage = "Something went wrong, please try again later";
+export const GenericError = "GenericError";
+
+export function getErrorMessage(error: string | null, fallbackMessage?: string) {
+  if (!error) return fallbackMessage || GenericError;
+  return errorMessages[error] || fallbackMessage || GenericError;
+}
+

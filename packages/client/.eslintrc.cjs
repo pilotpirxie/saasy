@@ -53,5 +53,6 @@ module.exports = {
         camelcase: "off",
         "no-trailing-spaces": ["error"],
         "object-curly-spacing": ["error", "always"],
+        "react/no-unescaped-entities": "off",
     }
 };

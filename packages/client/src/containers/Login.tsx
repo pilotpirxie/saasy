@@ -1,9 +1,9 @@
 import { FormEvent, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../store.ts";
-import axiosInstance from "../utils/httpClient.ts";
-import { login } from "../data/sessions/thunks/login.ts";
-import { isAxiosError } from "axios";
-import { errorMessages, genericErrorMessage } from "../data/utils/errorMessages.ts";
+import { login } from "../data/auth/thunks/login.ts";
+import { checkTotpStatus } from "../data/auth/api/checkTotpStatus.ts";
+import { getErrorMessage } from "../data/utils/errorMessages.ts";
+import { Link } from "react-router-dom";
 
 export function Login() {
   const [email, setEmail] = useState("");
@@ -13,32 +13,28 @@ export function Login() {
   const [totpError, setTotpError] = useState<string | null>(null);
 
   const dispatch = useAppDispatch();
-  const sessionsState = useAppSelector((state) => state.sessions);
+  const authState = useAppSelector((state) => state.auth);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setTotpError(null);
-
     try {
-      const response = await axiosInstance.post<{enabled: boolean}>("/api/auth/totp", {
-        email,
-      });
+      setTotpError(null);
+      e.preventDefault();
 
-      if (response.data.enabled && !totp) {
+      const totpStatus = await checkTotpStatus({ email });
+
+      if (totpStatus.enabled && !totp) {
         setShowTotpInput(true);
         return;
       }
 
-      dispatch(login({
+      await dispatch(login({
         email,
         password,
         totp,
       }));
-    } catch (error) {
-      if (isAxiosError(error) && error.response?.data?.error) {
-        setTotpError(errorMessages[error.response.data.error] || genericErrorMessage);
-      } else {
-        setTotpError("Something went wrong, please try again later");
+    } catch (err) {
+      if (err instanceof Error) {
+        setTotpError(err.message);
       }
     }
   };
@@ -53,8 +49,8 @@ export function Login() {
                 <h1 className="fw-bold text-center">Log In 🔐</h1>
               </div>
 
-              {(totpError || sessionsState.error) && <div className="alert alert-danger" role="alert">
-                {totpError || sessionsState.error}
+              {(totpError || authState.login.error) && <div className="alert alert-danger" role="alert">
+                {getErrorMessage(totpError || authState.login.error)}
               </div>}
 
               <div className="mb-3 d-flex flex-column">
@@ -108,7 +104,7 @@ export function Login() {
                     required
                   />
                   <div className="d-flex justify-content-end">
-                    <a className="fs-xs" href="/forgot-password">Forgot password?</a>
+                    <Link className="fs-xs" to="/forgot-password">Forgot password?</Link>
                   </div>
                 </div>
 
@@ -130,7 +126,7 @@ export function Login() {
 
               <div>
                 <p className="fs-sm text-center">
-                  Don&apos;t have an account? <a href="/register" className="fw-bold">Create new account</a>
+                  Don't have an account? <Link to="/register" className="fw-bold">Create new account</Link>
                 </p>
               </div>
 

@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../../utils/httpClient.ts";
 import { isAxiosError } from "axios";
-import { errorMessages, genericErrorMessage } from "../../utils/errorMessages.ts";
+import { GenericError } from "../../utils/errorMessages.ts";
 
 type Payload = {
   email: string;
@@ -19,7 +19,7 @@ type ThunkArg = {
 }
 
 export const login = createAsyncThunk<Returned, Payload, ThunkArg>(
-  "sessions/login",
+  "auth/login",
   async (payload, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post<Returned>("/api/auth/login", {
@@ -34,11 +34,11 @@ export const login = createAsyncThunk<Returned, Payload, ThunkArg>(
       return response.data;
     } catch (error) {
       if (isAxiosError(error) && error.response?.data?.error) {
-        const errorMessage = errorMessages[error.response.data.error] || genericErrorMessage;
+        const errorMessage = error.response.data.error;
         return rejectWithValue(errorMessage);
       }
 
-      return rejectWithValue(genericErrorMessage);
+      return rejectWithValue(GenericError);
     }
   }
 );
