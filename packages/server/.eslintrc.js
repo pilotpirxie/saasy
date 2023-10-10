@@ -44,5 +44,6 @@ module.exports = {
     "consistent-return": "off",
     "import/no-extraneous-dependencies": "off",
     camelcase: "off",
+    "no-trailing-spaces": ["error"],
   },
 };
