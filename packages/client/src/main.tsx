@@ -1,38 +1,38 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { Login } from "./containers/Login.tsx";
+import { LoginPage } from "./auth/containers/LoginPage.tsx";
 import "fastbootstrap/dist/js/fastbootstrap";
 import "fastbootstrap/dist/css/fastbootstrap.css";
 import "remixicon/fonts/remixicon.css";
-import { Register } from "./containers/Register.tsx";
-import { ForgotPassword } from "./containers/ForgotPassword.tsx";
-import { ResetPassword } from "./containers/ResetPassword.tsx";
-import { LoginProviderHandler } from "./containers/LoginProviderHandler.tsx";
+import { RegisterPage } from "./auth/containers/RegisterPage.tsx";
+import { ForgotPasswordPage } from "./auth/containers/ForgotPasswordPage.tsx";
+import { ResetPasswordPage } from "./auth/containers/ResetPasswordPage.tsx";
+import { LoginProviderHandlerPage } from "./auth/containers/LoginProviderHandlerPage.tsx";
 import { Provider } from "react-redux";
 import { store } from "./store.ts";
 
 const router = createBrowserRouter([
   {
     path: "login",
-    element: <Login />
+    element: <LoginPage />
   },
   {
     path: "register",
-    element: <Register />
+    element: <RegisterPage />
   },
   {
     path: "forgot-password",
-    element: <ForgotPassword />
+    element: <ForgotPasswordPage />
   },
   {
     path: "reset-password",
-    element: <ResetPassword />
+    element: <ResetPasswordPage />
   },
   {
     path: "login-provider-callback",
-    element: <LoginProviderHandler />
-  }
+    element: <LoginProviderHandlerPage />
+  },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

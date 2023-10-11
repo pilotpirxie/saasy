@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-export function LoginProviderHandler() {
+export function LoginProviderHandlerPage() {
   const navigate = useNavigate();
 
   useEffect(() => {

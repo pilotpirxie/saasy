@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
-import ReduxStatuses from "../utils/statuses.ts";
+import ReduxStatuses from "../../shared/utils/statuses.ts";
 import { login } from "./thunks/login.ts";
-import { GenericError } from "../utils/errorMessages.ts";
+import { GenericError } from "../../shared/utils/errorMessages.ts";
 
 export type AuthState = {
   session: {
