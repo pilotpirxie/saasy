@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
 import { EmailService } from "../../emails/services/emailService";
 import { EmailTemplates } from "../../emails/services/emailTemplates";
-import getInvitationsController from "./invitationsController";
+import initializeInvitationsController from "./invitationsController";
 
 type UserControllersConfig = {
   jwtSecret: string;
@@ -11,7 +11,7 @@ type UserControllersConfig = {
   emailTemplatesService: EmailTemplates;
 }
 
-export default function initializeInvitationControllers({
+export default function initializeCombinedInvitationsController({
   jwtSecret,
   prisma,
   emailService,
@@ -19,7 +19,7 @@ export default function initializeInvitationControllers({
 }: UserControllersConfig): Router {
   const router = Router();
 
-  router.use(getInvitationsController({
+  router.use(initializeInvitationsController({
     jwtSecret,
     prisma,
     emailService,

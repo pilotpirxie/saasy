@@ -3,10 +3,10 @@ import { Router } from "express";
 import { EmailService } from "../../emails/services/emailService";
 import { EmailTemplates } from "../../emails/services/emailTemplates";
 import { JwtInfo } from "../utils/jwtInfo";
-import getEmailController from "./emailController";
-import getSessionController from "./sessionController";
-import getPasswordController from "./passwordController";
-import getSocialAuthController from "./socialController";
+import initializeSessionController from "./sessionController";
+import initializePasswordController from "./passwordController";
+import initializeEmailAuthController from "./emailAuthController";
+import initializeSocialAuthController from "./socialAuthController";
 
 type AuthControllersConfig = {
   jwtInfo: JwtInfo;
@@ -27,7 +27,7 @@ type AuthControllersConfig = {
   callbackUrl: string;
 }
 
-export default function initializeAuthControllers({
+export default function initializeCombinedAuthController({
   jwtInfo,
   prisma,
   emailService,
@@ -38,25 +38,25 @@ export default function initializeAuthControllers({
 }: AuthControllersConfig): Router {
   const router = Router();
 
-  router.use(getEmailController({
+  router.use(initializeEmailAuthController({
     jwtInfo,
     prisma,
     emailService,
     emailTemplatesService,
   }));
 
-  router.use(getSessionController({
+  router.use(initializeSessionController({
     jwtInfo,
     prisma,
   }));
 
-  router.use(getPasswordController({
+  router.use(initializePasswordController({
     prisma,
     emailService,
     emailTemplatesService,
   }));
 
-  router.use(getSocialAuthController({
+  router.use(initializeSocialAuthController({
     prisma,
     jwtInfo,
     callbackUrl,

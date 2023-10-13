@@ -10,7 +10,7 @@ import { EmailService } from "../../emails/services/emailService";
 import { EmailTemplates } from "../../emails/services/emailTemplates";
 import { getHashedPassword } from "../utils/passwordManager";
 
-export default function getPasswordController({
+export default function initializePasswordController({
   prisma,
   emailService,
   emailTemplatesService,

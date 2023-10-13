@@ -10,7 +10,7 @@ import validation from "../../shared/middlewares/validation";
 import { TypedRequest } from "../../shared/types/express";
 import errorResponse from "../../shared/utils/errorResponse";
 
-export default function getInvitationsController({
+export default function initializeInvitationsController({
   prisma,
   jwtSecret,
   emailService,

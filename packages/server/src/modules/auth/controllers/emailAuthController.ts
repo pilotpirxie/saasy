@@ -14,7 +14,7 @@ import { JwtInfo } from "../utils/jwtInfo";
 import { getHashedPassword } from "../utils/passwordManager";
 import { createSession } from "../utils/sessionManager";
 
-export default function getEmailController({
+export default function initializeEmailAuthController({
   jwtInfo,
   prisma,
   emailService,

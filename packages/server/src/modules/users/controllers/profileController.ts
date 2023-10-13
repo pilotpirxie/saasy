@@ -6,7 +6,7 @@ import validation from "../../shared/middlewares/validation";
 import { TypedRequest } from "../../shared/types/express";
 import errorResponse from "../../shared/utils/errorResponse";
 
-export default function getProfileController({
+export default function initializeProfileController({
   prisma,
   jwtSecret,
 }: {

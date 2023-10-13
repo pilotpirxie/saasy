@@ -11,7 +11,7 @@ import { TypedRequest } from "../../shared/types/express";
 import { getHashedPassword } from "../../auth/utils/passwordManager";
 import errorResponse from "../../shared/utils/errorResponse";
 
-export default function getAccountController({
+export default function initializeAccountController({
   prisma,
   jwtSecret,
   emailService,

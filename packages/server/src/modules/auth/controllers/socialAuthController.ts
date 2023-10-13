@@ -84,7 +84,7 @@ async function authenticate({
   return authorizationCode.id;
 }
 
-export default function getSocialController({
+export default function initializeSocialAuthController({
   jwtInfo,
   prisma,
   socialAuthProviders,

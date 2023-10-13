@@ -7,12 +7,12 @@ import { errorHandler } from "./modules/shared/middlewares/errors";
 import { checkPrismaConnection } from "./data/prismaConnectionTest";
 import { usePrismaClientFactory } from "./data/prismaClientFactory";
 import { NodeCacheAdapter } from "./data/cacheStore";
-import initializeAuthController from "./modules/auth/controllers";
 import { NodemailerEmailService } from "./modules/emails/services/nodemailerEmailService";
 import { EmailTemplatesService } from "./modules/emails/services/emailTemplatesService";
-import initializeUsersControllers from "./modules/users/controllers";
-import initializeTeamsControllers from "./modules/teams/controllers";
-import initializeInvitationsControllers from "./modules/invitations/controllers";
+import initializeCombinedAuthController from "./modules/auth/controllers/combinedAuthController";
+import initializeCombinedTeamsController from "./modules/teams/controllers/combinedTeamsController";
+import initializeCombinedInvitationsController from "./modules/invitations/controllers/combinedInvitationsController";
+import initializeCombinedUsersController from "./modules/users/controllers/combinedUsersController";
 
 dotenv.config();
 
@@ -68,7 +68,7 @@ app.get(
   },
 );
 
-app.use("/api/auth", initializeAuthController({
+app.use("/api/auth", initializeCombinedAuthController({
   jwtInfo: {
     secret: process.env.JWT_SECRET || "",
     refreshTokenTimeout: process.env.JWT_REFRESH_TOKEN_TIMEOUT || "1d",
@@ -91,19 +91,19 @@ app.use("/api/auth", initializeAuthController({
   },
 }));
 
-app.use("/api/users", initializeUsersControllers({
+app.use("/api/users", initializeCombinedUsersController({
   jwtSecret: process.env.JWT_SECRET || "",
   emailService,
   emailTemplatesService,
   prisma,
 }));
 
-app.use("/api/teams", initializeTeamsControllers({
+app.use("/api/teams", initializeCombinedTeamsController({
   jwtSecret: process.env.JWT_SECRET || "",
   prisma,
 }));
 
-app.use("/api/invitations", initializeInvitationsControllers({
+app.use("/api/invitations", initializeCombinedInvitationsController({
   jwtSecret: process.env.JWT_SECRET || "",
   emailService,
   emailTemplatesService,

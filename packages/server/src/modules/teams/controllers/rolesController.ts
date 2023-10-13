@@ -6,7 +6,7 @@ import validation from "../../shared/middlewares/validation";
 import errorResponse from "../../shared/utils/errorResponse";
 import verifyUserTeamRole from "../middlewares/verifyUserTeamRole";
 
-export default function getRolesController({
+export default function initializeRolesController({
   prisma,
   jwtSecret,
 }: {

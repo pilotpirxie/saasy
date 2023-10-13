@@ -10,7 +10,7 @@ import { getIp } from "../../shared/utils/getIp";
 import { JwtInfo } from "../utils/jwtInfo";
 import { createSession } from "../utils/sessionManager";
 
-export default function getSessionController({
+export default function initializeSessionController({
   jwtInfo,
   prisma,
 }: {

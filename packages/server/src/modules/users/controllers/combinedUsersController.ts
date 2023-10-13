@@ -2,8 +2,8 @@ import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
 import { EmailService } from "../../emails/services/emailService";
 import { EmailTemplates } from "../../emails/services/emailTemplates";
-import getProfileController from "./profileController";
-import getAccountController from "./accountController";
+import initializeProfileController from "./profileController";
+import initializeAccountController from "./accountController";
 
 type UserControllersConfig = {
   jwtSecret: string;
@@ -12,7 +12,7 @@ type UserControllersConfig = {
   emailTemplatesService: EmailTemplates;
 }
 
-export default function initializeUserControllers({
+export default function initializeCombinedUsersController({
   jwtSecret,
   prisma,
   emailService,
@@ -20,12 +20,12 @@ export default function initializeUserControllers({
 }: UserControllersConfig): Router {
   const router = Router();
 
-  router.use(getProfileController({
+  router.use(initializeProfileController({
     jwtSecret,
     prisma,
   }));
 
-  router.use(getAccountController({
+  router.use(initializeAccountController({
     jwtSecret,
     prisma,
     emailService,

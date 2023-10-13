@@ -5,7 +5,7 @@ import jwtVerify from "../../shared/middlewares/jwt";
 import validation from "../../shared/middlewares/validation";
 import verifyUserTeamRole from "../middlewares/verifyUserTeamRole";
 
-export default function getTeamsController({
+export default function initializeTeamsController({
   prisma,
   jwtSecret,
 }: {
