@@ -1,6 +1,4 @@
 import { FormEvent, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../store.ts";
-import { login } from "../data/thunks/login.ts";
 import { checkTotpStatus } from "../data/api/checkTotpStatus.ts";
 import { Link } from "react-router-dom";
 import { CleanLayout } from "../components/CleanLayout.tsx";
@@ -12,6 +10,7 @@ import { EmailInput } from "../../shared/components/FormInputs/EmailInput.tsx";
 import { PasswordInput } from "../../shared/components/FormInputs/PasswordInput.tsx";
 import { TextInput } from "../../shared/components/FormInputs/TextInput.tsx";
 import { FormLink } from "../components/FormLink.tsx";
+import { loginByEmail } from "../data/api/loginByEmail.ts";
 
 export function LoginPage() {
   const [email, setEmail] = useState("");
@@ -19,30 +18,36 @@ export function LoginPage() {
   const [totp, setTotp] = useState("");
   const [showTotpInput, setShowTotpInput] = useState(false);
   const [totpError, setTotpError] = useState<string | null>(null);
-
-  const dispatch = useAppDispatch();
-  const authState = useAppSelector((state) => state.auth);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    setTotpError(null);
+    e.preventDefault();
+
+
     try {
-      setTotpError(null);
-      e.preventDefault();
-
       const totpStatus = await checkTotpStatus({ email });
-
       if (totpStatus.enabled && !totp) {
         setShowTotpInput(true);
         return;
       }
-
-      await dispatch(login({
-        email,
-        password,
-        totp,
-      }));
     } catch (err) {
       if (err instanceof Error) {
         setTotpError(err.message);
+      }
+    }
+
+    try {
+      const loginResponse = await loginByEmail({
+        email,
+        password,
+        totp,
+      });
+
+      window.location.href = loginResponse.redirectUrl;
+    } catch (err) {
+      if (err instanceof Error) {
+        setLoginError(err.message);
       }
     }
   };
@@ -53,7 +58,7 @@ export function LoginPage() {
         <h1 className="fw-bold text-center">Log In 🔐</h1>
       </div>
 
-      <ErrorMessage message={totpError || authState.login.error} />
+      <ErrorMessage message={totpError || loginError} />
 
       <AuthProviderButtons
         onGoogle={() => {}}

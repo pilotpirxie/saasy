@@ -2,22 +2,19 @@ import axiosInstance from "../../../shared/utils/httpClient.ts";
 import { isAxiosError } from "axios";
 import { GenericError } from "../../../shared/utils/errorMessages.ts";
 
-export type LoginParams = {
-  email: string;
-  password: string;
-  totp?: string;
+export type ExchangeCodeParams = {
+  code: string;
 }
 
-export type LoginResponse = {
-  redirectUrl: string;
+export type ExchangeCodeResponse = {
+  accessToken: string;
+  refreshToken: string;
 }
 
-export const loginByEmail = async ({ email, password, totp }: LoginParams) => {
+export const exchangeCode = async ({ code }: ExchangeCodeParams) => {
   try {
-    const response = await axiosInstance.post<LoginResponse>("/api/auth/login", {
-      email: email,
-      password: password,
-      totpCode: totp || undefined,
+    const response = await axiosInstance.post<ExchangeCodeResponse>("/api/auth/exchange", {
+      code,
     });
 
     return response.data;
