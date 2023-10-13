@@ -10,20 +10,20 @@ import { TypedRequest } from "../../shared/types/express";
 import { getIp } from "../../shared/utils/getIp";
 import { EmailService } from "../../emails/services/emailService";
 import { EmailTemplates } from "../../emails/services/emailTemplates";
-import { JwtInfo } from "../utils/jwtInfo";
 import { getHashedPassword } from "../utils/passwordManager";
-import { createSession } from "../utils/sessionManager";
+import { redirectWithCode } from "../../shared/utils/redirectManager";
 
 export default function initializeEmailAuthController({
-  jwtInfo,
   prisma,
   emailService,
   emailTemplatesService,
+  callbackUrl,
 }: {
-  jwtInfo: JwtInfo;
   prisma: PrismaClient;
   emailService: EmailService;
   emailTemplatesService: EmailTemplates;
+  callbackUrl: string;
+
 }): Router {
   const router = Router();
 
@@ -123,20 +123,19 @@ export default function initializeEmailAuthController({
           }
         }
 
-        const ip = getIp(req);
-
-        const { jwtToken, jwtRefreshToken } = await createSession({
-          prisma,
-          userId: user.id,
-          ip,
-          jwtInfo,
-          userAgent: req.headers["user-agent"] || "",
-          authProviderType: "email",
+        const authorizationCode = await prisma.authorizationCode.create({
+          data: {
+            userId: user.id,
+            authProviderType: "email",
+            expiresAt: dayjs().add(5, "minutes").toDate(),
+          },
         });
 
         return res.json({
-          accessToken: jwtToken,
-          refreshToken: jwtRefreshToken,
+          redirectUrl: redirectWithCode({
+            callbackUrl,
+            code: authorizationCode.id,
+          }),
         });
       } catch (error) {
         return next(error);

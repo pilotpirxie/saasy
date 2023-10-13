@@ -39,10 +39,10 @@ export default function initializeCombinedAuthController({
   const router = Router();
 
   router.use(initializeEmailAuthController({
-    jwtInfo,
     prisma,
     emailService,
     emailTemplatesService,
+    callbackUrl,
   }));
 
   router.use(initializeSessionController({
