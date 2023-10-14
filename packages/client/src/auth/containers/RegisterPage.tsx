@@ -3,22 +3,34 @@ import { SideLayout } from "../components/SideLayout.tsx";
 import { RegisterForm } from "../components/RegisterForm.tsx";
 import useIsMobile from "../../shared/hooks/useIsMobile.ts";
 import { CleanLayout } from "../components/CleanLayout.tsx";
+import { registerByEmail } from "../data/api/registerByEmail.ts";
 
 export function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const isMobile = useIsMobile();
+  const [registerError, setRegisterError] = useState<string | null>(null);
+  const [registered, setRegistered] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    try {
-      throw new Error("Not implemented");
+    setRegisterError(null);
+    setRegistered(false);
 
-      setError(null);
+    try {
+      await registerByEmail({
+        email,
+        password,
+      });
+
+      setRegistered(true);
     } catch (err) {
-      setError("Something went wrong");
+      if (err instanceof Error) {
+        setRegisterError(err.message);
+      } else {
+        setRegisterError("An error occurred");
+      }
     }
   };
 
@@ -27,7 +39,8 @@ export function RegisterPage() {
       <RegisterForm
         email={email}
         password={password}
-        error={error}
+        error={registerError}
+        registered={registered}
         onSubmit={handleSubmit}
         onEmailChange={setEmail}
         onPasswordChange={setPassword}
@@ -66,7 +79,8 @@ export function RegisterPage() {
         <RegisterForm
           email={email}
           password={password}
-          error={error}
+          error={registerError}
+          registered={registered}
           onSubmit={handleSubmit}
           onEmailChange={setEmail}
           onPasswordChange={setPassword}

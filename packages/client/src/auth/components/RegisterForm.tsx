@@ -1,4 +1,4 @@
-import { ErrorMessage } from "./ErrorMessage.tsx";
+import { ErrorMessage } from "../../shared/components/ErrorMessage.tsx";
 import { AuthProviderButtons } from "./AuthProviderButtons.tsx";
 import { HorizontalSplitter } from "./HorizontalSplitter.tsx";
 import { EmailInput } from "../../shared/components/FormInputs/EmailInput.tsx";
@@ -6,6 +6,7 @@ import { PasswordInput } from "../../shared/components/FormInputs/PasswordInput.
 import { FormLink } from "./FormLink.tsx";
 import { TermsNote } from "./TermsNote.tsx";
 import { ReCaptchaNote } from "./ReCaptchaNote.tsx";
+import { Link } from "react-router-dom";
 
 export const RegisterForm = ({
   email,
@@ -13,6 +14,7 @@ export const RegisterForm = ({
   password,
   onPasswordChange,
   error,
+  registered,
   onSubmit,
 }: {
   email: string;
@@ -20,6 +22,7 @@ export const RegisterForm = ({
   password: string;
   onPasswordChange: (password: string) => void;
   error: string | null;
+  registered: boolean;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 }) => {
   return <>
@@ -27,6 +30,13 @@ export const RegisterForm = ({
       <h1 className="fw-bold text-center">Sign Up 👋</h1>
     </div>
 
+    {registered ? <div
+      className="alert alert-success"
+      role="alert"
+    >
+      You have been registered! Please check your email to verify your account. <Link to={"/auth/resend"}>Resend</Link>
+    </div>
+      : null}
     <ErrorMessage message={error} />
 
     <AuthProviderButtons

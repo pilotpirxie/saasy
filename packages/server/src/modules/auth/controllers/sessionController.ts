@@ -256,9 +256,9 @@ export default function initializeSessionController({
         if (user.authProviderType !== authorizationCode.authProviderType) {
           return errorResponse({
             response: res,
-            message: "Invalid provider",
+            message: "Invalid auth provider",
             status: 400,
-            error: "InvalidProvider",
+            error: "InvalidAuthProvider",
           });
         }
 

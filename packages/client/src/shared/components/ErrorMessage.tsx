@@ -1,4 +1,4 @@
-import { getErrorMessage } from "../../shared/utils/errorMessages.ts";
+import { getErrorMessage } from "../utils/errorMessages.ts";
 
 export const ErrorMessage = ({ message }: { message: string | null }) => {
   if (message === null) {

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { CleanLayout } from "../components/CleanLayout.tsx";
-import { ErrorMessage } from "../components/ErrorMessage.tsx";
+import { ErrorMessage } from "../../shared/components/ErrorMessage.tsx";
 import { ReCaptchaNote } from "../components/ReCaptchaNote.tsx";
 import { EmailInput } from "../../shared/components/FormInputs/EmailInput.tsx";
 import { FormLink } from "../components/FormLink.tsx";

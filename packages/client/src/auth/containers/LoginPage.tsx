@@ -2,7 +2,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { checkTotpStatus } from "../data/api/checkTotpStatus.ts";
 import { Link } from "react-router-dom";
 import { CleanLayout } from "../components/CleanLayout.tsx";
-import { ErrorMessage } from "../components/ErrorMessage.tsx";
+import { ErrorMessage } from "../../shared/components/ErrorMessage.tsx";
 import { AuthProviderButtons } from "../components/AuthProviderButtons.tsx";
 import { HorizontalSplitter } from "../components/HorizontalSplitter.tsx";
 import { ReCaptchaNote } from "../components/ReCaptchaNote.tsx";
@@ -31,8 +31,9 @@ export function LoginPage() {
   }, []);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    setTotpError(null);
     e.preventDefault();
+
+    setTotpError(null);
 
     try {
       const totpStatus = await checkTotpStatus({ email });
@@ -43,6 +44,8 @@ export function LoginPage() {
     } catch (err) {
       if (err instanceof Error) {
         setTotpError(err.message);
+      } else {
+        setTotpError("An error occurred");
       }
     }
 
@@ -57,6 +60,8 @@ export function LoginPage() {
     } catch (err) {
       if (err instanceof Error) {
         setLoginError(err.message);
+      } else {
+        setLoginError("An error occurred");
       }
     }
   };

@@ -6,7 +6,6 @@ import url from "url";
 import validation from "../../shared/middlewares/validation";
 import { TypedRequest } from "../../shared/types/express";
 import { getIp } from "../../shared/utils/getIp";
-import { JwtInfo } from "../utils/jwtInfo";
 import { redirectWithCode, redirectWithError } from "../../shared/utils/redirectManager";
 
 async function authenticate({
@@ -83,13 +82,11 @@ async function authenticate({
 }
 
 export default function initializeSocialAuthController({
-  jwtInfo,
   prisma,
   socialAuthProviders,
   baseUrl,
   callbackUrl,
 }: {
-  jwtInfo: JwtInfo;
   prisma: PrismaClient;
   socialAuthProviders: {
     google: {

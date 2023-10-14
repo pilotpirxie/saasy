@@ -58,7 +58,6 @@ export default function initializeCombinedAuthController({
 
   router.use(initializeSocialAuthController({
     prisma,
-    jwtInfo,
     callbackUrl,
     baseUrl,
     socialAuthProviders,
