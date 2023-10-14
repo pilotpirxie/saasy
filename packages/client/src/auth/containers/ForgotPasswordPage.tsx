@@ -51,7 +51,7 @@ export function ForgotPasswordPage() {
       <FormLink
         label="Remember your password?"
         linkLabel={"Back to login"}
-        linkTo={"/login"}
+        linkTo={"/auth/login"}
       />
 
       <ReCaptchaNote />

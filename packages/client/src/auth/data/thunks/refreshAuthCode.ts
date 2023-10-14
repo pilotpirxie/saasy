@@ -1,17 +1,17 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { isAxiosError } from "axios";
 import { GenericError } from "../../../shared/utils/errorMessages.ts";
-import { exchangeCode, ExchangeCodeParams, ExchangeCodeResponse } from "../api/exchangeCode.ts";
+import { refreshCode, RefreshCodeParams, RefreshCodeResponse } from "../api/refreshCode.ts";
 
 type ThunkArg = {
   rejectValue: string;
 }
 
-export const exchangeAuthCode = createAsyncThunk<ExchangeCodeResponse, ExchangeCodeParams, ThunkArg>(
-  "auth/exchange",
+export const refreshAuthCode = createAsyncThunk<RefreshCodeResponse, RefreshCodeParams, ThunkArg>(
+  "auth/refresh",
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await exchangeCode(payload);
+      const response = await refreshCode(payload);
 
       localStorage.setItem("refreshToken", response.refreshToken);
 

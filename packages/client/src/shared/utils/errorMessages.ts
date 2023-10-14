@@ -12,7 +12,7 @@ export const errorMessages: Record<string, string> = {
 export const GenericError = "GenericError";
 
 export function getErrorMessage(error: string | null, fallbackMessage?: string) {
-  if (!error) return fallbackMessage || GenericError;
-  return errorMessages[error] || fallbackMessage || GenericError;
+  if (!error) return fallbackMessage || errorMessages[GenericError];
+  return errorMessages[error] || fallbackMessage || errorMessages[GenericError];
 }
 

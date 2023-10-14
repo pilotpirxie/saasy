@@ -77,8 +77,8 @@ app.use("/api/auth", initializeCombinedAuthController({
   emailService,
   emailTemplatesService,
   prisma,
-  baseUrl: "http://localhost:3000",
-  callbackUrl: "http://localhost:3000/login-provider-callback",
+  baseUrl: process.env.BASE_URL || "http://localhost:3000",
+  callbackUrl: process.env.AUTH_CALLBACK_URL || "http://localhost:5173/auth/exchange-code",
   socialAuthProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID || "",

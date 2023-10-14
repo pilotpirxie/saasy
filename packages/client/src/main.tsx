@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import { LoginPage } from "./auth/containers/LoginPage.tsx";
 import "fastbootstrap/dist/js/fastbootstrap";
 import "fastbootstrap/dist/css/fastbootstrap.css";
@@ -8,31 +8,60 @@ import "remixicon/fonts/remixicon.css";
 import { RegisterPage } from "./auth/containers/RegisterPage.tsx";
 import { ForgotPasswordPage } from "./auth/containers/ForgotPasswordPage.tsx";
 import { ResetPasswordPage } from "./auth/containers/ResetPasswordPage.tsx";
-import { LoginProviderHandlerPage } from "./auth/containers/LoginProviderHandlerPage.tsx";
+import { ExchangeCodePage } from "./auth/containers/ExchangeCodePage.tsx";
 import { Provider } from "react-redux";
 import { store } from "./store.ts";
+import { RedirectIfAuth } from "./shared/containers/RedirectIfAuth.tsx";
+import { AppRoot } from "./app/containers/AppRoot.tsx";
+import { ErrorPage } from "./app/containers/ErrorPage.tsx";
+import { Dashboard } from "./dashboard/containers/Dashboard.tsx";
 
 const router = createBrowserRouter([
   {
-    path: "login",
-    element: <LoginPage />
-  },
-  {
-    path: "register",
-    element: <RegisterPage />
-  },
-  {
-    path: "forgot-password",
-    element: <ForgotPasswordPage />
-  },
-  {
-    path: "reset-password",
-    element: <ResetPasswordPage />
-  },
-  {
-    path: "login-provider-callback",
-    element: <LoginProviderHandlerPage />
-  },
+    path: "/",
+    element: <AppRoot />,
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: "/",
+        element: <Navigate to={"/auth/login"} />
+      },
+      {
+        path: "/auth/login",
+        element: <RedirectIfAuth>
+          <LoginPage />
+        </RedirectIfAuth>
+      },
+      {
+        path: "/auth/register",
+        element: <RedirectIfAuth>
+          <RegisterPage />
+        </RedirectIfAuth>
+      },
+      {
+        path: "/auth/forgot-password",
+        element: <RedirectIfAuth>
+          <ForgotPasswordPage />
+        </RedirectIfAuth>
+      },
+      {
+        path: "/auth/reset-password",
+        element: <RedirectIfAuth>
+          <ResetPasswordPage />
+        </RedirectIfAuth>
+      },
+      {
+        path: "/auth/exchange-code",
+        element: <RedirectIfAuth>
+          <ExchangeCodePage />
+        </RedirectIfAuth>
+      },
+      {
+        path: "/dashboard",
+        element: <Dashboard />
+      }
+    ]
+  }
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

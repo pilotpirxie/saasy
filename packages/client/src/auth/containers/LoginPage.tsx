@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { checkTotpStatus } from "../data/api/checkTotpStatus.ts";
 import { Link } from "react-router-dom";
 import { CleanLayout } from "../components/CleanLayout.tsx";
@@ -19,11 +19,20 @@ export function LoginPage() {
   const [showTotpInput, setShowTotpInput] = useState(false);
   const [totpError, setTotpError] = useState<string | null>(null);
   const [loginError, setLoginError] = useState<string | null>(null);
+  const [urlError, setUrlError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get("error");
+
+    if (error) {
+      setUrlError(error);
+    }
+  }, []);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     setTotpError(null);
     e.preventDefault();
-
 
     try {
       const totpStatus = await checkTotpStatus({ email });
@@ -58,7 +67,7 @@ export function LoginPage() {
         <h1 className="fw-bold text-center">Log In 🔐</h1>
       </div>
 
-      <ErrorMessage message={totpError || loginError} />
+      <ErrorMessage message={totpError || loginError || urlError} />
 
       <AuthProviderButtons
         onGoogle={() => {}}
@@ -88,7 +97,7 @@ export function LoginPage() {
           <div className="d-flex justify-content-end">
             <Link
               className="fs-xs"
-              to="/forgot-password"
+              to="/auth/forgot-password"
             >
               Forgot password?
             </Link>
@@ -115,7 +124,7 @@ export function LoginPage() {
       <FormLink
         label={"Don't have an account?"}
         linkLabel={"Sign Up"}
-        linkTo={"/register"}
+        linkTo={"/auth/register"}
       />
 
       <ReCaptchaNote />

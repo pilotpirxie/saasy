@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { ReCaptchaNote } from "../components/ReCaptchaNote.tsx";
 import { SideLayout } from "../components/SideLayout.tsx";
 import { ErrorMessage } from "../components/ErrorMessage.tsx";
@@ -87,14 +86,6 @@ export function RegisterPage() {
                 onChange={setPassword}
                 required
               />
-              <div className="d-flex justify-content-end">
-                <Link
-                  className="fs-xs"
-                  to="/forgot-password"
-                >
-                  Forgot password?
-                </Link>
-              </div>
             </div>
 
             <button
@@ -108,7 +99,7 @@ export function RegisterPage() {
           <FormLink
             label={"Already have an account?"}
             linkLabel={"Log in"}
-            linkTo={"/login"}
+            linkTo={"/auth/login"}
           />
 
           <TermsNote />
