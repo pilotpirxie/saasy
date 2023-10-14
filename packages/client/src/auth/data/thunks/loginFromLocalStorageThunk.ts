@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { refreshAuthCode } from "./refreshAuthCode.ts";
+import { refreshThunk } from "./refreshThunk.ts";
 
 type ThunkArg = {
   rejectValue: string;
@@ -8,13 +8,13 @@ type ThunkArg = {
 type LoginFromLocalStorageResponse = object
 type LoginFromLocalStorageParams = object
 
-export const loginFromLocalStorage = createAsyncThunk<LoginFromLocalStorageParams, LoginFromLocalStorageResponse, ThunkArg>(
+export const loginFromLocalStorageThunk = createAsyncThunk<LoginFromLocalStorageParams, LoginFromLocalStorageResponse, ThunkArg>(
   "auth/loginFromLocalStorage",
   async (_, { dispatch }) => {
     const refreshToken = localStorage.getItem("refreshToken");
 
     if (refreshToken) {
-      await dispatch(refreshAuthCode({
+      await dispatch(refreshThunk({
         refreshToken,
       }));
     }

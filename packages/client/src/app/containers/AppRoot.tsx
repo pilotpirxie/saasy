@@ -1,15 +1,15 @@
 import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../store.ts";
-import { loginFromLocalStorage } from "../../auth/data/thunks/loginFromLocalStorage.ts";
-import { refreshAuthCode } from "../../auth/data/thunks/refreshAuthCode.ts";
+import { loginFromLocalStorageThunk } from "../../auth/data/thunks/loginFromLocalStorageThunk.ts";
+import { refreshThunk } from "../../auth/data/thunks/refreshThunk.ts";
 
 export const AppRoot = () => {
   const dispatch = useAppDispatch();
   const refreshToken = useAppSelector((state) => state.auth.session.refreshToken);
 
   useEffect(() => {
-    dispatch(loginFromLocalStorage({}));
+    dispatch(loginFromLocalStorageThunk({}));
   }, [dispatch]);
 
   useEffect(() => {
@@ -18,7 +18,7 @@ export const AppRoot = () => {
         return;
       }
 
-      dispatch(refreshAuthCode({
+      dispatch(refreshThunk({
         refreshToken
       }));
     }, 1000 * 60 * 5);

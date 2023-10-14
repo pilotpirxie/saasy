@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../store.ts";
-import { exchangeAuthCode } from "../data/thunks/exchangeAuthCode.ts";
+import { exchangeAuthCodeThunk } from "../data/thunks/exchangeAuthCodeThunk.ts";
 
 export function ExchangeCodePage() {
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ export function ExchangeCodePage() {
     }
 
     if (code) {
-      dispatch(exchangeAuthCode({
+      dispatch(exchangeAuthCodeThunk({
         code
       }));
     }
