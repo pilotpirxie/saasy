@@ -16,6 +16,7 @@ import { AppRoot } from "./app/containers/AppRoot.tsx";
 import { ErrorPage } from "./app/containers/ErrorPage.tsx";
 import { Dashboard } from "./dashboard/containers/Dashboard.tsx";
 import { RequiredAuth } from "./shared/containers/RequiredAuth.tsx";
+import { ResendVerify } from "./auth/containers/ResendVerify.tsx";
 
 const router = createBrowserRouter([
   {
@@ -37,6 +38,12 @@ const router = createBrowserRouter([
         path: "/auth/register",
         element: <RedirectIfAuth>
           <RegisterPage />
+        </RedirectIfAuth>
+      },
+      {
+        path: "/auth/resend",
+        element: <RedirectIfAuth>
+          <ResendVerify />
         </RedirectIfAuth>
       },
       {

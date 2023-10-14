@@ -34,7 +34,12 @@ export const RegisterForm = ({
       className="alert alert-success"
       role="alert"
     >
-      You have been registered! Please check your email to verify your account. <Link to={"/auth/resend"}>Resend</Link>
+      You have been registered! Please check your email to verify your account.
+      <br />
+      <Link
+        className="alert-link small"
+        to={"/auth/resend"}
+      >Resend email</Link>
     </div>
       : null}
     <ErrorMessage message={error} />
