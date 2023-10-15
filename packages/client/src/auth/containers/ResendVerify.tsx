@@ -1,22 +1,34 @@
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { CleanLayout } from "../components/CleanLayout.tsx";
 import { ReCaptchaNote } from "../components/ReCaptchaNote.tsx";
 import { EmailInput } from "../../shared/components/FormInputs/EmailInput.tsx";
 import { FormLink } from "../components/FormLink.tsx";
+import { resendVerify } from "../data/api/resendVerify.ts";
+import { ErrorMessage } from "../../shared/components/ErrorMessage.tsx";
 
 export function ResendVerify() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [sent, setSent] = useState<boolean>(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
-      throw new Error("Not implemented");
-
       setError(null);
+      setSent(false);
+
+      await resendVerify({ email });
+
+      setSent(true);
+      setError(null);
+      setEmail("");
     } catch (err) {
-      setError("Something went wrong");
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An error occurred");
+      }
     }
   };
 
@@ -24,16 +36,20 @@ export function ResendVerify() {
     <CleanLayout>
       <div className="mb-5">
         <h1 className="fw-bold text-center">
-          Resend verify email 📧
+          Send new verification email 📧
         </h1>
       </div>
 
-      {error && <div
-        className="alert alert-danger"
-        role="alert"
-      >
-        {error}
-      </div>}
+      {sent && (
+        <div
+          className="alert alert-success"
+          role="alert"
+        >
+          Verification email sent. Please check your inbox.
+        </div>
+      )}
+
+      <ErrorMessage message={error} />
 
       <form onSubmit={handleSubmit}>
         <div className="mb-3">

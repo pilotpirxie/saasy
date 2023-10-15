@@ -372,6 +372,28 @@ export default function initializeEmailAuthController({
           });
         }
 
+        const lastEmailVerification = await prisma.emailVerification.findFirst({
+          select: {
+            id: true,
+            createdAt: true,
+          },
+          where: {
+            userId: user.id,
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        });
+
+        if (lastEmailVerification && dayjs(lastEmailVerification.createdAt).isAfter(dayjs().subtract(15, "minute"))) {
+          return errorResponse({
+            response: res,
+            message: "Too fast. Wait a little before resending verification",
+            status: 429,
+            error: "TooFastResend",
+          });
+        }
+
         const emailVerification = await prisma.emailVerification.create({
           data: {
             userId: user.id,

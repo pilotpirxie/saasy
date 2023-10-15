@@ -25,6 +25,7 @@ export const errorMessages: Record<string, string> = {
   SessionRevoked: "Session has been revoked",
   AuthorizationCodeNotFound: "Authorization code not found",
   AuthorizationCodeExpired: "Authorization code expired",
+  TooFastResend: "You just requested a verification email. Please wait a few minutes before trying again",
 };
 
 export const GenericError = "GenericError";

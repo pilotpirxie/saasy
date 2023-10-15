@@ -72,7 +72,17 @@ export function LoginPage() {
         <h1 className="fw-bold text-center">Log In 🔐</h1>
       </div>
 
-      <ErrorMessage message={totpError || loginError || urlError} />
+      {loginError === "EmailNotVerified" ? <div
+        className="alert alert-danger"
+        role="alert"
+      >
+        Your email address has not been verified. Please check your email.
+        <br />
+        <Link
+          className="alert-link small"
+          to={"/auth/resend"}
+        >Resend email</Link>
+      </div> : <ErrorMessage message={totpError || loginError || urlError} />}
 
       <AuthProviderButtons
         onGoogle={() => {}}
