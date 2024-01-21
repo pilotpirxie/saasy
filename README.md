@@ -19,29 +19,29 @@ Features:
 
 ### Feature status
 
-| Feature                    	     | Server 	| Design 	| Client 	 |
-|----------------------------------|--------	|--------	|----------|
-| email login                	     | ✅      	| ✅      	| ✅      	 |
-| email register             	     | ✅      	| ✅      	| 	      |
-| email verification             	 | ✅      	|       	| 	      |
-| forgot password            	     | ✅      	| ✅      	| 	        |
-| reset password             	     | ✅      	| ✅      	| 	        |
-| login with Google          	     | ✅      	| ✅      	| 	        |
-| login with GitHub          	     | ✅      	| ✅      	| 	        |
-| jwt and refresh tokens     	     | ✅      	| ✅      	| ✅      	 |
-| account edit               	     | ✅      	|        	| 	        |
-| profile edit               	     | ✅      	|        	| 	        |
-| smtp emails                	     | ✅      	|        	| 	        |
-| teams management           	     | ✅      	|        	| 	        |
-| team roles                 	     | ✅      	|        	| 	        |
-| invitations                	     | ✅      	|        	| 	        |
-| project management         	     |        	|        	| 	        |
-| listing products           	     |        	|        	| 	        |
-| listing sub plans          	     |        	|        	| 	        |
-| product checkout           	     |        	|        	| 	        |
-| sub checkout               	     |        	|        	| 	        |
-| paddle sub integration     	     |        	|        	| 	        |
-| paddle product integration 	     |        	|        	| 	        |
+| Feature                    	     | Server 	 | Design 	 | Client 	 |
+|----------------------------------|----------|----------|----------|
+| email login                	     | ✅      	 | ✅      	 | ✅      	 |
+| email register             	     | ✅      	 | ✅      	 | 	        |
+| email verification             	 | ✅      	 | 	        | 	        |
+| forgot password            	     | ✅      	 | ✅      	 | 	        |
+| reset password             	     | ✅      	 | ✅      	 | 	        |
+| login with Google          	     | ✅      	 | ✅      	 | 	        |
+| login with GitHub          	     | ✅      	 | ✅      	 | 	        |
+| jwt and refresh tokens     	     | ✅      	 | ✅      	 | ✅      	 |
+| account edit               	     | ✅      	 | 	        | 	        |
+| profile edit               	     | ✅      	 | 	        | 	        |
+| smtp emails                	     | ✅      	 | 	        | 	        |
+| teams management           	     | ✅      	 | 	        | 	        |
+| team roles                 	     | ✅      	 | 	        | 	        |
+| invitations                	     | ✅      	 | 	        | 	        |
+| project management         	     | 	        | 	        | 	        |
+| listing products           	     | 	        | 	        | 	        |
+| listing sub plans          	     | 	        | 	        | 	        |
+| product checkout           	     | 	        | 	        | 	        |
+| sub checkout               	     | 	        | 	        | 	        |
+| paddle sub integration     	     | 	        | 	        | 	        |
+| paddle product integration 	     | 	        | 	        | 	        |
 
 ### License
 MIT

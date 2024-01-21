@@ -31,8 +31,7 @@
     "node-cache": "^5.1.2",
     "nodemailer": "^6.9.6",
     "prisma": "^5.4.2",
-    "totp-generator": "^0.0.14",
-    "uuid": "^9.0.1"
+    "totp-generator": "^0.0.14"
   },
   "devDependencies": {
     "@types/cors": "^2.8.14",
@@ -43,7 +42,6 @@
     "@types/node": "^18.18.3",
     "@types/nodemailer": "^6.4.11",
     "@types/totp-generator": "^0.0.8",
-    "@types/uuid": "^9.0.4",
     "@typescript-eslint/eslint-plugin": "^6.7.5",
     "@typescript-eslint/parser": "^6.7.5",
     "eslint": "^8.2.0",
