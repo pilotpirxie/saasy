@@ -12,6 +12,7 @@ export default function errorResponse({
   error: string;
 }) {
   return response.status(status).json({
+    timestamp: new Date().toISOString(),
     message,
     error,
   });

@@ -4,7 +4,7 @@ export const SideLayout = ({ leftChildren, rightChildren }: {leftChildren: React
   className="container-fluid h-100"
 >
   <div className="row h-100">
-    <div className="d-none d-lg-flex col-lg-6 bg-neutral-20">
+    <div className="d-none d-lg-flex col-lg-6 bg-dark text-white">
       <div className="d-flex h-100 w-100 justify-content-center align-items-center">
         {leftChildren}
       </div>

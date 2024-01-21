@@ -42,7 +42,7 @@
     "@types/ms": "^0.7.32",
     "@types/node": "^18.18.3",
     "@types/nodemailer": "^6.4.11",
-    "@types/totp-generator": "^0.0.6",
+    "@types/totp-generator": "^0.0.8",
     "@types/uuid": "^9.0.4",
     "@typescript-eslint/eslint-plugin": "^6.7.5",
     "@typescript-eslint/parser": "^6.7.5",
