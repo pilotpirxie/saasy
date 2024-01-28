@@ -4,19 +4,19 @@ import { RegisterForm } from "../components/RegisterForm.tsx";
 import useIsMobile from "../../shared/hooks/useIsMobile.ts";
 import { CleanLayout } from "../components/CleanLayout.tsx";
 import { registerByEmail } from "../data/api/registerByEmail.ts";
+import { useNavigate } from "react-router-dom";
 
 export function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const isMobile = useIsMobile();
   const [registerError, setRegisterError] = useState<string | null>(null);
-  const [registered, setRegistered] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setRegisterError(null);
-    setRegistered(false);
 
     try {
       await registerByEmail({
@@ -24,7 +24,13 @@ export function RegisterPage() {
         password,
       });
 
-      setRegistered(true);
+      navigate("/auth/login", {
+        state: {
+          email: email,
+          password: password,
+          justRegistered: true,
+        }
+      });
     } catch (err) {
       if (err instanceof Error) {
         setRegisterError(err.message);
@@ -40,7 +46,6 @@ export function RegisterPage() {
         email={email}
         password={password}
         error={registerError}
-        registered={registered}
         onSubmit={handleSubmit}
         onEmailChange={setEmail}
         onPasswordChange={setPassword}
@@ -80,7 +85,6 @@ export function RegisterPage() {
           email={email}
           password={password}
           error={registerError}
-          registered={registered}
           onSubmit={handleSubmit}
           onEmailChange={setEmail}
           onPasswordChange={setPassword}

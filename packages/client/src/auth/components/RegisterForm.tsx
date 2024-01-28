@@ -6,7 +6,6 @@ import { PasswordInput } from "../../shared/components/FormInputs/PasswordInput.
 import { FormLink } from "./FormLink.tsx";
 import { TermsNote } from "./TermsNote.tsx";
 import { ReCaptchaNote } from "./ReCaptchaNote.tsx";
-import { Link } from "react-router-dom";
 import config from "../../../config.ts";
 
 export const RegisterForm = ({
@@ -15,7 +14,6 @@ export const RegisterForm = ({
   password,
   onPasswordChange,
   error,
-  registered,
   onSubmit,
 }: {
   email: string;
@@ -23,7 +21,6 @@ export const RegisterForm = ({
   password: string;
   onPasswordChange: (password: string) => void;
   error: string | null;
-  registered: boolean;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 }) => {
   return <>
@@ -31,18 +28,6 @@ export const RegisterForm = ({
       <h1 className="fw-bold text-center">Sign Up 👋</h1>
     </div>
 
-    {registered ? <div
-      className="alert alert-success"
-      role="alert"
-    >
-      You have been registered! Please check your email to verify your account.
-      <br />
-      <Link
-        className="alert-link small"
-        to={"/auth/resend"}
-      >Resend email</Link>
-    </div>
-      : null}
     <ErrorMessage message={error} />
 
     <AuthProviderButtons

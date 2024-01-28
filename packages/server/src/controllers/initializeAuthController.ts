@@ -421,12 +421,12 @@ export default function initializeAuthController({
   const verifyEmailSchema = {
     body: {
       email: Joi.string().required(),
-      code: Joi.string().required(),
+      code: Joi.number().required(),
     },
   };
 
   router.post(
-    "/verify",
+    "/verify-email",
     validation(verifyEmailSchema),
     async (req: TypedRequest<typeof verifyEmailSchema>, res, next) => {
       try {
@@ -437,10 +437,11 @@ export default function initializeAuthController({
             id: true,
             userId: true,
             email: true,
+            expiresAt: true,
           },
           where: {
             email,
-            id: code,
+            code: code.toString(),
           },
         });
 
@@ -450,6 +451,15 @@ export default function initializeAuthController({
             message: "Verification code not found",
             status: 404,
             error: "VerificationCodeNotFound",
+          });
+        }
+
+        if (dayjs(verificationCode.expiresAt).isBefore(dayjs())) {
+          return errorResponse({
+            response: res,
+            message: "Verification code expired",
+            status: 400,
+            error: "VerificationCodeExpired",
           });
         }
 
@@ -739,7 +749,7 @@ export default function initializeAuthController({
 
         const ip = getIp(req);
 
-        await prisma.authorizationCode.delete({
+        await prisma.authorizationCode.deleteMany({
           where: {
             id: authorizationCode.id,
           },

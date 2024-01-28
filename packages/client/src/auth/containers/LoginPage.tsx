@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import { checkTotpStatus } from "../data/api/checkTotpStatus.ts";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { CleanLayout } from "../components/CleanLayout.tsx";
 import { ErrorMessage } from "../../shared/components/ErrorMessage.tsx";
 import { AuthProviderButtons } from "../components/AuthProviderButtons.tsx";
@@ -12,6 +12,8 @@ import { TextInput } from "../../shared/components/FormInputs/TextInput.tsx";
 import { FormLink } from "../components/FormLink.tsx";
 import { loginByEmail } from "../data/api/loginByEmail.ts";
 import config from "../../../config.ts";
+import { checkEmailStatus } from "../data/api/checkEmailStatus.ts";
+import { verifyEmail } from "../data/api/verifyEmail.ts";
 
 export function LoginPage() {
   const [email, setEmail] = useState("");
@@ -19,8 +21,13 @@ export function LoginPage() {
   const [totp, setTotp] = useState("");
   const [showTotpInput, setShowTotpInput] = useState(false);
   const [totpError, setTotpError] = useState<string | null>(null);
+  const [showVerifyEmail, setShowVerifyEmail] = useState(false);
+  const [emailVerifyError, setEmailVerifyError] = useState<string | null>(null);
+  const [verificationCode, setVerificationCode] = useState("");
   const [loginError, setLoginError] = useState<string | null>(null);
   const [urlError, setUrlError] = useState<string | null>(null);
+  const [justRegistered, setJustRegistered] = useState<boolean>(null);
+  const location = useLocation();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -29,12 +36,45 @@ export function LoginPage() {
     if (error) {
       setUrlError(error);
     }
-  }, []);
+
+    const locationState = location.state as { email?: string; password?: string; justRegistered?: boolean; };
+
+    if (locationState?.email) {
+      setEmail(locationState.email);
+    }
+
+    if (locationState?.password) {
+      setPassword(locationState.password);
+    }
+
+    if (locationState?.justRegistered) {
+      setJustRegistered(locationState.justRegistered);
+    }
+  }, [location.state]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setTotpError(null);
+    setShowTotpInput(false);
+    setEmailVerifyError(null);
+    setShowVerifyEmail(false);
+    setLoginError(null);
+
+    // TODO: combine check email, totp and initial credentials check into one request
+    try {
+      const emailStatus = await checkEmailStatus({ email });
+      if (emailStatus.status === 202) {
+        setShowVerifyEmail(true);
+        return;
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        setEmailVerifyError(err.message);
+      } else {
+        setLoginError("An error occurred");
+      }
+    }
 
     try {
       const totpStatus = await checkTotpStatus({ email });
@@ -67,23 +107,29 @@ export function LoginPage() {
     }
   };
 
+  const handleSubmitVerifyEmail = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      await verifyEmail({ email, code: verificationCode });
+
+      handleSubmit(e);
+    } catch (err) {
+      if (err instanceof Error) {
+        setEmailVerifyError(err.message);
+      } else {
+        setEmailVerifyError("An error occurred");
+      }
+    }
+  };
+
   return (
     <CleanLayout>
       <div className="mb-5">
         <h1 className="fw-bold text-center">Log In 🔐</h1>
       </div>
 
-      {loginError === "EmailNotVerified" ? <div
-        className="alert alert-danger"
-        role="alert"
-      >
-        Your email address has not been verified. Please check your email.
-        <br />
-        <Link
-          className="alert-link small"
-          to={"/auth/resend"}
-        >Resend email</Link>
-      </div> : <ErrorMessage message={totpError || loginError || urlError} />}
+      <ErrorMessage message={emailVerifyError || totpError || loginError || urlError} />
 
       <AuthProviderButtons
         onGoogle={() => window.location.href = config.baseUrl + "/api/auth/google"}
@@ -92,7 +138,16 @@ export function LoginPage() {
 
       <HorizontalSplitter label="or" />
 
-      <form onSubmit={handleSubmit}>
+      {justRegistered && !showTotpInput && !showVerifyEmail && <div className="mb-3">
+        <div
+          className="alert alert-success"
+          role="alert"
+        >
+          You have successfully registered. Please log in.
+        </div>
+      </div>}
+
+      {!showVerifyEmail && <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <EmailInput
             label={"Email address"}
@@ -135,7 +190,28 @@ export function LoginPage() {
         >
           Log In
         </button>
-      </form>
+      </form>}
+
+      {showVerifyEmail && <form onSubmit={handleSubmitVerifyEmail}>
+        <div className="mb-3">
+          <p className="text-center">
+            We have sent you an email with a verification code. Please enter the code below.
+          </p>
+          <TextInput
+            label={"Verification code"}
+            value={verificationCode}
+            onChange={setVerificationCode}
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="mb-3 btn btn-primary w-100 btn-lg"
+        >
+          Verify Email
+        </button>
+      </form>}
 
       <FormLink
         label={"Don't have an account?"}
