@@ -16,6 +16,7 @@ import { getHashedPassword } from "../utils/passwordManager";
 import { redirectWithCode, redirectWithError } from "../utils/redirectManager";
 import { getIp } from "../utils/getIp";
 import { createSession } from "../utils/sessionManager";
+import { generateCode } from "../utils/generateCode";
 
 export async function authenticate({
   prisma,
@@ -243,7 +244,7 @@ export default function initializeAuthController({
   };
 
   router.post(
-    "/totp",
+    "/totp-status",
     validation(totpStatusSchema),
     async (req: TypedRequest<typeof totpStatusSchema>, res, next) => {
       try {
@@ -272,6 +273,85 @@ export default function initializeAuthController({
         return res.json({
           enabled: !!user.totpAddedAt,
         });
+      } catch (error) {
+        return next(error);
+      }
+    },
+  );
+
+  const emailStatusSchema = {
+    body: {
+      email: Joi.string().email().required(),
+    },
+  };
+
+  // 404 - not exist at all so show register form
+  // 406 - exist but not as email so cannot login
+  // 202 - exist as email but not verified so first must verify
+  // 200 - exist as email and verified so can login
+  router.post(
+    "/email-status",
+    validation(emailStatusSchema),
+    async (req: TypedRequest<typeof emailStatusSchema>, res, next) => {
+      try {
+        const { email } = req.body;
+
+        const user = await prisma.user.findFirst({
+          select: {
+            id: true,
+            emailVerifiedAt: true,
+            authProviderType: true,
+            displayName: true,
+          },
+          where: {
+            email,
+          },
+        });
+
+        if (!user) {
+          return errorResponse({
+            response: res,
+            message: "User not found",
+            status: 404,
+            error: "UserNotFound",
+          });
+        }
+
+        if (user.authProviderType !== "email") {
+          return res.sendStatus(406);
+        }
+
+        if (!user.emailVerifiedAt) {
+          const code = generateCode();
+
+          await prisma.emailVerification.deleteMany({
+            where: {
+              userId: user.id,
+            },
+          });
+
+          await prisma.emailVerification.create({
+            data: {
+              userId: user.id,
+              email,
+              code,
+              expiresAt: dayjs().add(15, "minutes").toDate(),
+            },
+          });
+
+          emailService.sendEmail({
+            to: email,
+            subject: `${code} is your verification code`,
+            html: emailTemplatesService.getVerifyEmailTemplate({
+              code,
+              username: user.displayName,
+            }),
+          });
+
+          return res.sendStatus(202);
+        }
+
+        return res.sendStatus(200);
       } catch (error) {
         return next(error);
       }
@@ -318,7 +398,7 @@ export default function initializeAuthController({
           iterations,
         });
 
-        const user = await prisma.user.create({
+        await prisma.user.create({
           data: {
             email,
             password: hashedPassword,
@@ -331,23 +411,6 @@ export default function initializeAuthController({
           },
         });
 
-        const emailVerification = await prisma.emailVerification.create({
-          data: {
-            userId: user.id,
-            email,
-          },
-        });
-
-        emailService.sendEmail({
-          to: email,
-          subject: "Verify your email",
-          html: emailTemplatesService.getRegisterVerifyTemplate({
-            code: emailVerification.id,
-            username: user.displayName,
-            userId: user.id,
-          }),
-        });
-
         return res.sendStatus(201);
       } catch (error) {
         return next(error);
@@ -357,7 +420,7 @@ export default function initializeAuthController({
 
   const verifyEmailSchema = {
     body: {
-      userId: Joi.string().required(),
+      email: Joi.string().required(),
       code: Joi.string().required(),
     },
   };
@@ -367,7 +430,7 @@ export default function initializeAuthController({
     validation(verifyEmailSchema),
     async (req: TypedRequest<typeof verifyEmailSchema>, res, next) => {
       try {
-        const { code, userId } = req.body;
+        const { code, email } = req.body;
 
         const verificationCode = await prisma.emailVerification.findFirst({
           select: {
@@ -376,7 +439,7 @@ export default function initializeAuthController({
             email: true,
           },
           where: {
-            userId,
+            email,
             id: code,
           },
         });
@@ -422,86 +485,6 @@ export default function initializeAuthController({
           where: {
             userId: verificationCode.userId,
           },
-        });
-
-        return res.sendStatus(200);
-      } catch (error) {
-        return next(error);
-      }
-    },
-  );
-
-  const resendVerification = {
-    body: {
-      email: Joi.string().email().required(),
-    },
-  };
-
-  router.post(
-    "/resend-verify",
-    validation(resendVerification),
-    async (req: TypedRequest<typeof resendVerification>, res, next) => {
-      try {
-        const { email } = req.body;
-
-        const user = await prisma.user.findFirst({
-          select: {
-            id: true,
-            displayName: true,
-          },
-          where: {
-            email,
-            emailVerifiedAt: null,
-            authProviderType: "email",
-          },
-        });
-
-        if (!user) {
-          return errorResponse({
-            response: res,
-            message: "User not found",
-            status: 404,
-            error: "UserNotFound",
-          });
-        }
-
-        const lastEmailVerification = await prisma.emailVerification.findFirst({
-          select: {
-            id: true,
-            createdAt: true,
-          },
-          where: {
-            userId: user.id,
-          },
-          orderBy: {
-            createdAt: "desc",
-          },
-        });
-
-        if (lastEmailVerification && dayjs(lastEmailVerification.createdAt).isAfter(dayjs().subtract(15, "minute"))) {
-          return errorResponse({
-            response: res,
-            message: "Too fast. Wait a little before resending verification",
-            status: 429,
-            error: "TooFastResend",
-          });
-        }
-
-        const emailVerification = await prisma.emailVerification.create({
-          data: {
-            userId: user.id,
-            email,
-          },
-        });
-
-        emailService.sendEmail({
-          to: email,
-          subject: "Verify your email",
-          html: emailTemplatesService.getRegisterVerifyTemplate({
-            code: emailVerification.id,
-            username: user.displayName,
-            userId: user.id,
-          }),
         });
 
         return res.sendStatus(200);

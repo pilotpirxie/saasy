@@ -139,11 +139,11 @@ export default function initializeInvitationsController({
           },
         });
 
-        emailService.sendEmail({
-          to: email,
-          subject: `You've been invited to a team ${team.name}`,
-          html: emailTemplatesService.getInvitationEmail(),
-        });
+        // emailService.sendEmail({
+        //   to: email,
+        //   subject: `You've been invited to a team ${team.name}`,
+        //   html: emailTemplatesService.getInvitationEmail(),
+        // });
 
         return res.json(invitation);
       } catch (error) {

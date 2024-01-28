@@ -270,22 +270,22 @@ export default function initializeUsersController({
           });
         }
 
-        const emailVerification = await prisma.emailVerification.create({
-          data: {
-            userId: user.id,
-            email: newEmail,
-          },
-        });
-
-        emailService.sendEmail({
-          to: newEmail,
-          subject: "Verify your email",
-          html: emailTemplatesService.getVerifyEmailTemplate({
-            code: emailVerification.id,
-            username: user.displayName,
-            userId: user.id,
-          }),
-        });
+        // const emailVerification = await prisma.emailVerification.create({
+        //   data: {
+        //     userId: user.id,
+        //     email: newEmail,
+        //   },
+        // });
+        //
+        // emailService.sendEmail({
+        //   to: newEmail,
+        //   subject: "Verify your email",
+        //   html: emailTemplatesService.getVerifyEmailTemplate({
+        //     code: emailVerification.id,
+        //     username: user.displayName,
+        //     userId: user.id,
+        //   }),
+        // });
 
         return res.sendStatus(200);
       } catch (error) {

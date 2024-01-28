@@ -56,7 +56,6 @@ const emailService = new NodemailerEmailService({
 });
 
 const emailTemplatesService = new EmailTemplatesService({
-  baseUrl: "http://localhost:3000",
   companyName: "Company Name",
 });
 

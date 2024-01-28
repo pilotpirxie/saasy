@@ -4,7 +4,7 @@ import { GenericError } from "../../../shared/utils/errorMessages.ts";
 
 export const checkTotpStatus = async ({ email }: {email: string}) => {
   try {
-    const response = await axiosInstance.post<{ enabled: boolean }>("/api/auth/totp", { email });
+    const response = await axiosInstance.post<{ enabled: boolean }>("/api/auth/totp-status", { email });
     return response.data;
   } catch (error) {
     if (isAxiosError(error) && error.response?.data?.error) {
