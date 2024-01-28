@@ -64,7 +64,7 @@ export function ResendVerify() {
 
         <button
           type="submit"
-          className="mb-3 btn btn-primary form-control btn-lg"
+          className="mb-3 btn btn-primary w-100 btn-lg"
         >
           Send new verification email
         </button>

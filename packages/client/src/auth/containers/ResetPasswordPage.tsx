@@ -48,7 +48,7 @@ export function ResetPasswordPage() {
 
         <button
           type="submit"
-          className="mb-3 btn btn-primary form-control btn-lg"
+          className="mb-3 btn btn-primary w-100 btn-lg"
         >
           Set new password
         </button>

@@ -19,8 +19,15 @@ export class EmailTemplatesService implements EmailTemplates {
     this.baseUrl = baseUrl;
   }
 
-  getRegisterVerifyTemplate(options: { username: string; userId: string; code: string; }): string {
-    const registerVerifyTemplate = fs.readFileSync(path.join(__dirname, "../templates/registerVerify.hbs"), "utf8");
+  getRegisterVerifyTemplate(options: {
+    username: string;
+    userId: string;
+    code: string;
+  }): string {
+    const registerVerifyTemplate = fs.readFileSync(
+      path.join(__dirname, "../templates/registerVerify.hbs"),
+      "utf8",
+    );
     return handlebars.compile(registerVerifyTemplate)({
       baseUrl: this.baseUrl,
       companyName: this.companyName,
@@ -32,14 +39,24 @@ export class EmailTemplatesService implements EmailTemplates {
     username: string;
     invoiceId: string;
     invoiceUrl: string;
-    description: string
+    description: string;
   }): string {
-    const invoiceTemplate = fs.readFileSync(path.join(__dirname, "../templates/invoice.hbs"), "utf8");
+    const invoiceTemplate = fs.readFileSync(
+      path.join(__dirname, "../templates/invoice.hbs"),
+      "utf8",
+    );
     return handlebars.compile(invoiceTemplate)(options);
   }
 
-  getVerifyEmailTemplate(options: { username: string; userId: string, code: string }): string {
-    const invoiceTemplate = fs.readFileSync(path.join(__dirname, "../templates/emailVerify.hbs"), "utf8");
+  getVerifyEmailTemplate(options: {
+    username: string;
+    userId: string;
+    code: string;
+  }): string {
+    const invoiceTemplate = fs.readFileSync(
+      path.join(__dirname, "../templates/emailVerify.hbs"),
+      "utf8",
+    );
     return handlebars.compile(invoiceTemplate)({
       baseUrl: this.baseUrl,
       companyName: this.companyName,
@@ -47,8 +64,15 @@ export class EmailTemplatesService implements EmailTemplates {
     });
   }
 
-  getPasswordResetTemplate(options: { username: string; userId: string; code: string }): string {
-    const invoiceTemplate = fs.readFileSync(path.join(__dirname, "../emailTemplates/passwordReset.hbs"), "utf8");
+  getPasswordResetTemplate(options: {
+    username: string;
+    userId: string;
+    code: string;
+  }): string {
+    const invoiceTemplate = fs.readFileSync(
+      path.join(__dirname, "../emailTemplates/passwordReset.hbs"),
+      "utf8",
+    );
     return handlebars.compile(invoiceTemplate)({
       baseUrl: this.baseUrl,
       companyName: this.companyName,
@@ -57,7 +81,10 @@ export class EmailTemplatesService implements EmailTemplates {
   }
 
   getInvitationEmail(): string {
-    const invoiceTemplate = fs.readFileSync(path.join(__dirname, "../templates/invitation.hbs"), "utf8");
+    const invoiceTemplate = fs.readFileSync(
+      path.join(__dirname, "../templates/invitation.hbs"),
+      "utf8",
+    );
     return handlebars.compile(invoiceTemplate)({
       baseUrl: this.baseUrl,
       companyName: this.companyName,

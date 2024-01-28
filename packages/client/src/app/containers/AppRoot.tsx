@@ -6,22 +6,29 @@ import { refreshThunk } from "../../auth/data/thunks/refreshThunk.ts";
 
 export const AppRoot = () => {
   const dispatch = useAppDispatch();
-  const refreshToken = useAppSelector((state) => state.auth.session.refreshToken);
+  const refreshToken = useAppSelector(
+    (state) => state.auth.session.refreshToken,
+  );
 
   useEffect(() => {
     dispatch(loginFromLocalStorageThunk({}));
   }, [dispatch]);
 
   useEffect(() => {
-    const refreshInterval = setInterval(() => {
-      if (!refreshToken) {
-        return;
-      }
+    const refreshInterval = setInterval(
+      () => {
+        if (!refreshToken) {
+          return;
+        }
 
-      dispatch(refreshThunk({
-        refreshToken
-      }));
-    }, 1000 * 60 * 5);
+        dispatch(
+          refreshThunk({
+            refreshToken,
+          }),
+        );
+      },
+      1000 * 60 * 5,
+    );
 
     return () => {
       clearInterval(refreshInterval);

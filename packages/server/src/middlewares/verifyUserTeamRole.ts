@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
-import errorResponse from "../../shared/utils/errorResponse";
+import errorResponse from "../utils/errorResponse";
 
 export type UserTeamRole = "owner" | "editor" | "viewer";
 

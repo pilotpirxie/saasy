@@ -2,25 +2,27 @@ import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
 import Joi from "joi";
 import dayjs from "dayjs";
-import { EmailService } from "../../emails/services/emailService";
-import { EmailTemplates } from "../../emails/services/emailTemplates";
-import jwtVerify from "../../shared/middlewares/jwt";
-import verifyUserTeamRole, { UserTeamRole } from "../../teams/middlewares/verifyUserTeamRole";
-import validation from "../../shared/middlewares/validation";
-import { TypedRequest } from "../../shared/types/express";
-import errorResponse from "../../shared/utils/errorResponse";
+import { EmailService } from "../services/emailService";
+import { EmailTemplates } from "../services/emailTemplates";
+import jwtVerify from "../middlewares/jwt";
+import errorResponse from "../utils/errorResponse";
+import verifyUserTeamRole, { UserTeamRole } from "../middlewares/verifyUserTeamRole";
+import validation from "../middlewares/validation";
+import { TypedRequest } from "../express";
 
-export default function initializeInvitationsController({
-  prisma,
-  jwtSecret,
-  emailService,
-  emailTemplatesService,
-}: {
-  prisma: PrismaClient,
-  jwtSecret: string
+type UserControllersConfig = {
+  jwtSecret: string;
+  prisma: PrismaClient;
   emailService: EmailService;
   emailTemplatesService: EmailTemplates;
-}): Router {
+}
+
+export default function initializeInvitationsController({
+  jwtSecret,
+  prisma,
+  emailService,
+  emailTemplatesService,
+}: UserControllersConfig): Router {
   const router = Router();
 
   router.get(

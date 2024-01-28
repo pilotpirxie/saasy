@@ -11,6 +11,7 @@ import { PasswordInput } from "../../shared/components/FormInputs/PasswordInput.
 import { TextInput } from "../../shared/components/FormInputs/TextInput.tsx";
 import { FormLink } from "../components/FormLink.tsx";
 import { loginByEmail } from "../data/api/loginByEmail.ts";
+import config from "../../../config.ts";
 
 export function LoginPage() {
   const [email, setEmail] = useState("");
@@ -85,8 +86,8 @@ export function LoginPage() {
       </div> : <ErrorMessage message={totpError || loginError || urlError} />}
 
       <AuthProviderButtons
-        onGoogle={() => {}}
-        onGitHub={() => {}}
+        onGoogle={() => window.location.href = config.baseUrl + "/api/auth/google"}
+        onGitHub={() => window.location.href = config.baseUrl + "/api/auth/github"}
       />
 
       <HorizontalSplitter label="or" />
@@ -130,7 +131,7 @@ export function LoginPage() {
 
         <button
           type="submit"
-          className="mb-3 btn btn-primary form-control btn-lg"
+          className="mb-3 btn btn-primary w-100 btn-lg"
         >
           Log In
         </button>

@@ -3,16 +3,16 @@ import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import NodeCache from "node-cache";
 import cors from "cors";
-import { errorHandler } from "./modules/shared/middlewares/errors";
+import { errorHandler } from "./middlewares/errors";
 import { checkPrismaConnection } from "./data/prismaConnectionTest";
 import { usePrismaClientFactory } from "./data/prismaClientFactory";
 import { NodeCacheAdapter } from "./data/cacheStore";
-import { NodemailerEmailService } from "./modules/emails/services/nodemailerEmailService";
-import { EmailTemplatesService } from "./modules/emails/services/emailTemplatesService";
-import initializeCombinedAuthController from "./modules/auth/controllers/combinedAuthController";
-import initializeCombinedTeamsController from "./modules/teams/controllers/combinedTeamsController";
-import initializeCombinedInvitationsController from "./modules/invitations/controllers/combinedInvitationsController";
-import initializeCombinedUsersController from "./modules/users/controllers/combinedUsersController";
+import { NodemailerEmailService } from "./services/nodemailerEmailService";
+import { EmailTemplatesService } from "./services/emailTemplatesService";
+import initializeAuthController from "./controllers/initializeAuthController";
+import initializeUsersController from "./controllers/initializeUsersController";
+import initializeTeamsController from "./controllers/initializeTeamsController";
+import initializeInvitationsController from "./controllers/initializeInvitationsController";
 
 dotenv.config();
 
@@ -68,7 +68,7 @@ app.get(
   },
 );
 
-app.use("/api/auth", initializeCombinedAuthController({
+app.use("/api/auth", initializeAuthController({
   jwtInfo: {
     secret: process.env.JWT_SECRET || "",
     refreshTokenTimeout: process.env.JWT_REFRESH_TOKEN_TIMEOUT || "1d",
@@ -91,19 +91,19 @@ app.use("/api/auth", initializeCombinedAuthController({
   },
 }));
 
-app.use("/api/users", initializeCombinedUsersController({
+app.use("/api/users", initializeUsersController({
   jwtSecret: process.env.JWT_SECRET || "",
   emailService,
   emailTemplatesService,
   prisma,
 }));
 
-app.use("/api/teams", initializeCombinedTeamsController({
+app.use("/api/teams", initializeTeamsController({
   jwtSecret: process.env.JWT_SECRET || "",
   prisma,
 }));
 
-app.use("/api/invitations", initializeCombinedInvitationsController({
+app.use("/api/invitations", initializeInvitationsController({
   jwtSecret: process.env.JWT_SECRET || "",
   emailService,
   emailTemplatesService,

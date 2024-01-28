@@ -7,6 +7,7 @@ import { FormLink } from "./FormLink.tsx";
 import { TermsNote } from "./TermsNote.tsx";
 import { ReCaptchaNote } from "./ReCaptchaNote.tsx";
 import { Link } from "react-router-dom";
+import config from "../../../config.ts";
 
 export const RegisterForm = ({
   email,
@@ -45,8 +46,8 @@ export const RegisterForm = ({
     <ErrorMessage message={error} />
 
     <AuthProviderButtons
-      onGoogle={() => {}}
-      onGitHub={() => {}}
+      onGoogle={() => window.location.href = config.baseUrl + "/api/auth/google"}
+      onGitHub={() => window.location.href = config.baseUrl + "/api/auth/github"}
     />
 
     <HorizontalSplitter label="or" />
@@ -73,7 +74,7 @@ export const RegisterForm = ({
 
       <button
         type="submit"
-        className="mb-3 btn btn-primary form-control btn-lg"
+        className="mb-3 btn btn-primary w-100 btn-lg"
       >
         Sign Up
       </button>
