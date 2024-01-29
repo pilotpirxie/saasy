@@ -146,6 +146,7 @@ export default function initializeAuthController({
             totpToken: true,
             authProviderType: true,
             emailVerifiedAt: true,
+            displayName: true,
           },
           where: {
             email,
@@ -171,15 +172,6 @@ export default function initializeAuthController({
           });
         }
 
-        if (!user.emailVerifiedAt) {
-          return errorResponse({
-            response: res,
-            message: "Email not verified",
-            status: 400,
-            error: "EmailNotVerified",
-          });
-        }
-
         const hashedPassword = getHashedPassword({
           password,
           salt: user.salt,
@@ -192,6 +184,41 @@ export default function initializeAuthController({
             message: "Invalid credentials",
             status: 401,
             error: "InvalidCredentials",
+          });
+        }
+
+        if (!user.emailVerifiedAt) {
+          const code = generateCode();
+
+          await prisma.emailVerification.deleteMany({
+            where: {
+              userId: user.id,
+            },
+          });
+
+          await prisma.emailVerification.create({
+            data: {
+              userId: user.id,
+              email,
+              code,
+              expiresAt: dayjs().add(15, "minutes").toDate(),
+            },
+          });
+
+          emailService.sendEmail({
+            to: email,
+            subject: `${code} is your verification code`,
+            html: emailTemplatesService.getVerifyEmailTemplate({
+              code,
+              username: user.displayName,
+            }),
+          });
+
+          return errorResponse({
+            response: res,
+            message: "Email not verified",
+            status: 400,
+            error: "EmailNotVerified",
           });
         }
 
@@ -231,127 +258,6 @@ export default function initializeAuthController({
             code: authorizationCode.id,
           }),
         });
-      } catch (error) {
-        return next(error);
-      }
-    },
-  );
-
-  const totpStatusSchema = {
-    body: {
-      email: Joi.string().email().required(),
-    },
-  };
-
-  router.post(
-    "/totp-status",
-    validation(totpStatusSchema),
-    async (req: TypedRequest<typeof totpStatusSchema>, res, next) => {
-      try {
-        const { email } = req.body;
-
-        const user = await prisma.user.findFirst({
-          select: {
-            id: true,
-            totpAddedAt: true,
-          },
-          where: {
-            email,
-            authProviderType: "email",
-          },
-        });
-
-        if (!user) {
-          return errorResponse({
-            response: res,
-            message: "User not found",
-            status: 404,
-            error: "UserNotFound",
-          });
-        }
-
-        return res.json({
-          enabled: !!user.totpAddedAt,
-        });
-      } catch (error) {
-        return next(error);
-      }
-    },
-  );
-
-  const emailStatusSchema = {
-    body: {
-      email: Joi.string().email().required(),
-    },
-  };
-
-  // 404 - not exist at all so show register form
-  // 406 - exist but not as email so cannot login
-  // 202 - exist as email but not verified so first must verify
-  // 200 - exist as email and verified so can login
-  router.post(
-    "/email-status",
-    validation(emailStatusSchema),
-    async (req: TypedRequest<typeof emailStatusSchema>, res, next) => {
-      try {
-        const { email } = req.body;
-
-        const user = await prisma.user.findFirst({
-          select: {
-            id: true,
-            emailVerifiedAt: true,
-            authProviderType: true,
-            displayName: true,
-          },
-          where: {
-            email,
-          },
-        });
-
-        if (!user) {
-          return errorResponse({
-            response: res,
-            message: "User not found",
-            status: 404,
-            error: "UserNotFound",
-          });
-        }
-
-        if (user.authProviderType !== "email") {
-          return res.sendStatus(406);
-        }
-
-        if (!user.emailVerifiedAt) {
-          const code = generateCode();
-
-          await prisma.emailVerification.deleteMany({
-            where: {
-              userId: user.id,
-            },
-          });
-
-          await prisma.emailVerification.create({
-            data: {
-              userId: user.id,
-              email,
-              code,
-              expiresAt: dayjs().add(15, "minutes").toDate(),
-            },
-          });
-
-          emailService.sendEmail({
-            to: email,
-            subject: `${code} is your verification code`,
-            html: emailTemplatesService.getVerifyEmailTemplate({
-              code,
-              username: user.displayName,
-            }),
-          });
-
-          return res.sendStatus(202);
-        }
-
-        return res.sendStatus(200);
       } catch (error) {
         return next(error);
       }

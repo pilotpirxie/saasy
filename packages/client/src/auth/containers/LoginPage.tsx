@@ -1,5 +1,4 @@
 import { FormEvent, useEffect, useState } from "react";
-import { checkTotpStatus } from "../data/api/checkTotpStatus.ts";
 import { Link, useLocation } from "react-router-dom";
 import { CleanLayout } from "../components/CleanLayout.tsx";
 import { ErrorMessage } from "../../shared/components/ErrorMessage.tsx";
@@ -12,7 +11,6 @@ import { TextInput } from "../../shared/components/FormInputs/TextInput.tsx";
 import { FormLink } from "../components/FormLink.tsx";
 import { loginByEmail } from "../data/api/loginByEmail.ts";
 import config from "../../../config.ts";
-import { checkEmailStatus } from "../data/api/checkEmailStatus.ts";
 import { verifyEmail } from "../data/api/verifyEmail.ts";
 
 export function LoginPage() {
@@ -26,7 +24,7 @@ export function LoginPage() {
   const [verificationCode, setVerificationCode] = useState("");
   const [loginError, setLoginError] = useState<string | null>(null);
   const [urlError, setUrlError] = useState<string | null>(null);
-  const [justRegistered, setJustRegistered] = useState<boolean>(null);
+  const [justRegistered, setJustRegistered] = useState<boolean>(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -56,39 +54,10 @@ export function LoginPage() {
     e.preventDefault();
 
     setTotpError(null);
-    setShowTotpInput(false);
     setEmailVerifyError(null);
     setShowVerifyEmail(false);
     setLoginError(null);
-
-    // TODO: combine check email, totp and initial credentials check into one request
-    try {
-      const emailStatus = await checkEmailStatus({ email });
-      if (emailStatus.status === 202) {
-        setShowVerifyEmail(true);
-        return;
-      }
-    } catch (err) {
-      if (err instanceof Error) {
-        setEmailVerifyError(err.message);
-      } else {
-        setLoginError("An error occurred");
-      }
-    }
-
-    try {
-      const totpStatus = await checkTotpStatus({ email });
-      if (totpStatus.enabled && !totp) {
-        setShowTotpInput(true);
-        return;
-      }
-    } catch (err) {
-      if (err instanceof Error) {
-        setTotpError(err.message);
-      } else {
-        setTotpError("An error occurred");
-      }
-    }
+    setJustRegistered(false);
 
     try {
       const loginResponse = await loginByEmail({
@@ -100,6 +69,16 @@ export function LoginPage() {
       window.location.href = loginResponse.redirectUrl;
     } catch (err) {
       if (err instanceof Error) {
+        if (err.message === "TotpCodeRequired") {
+          setShowTotpInput(true);
+          return;
+        }
+
+        if (err.message === "EmailNotVerified") {
+          setShowVerifyEmail(true);
+          return;
+        }
+
         setLoginError(err.message);
       } else {
         setLoginError("An error occurred");
@@ -109,6 +88,8 @@ export function LoginPage() {
 
   const handleSubmitVerifyEmail = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    setEmailVerifyError(null);
 
     try {
       await verifyEmail({ email, code: verificationCode });
@@ -131,20 +112,28 @@ export function LoginPage() {
 
       <ErrorMessage message={emailVerifyError || totpError || loginError || urlError} />
 
-      <AuthProviderButtons
-        onGoogle={() => window.location.href = config.baseUrl + "/api/auth/google"}
-        onGitHub={() => window.location.href = config.baseUrl + "/api/auth/github"}
-      />
-
-      <HorizontalSplitter label="or" />
-
-      {justRegistered && !showTotpInput && !showVerifyEmail && <div className="mb-3">
+      {justRegistered && !showTotpInput && !showVerifyEmail && !loginError && <div className="mb-3">
         <div
           className="alert alert-success"
           role="alert"
         >
           You have successfully registered. Please log in.
         </div>
+      </div>}
+
+      {showVerifyEmail && !showTotpInput && !loginError && !emailVerifyError && <div className="mb-3">
+        <p className="alert alert-info">
+          We have sent you an email with a verification code. Please enter the code below.
+        </p>
+      </div>}
+
+      {!showVerifyEmail && <div>
+        <AuthProviderButtons
+          onGoogle={() => window.location.href = config.baseUrl + "/api/auth/google"}
+          onGitHub={() => window.location.href = config.baseUrl + "/api/auth/github"}
+        />
+
+        <HorizontalSplitter label="or"/>
       </div>}
 
       {!showVerifyEmail && <form onSubmit={handleSubmit}>
@@ -194,9 +183,6 @@ export function LoginPage() {
 
       {showVerifyEmail && <form onSubmit={handleSubmitVerifyEmail}>
         <div className="mb-3">
-          <p className="text-center">
-            We have sent you an email with a verification code. Please enter the code below.
-          </p>
           <TextInput
             label={"Verification code"}
             value={verificationCode}
@@ -219,7 +205,7 @@ export function LoginPage() {
         linkTo={"/auth/register"}
       />
 
-      <ReCaptchaNote />
+      <ReCaptchaNote/>
     </CleanLayout>
   );
 }
