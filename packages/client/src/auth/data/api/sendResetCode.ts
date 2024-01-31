@@ -2,13 +2,13 @@ import axiosInstance from "../../../shared/utils/httpClient.ts";
 import { isAxiosError } from "axios";
 import { GenericError } from "../../../shared/utils/errorMessages.ts";
 
-export type CheckEmailStatusParams = {
+export type SendResetCodeParams = {
   email: string;
 }
 
-export const checkEmailStatus = async ({ email }: CheckEmailStatusParams) => {
+export const sendResetCode = async ({ email }: SendResetCodeParams) => {
   try {
-    return await axiosInstance.post<{ enabled: boolean }>("/api/auth/email-status", { email });
+    await axiosInstance.post<{ enabled: boolean }>("/api/auth/forgot-password", { email });
   } catch (error) {
     if (isAxiosError(error) && error.response?.data?.error) {
       throw new Error(error.response.data.error);

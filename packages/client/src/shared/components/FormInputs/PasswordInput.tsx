@@ -4,12 +4,14 @@ export const PasswordInput = ({
   onChange,
   autofocus,
   required,
+  minLength,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   autofocus?: boolean;
   required?: boolean;
+  minLength?: number;
 }) => {
   return (<div>
     <label
@@ -26,6 +28,7 @@ export const PasswordInput = ({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       required={required}
+      minLength={minLength ?? 8}
     />
   </div>);
 };

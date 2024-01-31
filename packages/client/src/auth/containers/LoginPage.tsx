@@ -18,12 +18,9 @@ export function LoginPage() {
   const [password, setPassword] = useState("");
   const [totp, setTotp] = useState("");
   const [showTotpInput, setShowTotpInput] = useState(false);
-  const [totpError, setTotpError] = useState<string | null>(null);
   const [showVerifyEmail, setShowVerifyEmail] = useState(false);
-  const [emailVerifyError, setEmailVerifyError] = useState<string | null>(null);
   const [verificationCode, setVerificationCode] = useState("");
   const [loginError, setLoginError] = useState<string | null>(null);
-  const [urlError, setUrlError] = useState<string | null>(null);
   const [justRegistered, setJustRegistered] = useState<boolean>(false);
   const location = useLocation();
 
@@ -32,7 +29,7 @@ export function LoginPage() {
     const error = urlParams.get("error");
 
     if (error) {
-      setUrlError(error);
+      setLoginError(error);
     }
 
     const locationState = location.state as { email?: string; password?: string; justRegistered?: boolean; };
@@ -53,8 +50,6 @@ export function LoginPage() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    setTotpError(null);
-    setEmailVerifyError(null);
     setShowVerifyEmail(false);
     setLoginError(null);
     setJustRegistered(false);
@@ -89,7 +84,7 @@ export function LoginPage() {
   const handleSubmitVerifyEmail = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    setEmailVerifyError(null);
+    setLoginError(null);
 
     try {
       await verifyEmail({ email, code: verificationCode });
@@ -97,9 +92,9 @@ export function LoginPage() {
       handleSubmit(e);
     } catch (err) {
       if (err instanceof Error) {
-        setEmailVerifyError(err.message);
+        setLoginError(err.message);
       } else {
-        setEmailVerifyError("An error occurred");
+        setLoginError("An error occurred");
       }
     }
   };
@@ -110,7 +105,7 @@ export function LoginPage() {
         <h1 className="fw-bold text-center">Log In 🔐</h1>
       </div>
 
-      <ErrorMessage message={emailVerifyError || totpError || loginError || urlError} />
+      <ErrorMessage message={loginError} />
 
       {justRegistered && !showTotpInput && !showVerifyEmail && !loginError && <div className="mb-3">
         <div
@@ -121,7 +116,7 @@ export function LoginPage() {
         </div>
       </div>}
 
-      {showVerifyEmail && !showTotpInput && !loginError && !emailVerifyError && <div className="mb-3">
+      {showVerifyEmail && !showTotpInput && !loginError && <div className="mb-3">
         <p className="alert alert-info">
           We have sent you an email with a verification code. Please enter the code below.
         </p>

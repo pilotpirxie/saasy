@@ -6,7 +6,6 @@ import "fastbootstrap/dist/css/fastbootstrap.css";
 import "remixicon/fonts/remixicon.css";
 import { RegisterPage } from "./auth/containers/RegisterPage.tsx";
 import { ForgotPasswordPage } from "./auth/containers/ForgotPasswordPage.tsx";
-import { ResetPasswordPage } from "./auth/containers/ResetPasswordPage.tsx";
 import { ExchangeCodePage } from "./auth/containers/ExchangeCodePage.tsx";
 import { Provider } from "react-redux";
 import { store } from "./store.ts";
@@ -15,7 +14,6 @@ import { AppRoot } from "./app/containers/AppRoot.tsx";
 import { ErrorPage } from "./app/containers/ErrorPage.tsx";
 import { Dashboard } from "./dashboard/containers/Dashboard.tsx";
 import { RequiredAuth } from "./shared/containers/RequiredAuth.tsx";
-import { ResendVerify } from "./auth/containers/ResendVerify.tsx";
 
 const router = createBrowserRouter([
   {
@@ -40,21 +38,9 @@ const router = createBrowserRouter([
         </RedirectIfAuth>
       },
       {
-        path: "/auth/resend",
-        element: <RedirectIfAuth>
-          <ResendVerify />
-        </RedirectIfAuth>
-      },
-      {
         path: "/auth/forgot-password",
         element: <RedirectIfAuth>
           <ForgotPasswordPage />
-        </RedirectIfAuth>
-      },
-      {
-        path: "/auth/reset-password",
-        element: <RedirectIfAuth>
-          <ResetPasswordPage />
         </RedirectIfAuth>
       },
       {
@@ -74,7 +60,9 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <Provider store={store}>
-    <RouterProvider router={router} />
-  </Provider>
+  <React.StrictMode>
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
+  </React.StrictMode>
 );

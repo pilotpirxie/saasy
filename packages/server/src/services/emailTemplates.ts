@@ -6,7 +6,6 @@ export type EmailTemplates = {
 
   getPasswordResetTemplate(options: {
     username: string;
-    userId: string;
     code: string;
   }): string;
 

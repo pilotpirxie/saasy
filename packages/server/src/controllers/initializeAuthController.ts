@@ -267,7 +267,7 @@ export default function initializeAuthController({
   const registerSchema = {
     body: {
       email: Joi.string().email().required(),
-      password: Joi.string().required(),
+      password: Joi.string().min(8).required(),
     },
   };
 
@@ -697,6 +697,7 @@ export default function initializeAuthController({
           select: {
             id: true,
             displayName: true,
+            email: true,
           },
           where: {
             email,
@@ -719,20 +720,23 @@ export default function initializeAuthController({
           },
         });
 
-        const passwordReset = await prisma.passwordRecovery.create({
+        const code = generateCode();
+
+        await prisma.passwordRecovery.create({
           data: {
             userId: user.id,
-            expiresAt: dayjs().add(1, "hour").toDate(),
+            email,
+            expiresAt: dayjs().add(15, "minutes").toDate(),
+            code,
           },
         });
 
         emailService.sendEmail({
           to: email,
-          subject: "Reset your password",
+          subject: `${code} is your password reset code`,
           html: emailTemplatesService.getPasswordResetTemplate({
-            code: passwordReset.id,
+            code,
             username: user.displayName,
-            userId: user.id,
           }),
         });
 
@@ -743,20 +747,19 @@ export default function initializeAuthController({
     },
   );
 
-  const passwordResetSchema = {
+  const checkResetCodeSchema = {
     body: {
-      userId: Joi.string().required(),
+      email: Joi.string().required(),
       code: Joi.string().required(),
-      password: Joi.string().required(),
     },
   };
 
   router.post(
-    "/reset-password",
-    validation(passwordResetSchema),
-    async (req: TypedRequest<typeof passwordResetSchema>, res, next) => {
+    "/check-reset-code",
+    validation(checkResetCodeSchema),
+    async (req: TypedRequest<typeof checkResetCodeSchema>, res, next) => {
       try {
-        const { code, userId, password } = req.body;
+        const { code, email } = req.body;
 
         const passwordReset = await prisma.passwordRecovery.findFirst({
           select: {
@@ -765,8 +768,60 @@ export default function initializeAuthController({
             expiresAt: true,
           },
           where: {
-            id: code,
-            userId,
+            code,
+            email,
+          },
+        });
+
+        if (!passwordReset) {
+          return errorResponse({
+            response: res,
+            message: "Password reset not found",
+            status: 404,
+            error: "PasswordResetNotFound",
+          });
+        }
+
+        if (dayjs(passwordReset.expiresAt).isBefore(dayjs())) {
+          return errorResponse({
+            response: res,
+            message: "Password reset has expired",
+            status: 400,
+            error: "PasswordResetExpired",
+          });
+        }
+
+        return res.sendStatus(200);
+      } catch (error) {
+        return next(error);
+      }
+    },
+  );
+
+  const passwordResetSchema = {
+    body: {
+      email: Joi.string().required(),
+      code: Joi.string().required(),
+      newPassword: Joi.string().min(8).required(),
+    },
+  };
+
+  router.post(
+    "/reset-password",
+    validation(passwordResetSchema),
+    async (req: TypedRequest<typeof passwordResetSchema>, res, next) => {
+      try {
+        const { code, email, newPassword } = req.body;
+
+        const passwordReset = await prisma.passwordRecovery.findFirst({
+          select: {
+            id: true,
+            userId: true,
+            expiresAt: true,
+          },
+          where: {
+            code,
+            email,
           },
         });
 
@@ -791,7 +846,7 @@ export default function initializeAuthController({
         const salt = crypto.randomBytes(16).toString("hex");
         const iterations = 600000;
         const hashedPassword = getHashedPassword({
-          password,
+          password: newPassword,
           salt,
           iterations,
         });
@@ -807,9 +862,9 @@ export default function initializeAuthController({
           },
         });
 
-        await prisma.passwordRecovery.delete({
+        await prisma.passwordRecovery.deleteMany({
           where: {
-            id: passwordReset.id,
+            userId: passwordReset.userId,
           },
         });
 

@@ -1,13 +1,13 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { isAxiosError } from "axios";
 import { GenericError } from "../../../shared/utils/errorMessages.ts";
-import { logout, LogoutParams, LogoutResponse } from "../api/logout.ts";
+import { logout, LogoutParams } from "../api/logout.ts";
 
 type ThunkArg = {
   rejectValue: string;
 }
 
-export const logoutThunk = createAsyncThunk<LogoutResponse, LogoutParams, ThunkArg>(
+export const logoutThunk = createAsyncThunk<object, LogoutParams, ThunkArg>(
   "auth/logout",
   async (payload, { rejectWithValue }) => {
     try {

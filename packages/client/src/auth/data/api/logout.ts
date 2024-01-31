@@ -6,11 +6,9 @@ export type LogoutParams = {
   refreshToken: string;
 }
 
-export type LogoutResponse = object
-
 export const logout = async ({ refreshToken }: LogoutParams) => {
   try {
-    await axiosInstance.post<LogoutResponse>("/api/auth/logout", {
+    await axiosInstance.post("/api/auth/logout", {
       refreshToken,
     });
   } catch (error) {

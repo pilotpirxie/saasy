@@ -33,7 +33,7 @@ export class EmailTemplatesService implements EmailTemplates {
     code: string;
   }): string {
     const invoiceTemplate = fs.readFileSync(
-      path.join(__dirname, "../emailTemplates/passwordReset.hbs"),
+      path.join(__dirname, "../templates/passwordReset.hbs"),
       "utf8",
     );
     return handlebars.compile(invoiceTemplate)({

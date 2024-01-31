@@ -8,7 +8,7 @@ export const errorMessages: Record<string, string> = {
   InvalidTotpCode: "Invalid TOTP code. Check your code and try again",
   GenericError: "Something went wrong, try again later",
   UserAlreadyExists: "User already exists. If you already have an account, try logging in",
-  PasswordResetNotFound: "Password reset not found",
+  PasswordResetNotFound: "Password reset code not found",
   CannotAssignRoleToSelf: "Cannot assign role to self",
   MissingAuthorizationHeader: "Missing authorization header",
   ForbiddenNotInTeam: "Forbidden, you are not in this team",
