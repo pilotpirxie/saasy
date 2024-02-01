@@ -1,12 +1,12 @@
 .tile {
-    max-width: 200px;
-    width: 200px;
-    height: 100px;
+    max-width: 300px;
+    width: 300px;
+    height: 150px;
     cursor: pointer;
 }
 
 .tile:hover {
-    opacity: 0.5;
+    opacity: 0.8;
 }
 
 .tile-name {

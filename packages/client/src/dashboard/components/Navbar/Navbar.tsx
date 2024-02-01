@@ -8,7 +8,7 @@ export const Navbar = ({
   return <nav className="navbar bg-dark navbar-expand-sm">
     <div className="container-fluid">
       <a
-        className="navbar-brand text-white"
+        className="navbar-brand text-white fw-bold"
         href="#"
       >App Name</a>
       <button
@@ -63,7 +63,7 @@ export const Navbar = ({
                 className="d-inline-block align-text-top rounded-circle"
               />
 
-              <div className="d-block d-sm-none ms-1">Profile</div>
+              <div className="d-block d-sm-none ms-1 text-white">Profile</div>
             </div>
             <ul className="dropdown-menu dropdown-menu-sm-end">
               <li><a

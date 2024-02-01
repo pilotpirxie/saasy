@@ -74,7 +74,7 @@ export const Dashboard = () => {
             return <div
               key={team.id}
             >
-              <h3 className='mt-5'>{team.name}</h3>
+              <h5 className='mt-5 fw-bold'>{team.name}</h5>
               <div className='d-flex flex-wrap gap-2'>
                 {team.projects.map((project) => {
                   return <Tile
