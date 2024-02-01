@@ -1,6 +1,7 @@
 import { useAppDispatch, useAppSelector } from "../../store.ts";
 import { logoutThunk } from "../../auth/data/thunks/logoutThunk.ts";
 import { useNavigate } from "react-router-dom";
+import { Navbar } from "../components/Navbar.tsx";
 
 export const Dashboard = () => {
   const dispatch = useAppDispatch();
@@ -20,7 +21,6 @@ export const Dashboard = () => {
   };
 
   return <div>
-    <h1>Dashboard</h1>
-    <button onClick={handleLogout}>Logout</button>
+    <Navbar onLogout={handleLogout} />
   </div>;
 };
