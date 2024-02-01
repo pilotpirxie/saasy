@@ -1,0 +1,11 @@
+.nav-link:hover {
+    background-color: #34383b;
+}
+
+.nav-link.active {
+    background-color: #34383b;
+}
+
+.dropdown-toggle:after {
+    color: #ffffff;
+}

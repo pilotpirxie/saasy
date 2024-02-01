@@ -1,7 +1,7 @@
 import { useAppDispatch, useAppSelector } from "../../store.ts";
 import { logoutThunk } from "../../auth/data/thunks/logoutThunk.ts";
 import { useNavigate } from "react-router-dom";
-import { Navbar } from "../components/Navbar.tsx";
+import { Navbar } from "../components/Navbar/Navbar.tsx";
 import { Tile } from "../components/Tile/Tile.tsx";
 
 export const Dashboard = () => {

@@ -1,12 +1,14 @@
+import "./Navbar.css";
+
 export const Navbar = ({
   onLogout,
 }: {
   onLogout: () => void;
 }) => {
-  return <nav className="navbar bg-light navbar-expand-sm">
+  return <nav className="navbar bg-dark navbar-expand-sm">
     <div className="container-fluid">
       <a
-        className="navbar-brand"
+        className="navbar-brand text-white"
         href="#"
       >App Name</a>
       <button
@@ -27,22 +29,22 @@ export const Navbar = ({
         <ul className="navbar-nav me-auto">
           <li className="nav-item">
             <a
-              className="nav-link active"
+              className="nav-link text-white"
               aria-current="page"
               href="#"
             >Projects</a>
           </li>
           <li className="nav-item">
             <a
-              className="nav-link"
+              className="nav-link text-white"
               href="#"
             >Teams</a>
           </li>
           <li className="nav-item">
             <a
-              className="nav-link"
+              className="nav-link text-white active"
               href="#"
-            >Invitations</a>
+            >Documentation</a>
           </li>
         </ul>
         <ul className="navbar-nav">
