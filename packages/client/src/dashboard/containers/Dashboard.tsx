@@ -67,14 +67,36 @@ export const Dashboard = () => {
 
   return <div>
     <Navbar onLogout={handleLogout} />
-    <div className="container-fluid">
+    <div className="container">
       <div className="row">
         <div className="col-12">
           {teams.map((team) => {
             return <div
               key={team.id}
             >
-              <h5 className='mt-5 fw-bold'>{team.name}</h5>
+              <div className="mt-5 d-flex align-items-center">
+                <h5 className='fw-bold'>{team.name}</h5>
+                <div className='ms-auto gap-2 d-flex'>
+                  <button
+                    className="btn btn-sm btn-light"
+                  >
+                    <span className="ri-user-2-line me-1"></span>
+                    Members
+                  </button>
+                  <button
+                    className="btn btn-sm btn-light"
+                  >
+                    <span className="ri-settings-3-line me-1"></span>
+                    Settings
+                  </button>
+                  <button
+                    className="btn btn-sm btn-primary"
+                  >
+                    <span className="me-1 ri-suitcase-2-line"></span>
+                    Upgrade plan
+                  </button>
+                </div>
+              </div>
               <div className='d-flex flex-wrap gap-2'>
                 {team.projects.map((project) => {
                   return <Tile
