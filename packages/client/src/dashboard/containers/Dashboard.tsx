@@ -119,7 +119,7 @@ export const Dashboard = () => {
     <Modal
       show={true}
       title={"Modal Title"}
-      onClose={() => {}}
+      onClose={() => console.log("1")}
       footerChildren={
         <button
           className="btn btn-sm btn-primary"

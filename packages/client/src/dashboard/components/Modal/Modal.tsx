@@ -1,5 +1,6 @@
 import "./Modal.css";
-import { ReactNode } from "react";
+import { ReactNode, useRef } from "react";
+import { useClickOutside } from "../../../shared/hooks/useClickOutside.ts";
 
 export const Modal = ({
   show,
@@ -14,12 +15,20 @@ export const Modal = ({
   footerChildren?: ReactNode;
   title: string;
 }) => {
+  const ref = useRef(null);
+  useClickOutside(ref, onClose);
+
   if (!show) {
     return null;
   }
 
-  return <div className="modal fade show d-block bg-modal">
-    <div className="modal-dialog">
+  return <div
+    className="modal fade show d-block bg-modal"
+  >
+    <div
+      className="modal-dialog"
+      ref={ref}
+    >
       <div className="modal-content">
         <div className="modal-header">
           <h5 className="modal-title">{title}</h5>
