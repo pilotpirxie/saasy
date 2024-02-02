@@ -3,6 +3,8 @@ import { logoutThunk } from "../../auth/data/thunks/logoutThunk.ts";
 import { useNavigate } from "react-router-dom";
 import { Navbar } from "../components/Navbar/Navbar.tsx";
 import { Tile } from "../components/Tile/Tile.tsx";
+import { PlusTile } from "../components/PlusTile/PlusTile.tsx";
+import { Modal } from "../components/Modal/Modal.tsx";
 
 export const Dashboard = () => {
   const dispatch = useAppDispatch();
@@ -93,11 +95,11 @@ export const Dashboard = () => {
                     className="btn btn-sm btn-primary"
                   >
                     <span className="me-1 ri-suitcase-2-line"></span>
-                    Upgrade plan
+                    Upgrade
                   </button>
                 </div>
               </div>
-              <div className='d-flex flex-wrap gap-2'>
+              <div className='d-flex flex-wrap gap-2 mt-2'>
                 {team.projects.map((project) => {
                   return <Tile
                     key={project.id}
@@ -105,11 +107,28 @@ export const Dashboard = () => {
                     color={project.color}
                   />;
                 })}
+                <PlusTile />
               </div>
             </div>;
           })}
         </div>
+
       </div>
     </div>
+
+    <Modal
+      show={true}
+      title={"Modal Title"}
+      onClose={() => {}}
+      footerChildren={
+        <button
+          className="btn btn-sm btn-primary"
+        >
+          Save
+        </button>
+      }
+    >
+      <p>Modal Content</p>
+    </Modal>
   </div>;
 };
