@@ -71,8 +71,13 @@ export const Dashboard = () => {
     <Navbar onLogout={handleLogout} />
     <NewProjectModal
       onClose={() => {}}
-      onCreate={(name, color) => {}}
-      teamName={"Team 1"}
+      teams={[
+        { id: "1", name: "Team 1" },
+        { id: "2", name: "Team 2" },
+        { id: "3", name: "Team 3" }
+      ]}
+      initialTeamId={"3"}
+      onCreate={(teamId, name, color) => {}}
     />
     <div className="container">
       <div className="row">

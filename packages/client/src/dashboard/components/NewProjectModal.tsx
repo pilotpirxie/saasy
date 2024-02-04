@@ -2,18 +2,25 @@ import { Modal } from "./Modal/Modal.tsx";
 import { TextInput } from "../../shared/components/FormInputs/TextInput.tsx";
 import { ColorPicker } from "../../shared/components/FormInputs/ColorPicker.tsx";
 import { useState } from "react";
+import { SelectInput } from "../../shared/components/FormInputs/SelectInput.tsx";
 
 export const NewProjectModal = ({
-  teamName,
+  initialTeamId,
+  teams,
   onCreate,
   onClose,
 }: {
-  teamName: string;
-  onCreate: (name: string, color: string) => void;
+  initialTeamId: string;
+  teams: {
+    id: string;
+    name: string;
+  }[];
+  onCreate: (teamId: string, name: string, color: string) => void;
   onClose: () => void;
 }) => {
   const [name, setName] = useState("");
   const [color, setColor] = useState("#ff5976");
+  const [teamId, setTeamId] = useState(initialTeamId);
 
   return <Modal
     show={true}
@@ -21,18 +28,18 @@ export const NewProjectModal = ({
     title={"New project"}
     footerChildren={<button
       className="btn btn-sm btn-primary"
-      onClick={() => onCreate(name, color)}
+      onClick={() => onCreate(teamId, name, color)}
     >
       Create
     </button>}
 
   >
     <div>
-      <TextInput
+      <SelectInput
         label={"Team"}
-        value={teamName}
-        onChange={() => {}}
-        disabled
+        value={teamId}
+        onChange={(value) => setTeamId(value)}
+        items={teams.map((team) => ({ label: team.name, value: team.id }))}
       />
 
       <div className="mt-3">
