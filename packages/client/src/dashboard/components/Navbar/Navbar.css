@@ -1,11 +1,15 @@
-.nav-link:hover {
-    background-color: #34383b;
-}
+/*.nav-link {*/
+/*    border-radius: 8px;*/
+/*}*/
 
-.nav-link.active {
-    background-color: #34383b;
-}
+/*.nav-link:hover {*/
+/*    background-color: #ececec;*/
+/*}*/
 
-.dropdown-toggle:after {
-    color: #ffffff;
-}
+/*.nav-link.active {*/
+/*    background-color: #ececec;*/
+/*}*/
+
+/*.dropdown-toggle:after {*/
+/*    !*color: #ffffff;*!*/
+/*}*/

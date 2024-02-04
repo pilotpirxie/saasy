@@ -3,8 +3,7 @@ import { logoutThunk } from "../../auth/data/thunks/logoutThunk.ts";
 import { useNavigate } from "react-router-dom";
 import { Navbar } from "../components/Navbar/Navbar.tsx";
 import { Tile } from "../components/Tile/Tile.tsx";
-import { PlusTile } from "../components/PlusTile/PlusTile.tsx";
-import { NewProjectModal } from "../components/NewProjectModal.tsx";
+import { PlusTile } from "../components/Tile/PlusTile.tsx";
 
 export const Dashboard = () => {
   const dispatch = useAppDispatch();
@@ -69,16 +68,16 @@ export const Dashboard = () => {
 
   return <div>
     <Navbar onLogout={handleLogout} />
-    <NewProjectModal
-      onClose={() => {}}
-      teams={[
-        { id: "1", name: "Team 1" },
-        { id: "2", name: "Team 2" },
-        { id: "3", name: "Team 3" }
-      ]}
-      initialTeamId={"3"}
-      onCreate={(teamId, name, color) => {}}
-    />
+    {/*<NewProjectModal*/}
+    {/*  onClose={() => {}}*/}
+    {/*  teams={[*/}
+    {/*    { id: "1", name: "Team 1" },*/}
+    {/*    { id: "2", name: "Team 2" },*/}
+    {/*    { id: "3", name: "Team 3" }*/}
+    {/*  ]}*/}
+    {/*  initialTeamId={"3"}*/}
+    {/*  onCreate={(teamId, name, color) => {}}*/}
+    {/*/>*/}
     <div className="container">
       <div className="row">
         <div className="col-12">

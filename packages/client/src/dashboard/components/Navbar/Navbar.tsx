@@ -5,10 +5,10 @@ export const Navbar = ({
 }: {
   onLogout: () => void;
 }) => {
-  return <nav className="navbar bg-dark navbar-expand-sm">
-    <div className="container-fluid">
+  return <nav className="navbar bg-light-subtle navbar-expand-sm border-bottom shadow-sm">
+    <div className="container">
       <a
-        className="navbar-brand text-white fw-bold"
+        className="navbar-brand fw-bold"
         href="#"
       >App Name</a>
       <button
@@ -29,20 +29,20 @@ export const Navbar = ({
         <ul className="navbar-nav me-auto">
           <li className="nav-item">
             <a
-              className="nav-link text-white"
+              className="nav-link active"
               aria-current="page"
               href="#"
             >Projects</a>
           </li>
           <li className="nav-item">
             <a
-              className="nav-link text-white"
+              className="nav-link"
               href="#"
             >Teams</a>
           </li>
           <li className="nav-item">
             <a
-              className="nav-link text-white active"
+              className="nav-link"
               href="#"
             >Documentation</a>
           </li>
@@ -62,8 +62,7 @@ export const Navbar = ({
                 height="24"
                 className="d-inline-block align-text-top rounded-circle"
               />
-
-              <div className="d-block d-sm-none ms-1 text-white">Profile</div>
+              <div className="d-block d-sm-none ms-1">Profile</div>
             </div>
             <ul className="dropdown-menu dropdown-menu-sm-end">
               <li><a

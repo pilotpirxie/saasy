@@ -604,16 +604,6 @@
   resolved "https://registry.yarnpkg.com/@sideway/pinpoint/-/pinpoint-2.0.0.tgz#cff8ffadc372ad29fd3f78277aeb29e632cc70df"
   integrity sha512-RNiOoTPkptFtSVzQevY/yWtZwf/RxyVnPy/OcA9HBM3MlGDnBEYL5B41H0MTn0Uec8Hi+2qUtTfG2WWZBmMejQ==
 
-"@thednp/event-listener@^2.0.4":
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/@thednp/event-listener/-/event-listener-2.0.4.tgz#76400393849e6e5d1e7cb8bcf23e3f184dfe1865"
-  integrity sha512-sc4B7AzYAIvnGnivirq0XyR7LfzEDhGiiB70Q0qdNn8wSJ2pL1buVAsEZxrlc47qRJiBV4YIP+BFkyMm2r3NLg==
-
-"@thednp/shorty@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@thednp/shorty/-/shorty-2.0.0.tgz#e05e6754032c091f599ac0c4ed7efde6558bdedb"
-  integrity sha512-kwtLivCxYIoFfGIVU4NlZtfdA/zxZ6X8UcWaJrb7XqU3WQ4Q1p5IaZlLBfOVAO06WH5oWE87QUdK/dS56Wnfjg==
-
 "@tsconfig/node10@^1.0.7":
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/@tsconfig/node10/-/node10-1.0.9.tgz#df4907fc07a886922637b15e02d4cebc4c0021b2"
@@ -1196,19 +1186,6 @@ body-parser@^1.20.2:
     raw-body "2.5.2"
     type-is "~1.6.18"
     unpipe "1.0.0"
-
-bootstrap.native@^5.0.11:
-  version "5.0.11"
-  resolved "https://registry.yarnpkg.com/bootstrap.native/-/bootstrap.native-5.0.11.tgz#5edc74d4c87cbc7bdecee9b39eed25229caeb81f"
-  integrity sha512-bk2i4sQcQk2KuCTs1yygTa+JGjZOpKzIZ/It6TZZOO/Q+PmVGuKuIbrznXF64BUFxXaPNy7gO9LnE7vjGdauSQ==
-  dependencies:
-    "@thednp/event-listener" "^2.0.4"
-    "@thednp/shorty" "^2.0.0"
-
-bootstrap@^5.3.2:
-  version "5.3.2"
-  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-5.3.2.tgz#97226583f27aae93b2b28ab23f4c114757ff16ae"
-  integrity sha512-D32nmNWiQHo94BKHLmOrdjlL05q1c8oxbtBphQFb9Z5to6eGRDCm0QgeaZ4zFBHzfg2++rqa2JkqCcxDy0sH0g==
 
 brace-expansion@^1.1.7:
   version "1.1.11"
@@ -1943,14 +1920,6 @@ fast-levenshtein@^2.0.6:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz#3d8a5c66883a16a30ca8643e851f19baa7797917"
   integrity sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==
-
-fastbootstrap@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/fastbootstrap/-/fastbootstrap-2.2.0.tgz#8c7502c9090419b884ce778477929bfd0b1e1fe7"
-  integrity sha512-31bJ6OaNntrUSZB4BVlO8mBJB45d7A0AxHchvdJQjp9CCK6qGx3c+byjcDqXgExXkG2miL+NW97Q6K7SWwwGWg==
-  dependencies:
-    bootstrap "^5.3.2"
-    bootstrap.native "^5.0.11"
 
 fastq@^1.6.0:
   version "1.16.0"
