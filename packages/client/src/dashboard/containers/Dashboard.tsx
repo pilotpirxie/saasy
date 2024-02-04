@@ -85,9 +85,9 @@ export const Dashboard = () => {
             return <div
               key={team.id}
             >
-              <div className="mt-5 d-flex align-items-center">
-                <h5 className='fw-bold'>{team.name}</h5>
-                <div className='ms-auto gap-2 d-flex'>
+              <div className="mt-5 d-flex align-items-center flex-wrap">
+                <h5 className='fw-bold me-2'>{team.name}</h5>
+                <div className='ms-sm-auto gap-2 d-flex flex-wrap'>
                   <button
                     className="btn btn-sm btn-light"
                   >
