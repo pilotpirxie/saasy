@@ -4,12 +4,14 @@ export const TextInput = ({
   onChange,
   autofocus,
   required,
+  disabled
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   autofocus?: boolean;
   required?: boolean;
+  disabled?: boolean;
 }) => {
   return (<div>
     <label
@@ -26,6 +28,7 @@ export const TextInput = ({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       required={required}
+      disabled={disabled}
     />
   </div>);
 };

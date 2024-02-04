@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Navbar } from "../components/Navbar/Navbar.tsx";
 import { Tile } from "../components/Tile/Tile.tsx";
 import { PlusTile } from "../components/PlusTile/PlusTile.tsx";
-import { Modal } from "../components/Modal/Modal.tsx";
+import { NewProjectModal } from "../components/NewProjectModal.tsx";
 
 export const Dashboard = () => {
   const dispatch = useAppDispatch();
@@ -69,6 +69,11 @@ export const Dashboard = () => {
 
   return <div>
     <Navbar onLogout={handleLogout} />
+    <NewProjectModal
+      onClose={() => {}}
+      onCreate={(name, color) => {}}
+      teamName={"Team 1"}
+    />
     <div className="container">
       <div className="row">
         <div className="col-12">
@@ -112,23 +117,7 @@ export const Dashboard = () => {
             </div>;
           })}
         </div>
-
       </div>
     </div>
-
-    <Modal
-      show={true}
-      title={"Modal Title"}
-      onClose={() => console.log("1")}
-      footerChildren={
-        <button
-          className="btn btn-sm btn-primary"
-        >
-          Save
-        </button>
-      }
-    >
-      <p>Modal Content</p>
-    </Modal>
   </div>;
 };

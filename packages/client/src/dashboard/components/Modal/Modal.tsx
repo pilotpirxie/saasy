@@ -38,7 +38,7 @@ export const Modal = ({
             onClick={onClose}
           ></button>
         </div>
-        <div className="modal-body">
+        <div className="modal-body pt-0">
           {children}
         </div>
         {footerChildren && <div className="modal-footer">
