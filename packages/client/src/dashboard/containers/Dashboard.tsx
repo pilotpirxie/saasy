@@ -4,15 +4,20 @@ import { useNavigate } from "react-router-dom";
 import { Navbar } from "../components/Navbar/Navbar.tsx";
 import { Tile } from "../components/Tile/Tile.tsx";
 import { PlusTile } from "../components/Tile/PlusTile.tsx";
+import { NewProjectModal } from "../components/NewProjectModal.tsx";
+import { useState } from "react";
+import { Footer } from "../components/Footer.tsx";
+import { ScreenContainer } from "../../shared/containers/ScreenContainer.tsx";
 
 export const Dashboard = () => {
   const dispatch = useAppDispatch();
   const sessionState = useAppSelector((state) => state.auth.session);
   const navigate = useNavigate();
+  const [showNewProjectModalForTeam, setShowNewProjectModalForTeam] = useState<string | null>(null);
 
   const teams = [{
     id: 1,
-    name: "Team 1",
+    name: "XantesS's Team",
     membersCount: 2,
     projects: [{
       id: 1,
@@ -66,18 +71,24 @@ export const Dashboard = () => {
     navigate("/auth/login");
   };
 
-  return <div>
-    <Navbar onLogout={handleLogout} />
-    {/*<NewProjectModal*/}
-    {/*  onClose={() => {}}*/}
-    {/*  teams={[*/}
-    {/*    { id: "1", name: "Team 1" },*/}
-    {/*    { id: "2", name: "Team 2" },*/}
-    {/*    { id: "3", name: "Team 3" }*/}
-    {/*  ]}*/}
-    {/*  initialTeamId={"3"}*/}
-    {/*  onCreate={(teamId, name, color) => {}}*/}
-    {/*/>*/}
+  return <ScreenContainer>
+    <Navbar
+      onLogout={handleLogout}
+      onNewProject={() => setShowNewProjectModalForTeam(teams[0].id.toString())}
+    />
+    <NewProjectModal
+      show={!!showNewProjectModalForTeam}
+      onClose={() => setShowNewProjectModalForTeam(null)}
+      teams={[
+        { id: "1", name: "Team 1" },
+        { id: "2", name: "Team 2" },
+        { id: "3", name: "Team 3" }
+      ]}
+      initialTeamId={showNewProjectModalForTeam || ""}
+      onCreate={(teamId, name, color) => {
+        console.info("Creating project", teamId, name, color);
+      }}
+    />
     <div className="container">
       <div className="row">
         <div className="col-12">
@@ -116,12 +127,17 @@ export const Dashboard = () => {
                     color={project.color}
                   />;
                 })}
-                <PlusTile />
+                <PlusTile
+                  onClick={
+                    () => setShowNewProjectModalForTeam(team.id.toString())
+                  }
+                />
               </div>
             </div>;
           })}
         </div>
       </div>
     </div>
-  </div>;
+    <Footer />
+  </ScreenContainer>;
 };

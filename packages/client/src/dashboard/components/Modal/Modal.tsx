@@ -1,6 +1,5 @@
 import "./Modal.css";
 import { ReactNode, useRef } from "react";
-import { useClickOutside } from "../../../shared/hooks/useClickOutside.ts";
 
 export const Modal = ({
   show,
@@ -16,7 +15,7 @@ export const Modal = ({
   title: string;
 }) => {
   const ref = useRef(null);
-  useClickOutside(ref, onClose);
+  // useClickOutside(ref, onClose);
 
   if (!show) {
     return null;

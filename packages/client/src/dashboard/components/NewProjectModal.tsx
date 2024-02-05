@@ -1,7 +1,7 @@
 import { Modal } from "./Modal/Modal.tsx";
 import { TextInput } from "../../shared/components/FormInputs/TextInput.tsx";
 import { ColorPicker } from "../../shared/components/FormInputs/ColorPicker.tsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SelectInput } from "../../shared/components/FormInputs/SelectInput.tsx";
 
 export const NewProjectModal = ({
@@ -9,6 +9,7 @@ export const NewProjectModal = ({
   teams,
   onCreate,
   onClose,
+  show,
 }: {
   initialTeamId: string;
   teams: {
@@ -17,13 +18,22 @@ export const NewProjectModal = ({
   }[];
   onCreate: (teamId: string, name: string, color: string) => void;
   onClose: () => void;
+  show: boolean;
 }) => {
   const [name, setName] = useState("");
   const [color, setColor] = useState("#ff5976");
   const [teamId, setTeamId] = useState(initialTeamId);
 
+  useEffect(() => {
+    if (show) {
+      setName("");
+      setColor("#ff5976");
+      setTeamId(initialTeamId);
+    }
+  }, [initialTeamId, show]);
+
   return <Modal
-    show={true}
+    show={show}
     onClose={() => onClose()}
     title={"New project"}
     footerChildren={<button

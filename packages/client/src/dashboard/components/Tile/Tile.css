@@ -15,3 +15,11 @@
     text-overflow: ellipsis;
     max-width: 120px;
 }
+
+@media (max-width: 575px) {
+    .tile {
+        max-width: 300px;
+        width: 300px;
+        height: 150px;
+    }
+}

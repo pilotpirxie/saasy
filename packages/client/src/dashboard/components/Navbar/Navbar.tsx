@@ -1,16 +1,33 @@
 import "./Navbar.css";
+import { Link } from "react-router-dom";
 
 export const Navbar = ({
   onLogout,
+  onNewProject,
 }: {
   onLogout: () => void;
+  onNewProject: () => void;
 }) => {
-  return <nav className="navbar bg-light-subtle navbar-expand-sm border-bottom shadow-sm">
+  return <nav className="navbar bg-light-subtle navbar-expand-sm border-bottom">
     <div className="container">
-      <a
-        className="navbar-brand fw-bold"
-        href="#"
-      >App Name</a>
+      <div className="d-flex">
+        <Link
+          to="/dashboard"
+          className="navbar-brand fw-bold"
+        >App Name</Link>
+
+        <button
+          className="btn btn-sm btn-primary d-flex d-sm-none align-items-center m-auto"
+          type="button"
+          onClick={onNewProject}
+        >
+          <span className="ri-add-line me-1"></span>
+          <div>
+            New project
+          </div>
+        </button>
+      </div>
+
       <button
         className="navbar-toggler"
         type="button"
@@ -22,30 +39,38 @@ export const Navbar = ({
       >
         <span className="navbar-toggler-icon"></span>
       </button>
+
       <div
         className="collapse navbar-collapse"
         id="navbarText"
       >
         <ul className="navbar-nav me-auto">
           <li className="nav-item">
-            <a
+            <Link
               className="nav-link active"
-              aria-current="page"
-              href="#"
-            >Projects</a>
+              to="/dashboard"
+            >Projects</Link>
           </li>
           <li className="nav-item">
-            <a
+            <Link
               className="nav-link"
-              href="#"
-            >Teams</a>
+              to="/teams"
+            >Teams</Link>
           </li>
-          <li className="nav-item">
-            <a
-              className="nav-link"
-              href="#"
-            >Documentation</a>
+
+          <li className="nav-item align-items-center d-none d-sm-flex">
+            <button
+              className="btn btn-sm btn-primary d-flex align-items-center"
+              type="button"
+              onClick={onNewProject}
+            >
+              <span className="ri-add-line"></span>
+              <div className="d-none d-md-block ms-1">
+                New project
+              </div>
+            </button>
           </li>
+
         </ul>
         <ul className="navbar-nav">
           <li className="nav-item dropdown">
@@ -63,20 +88,21 @@ export const Navbar = ({
                 className="d-inline-block align-text-top rounded-circle"
               />
               <div className="d-block d-sm-none ms-1">Profile</div>
+              <div className="ms-1">Profile</div>
             </div>
             <ul className="dropdown-menu dropdown-menu-sm-end">
-              <li><a
+              <li><Link
                 className="dropdown-item"
-                href="#"
-              >Settings</a></li>
-              <li><a
+                to="/account"
+              >Settings</Link></li>
+              <li><Link
                 className="dropdown-item"
-                href="#"
-              >Help</a></li>
-              <li><a
-                className="dropdown-item"
+                to="/help"
+              >Help</Link></li>
+              <li><div
+                className="dropdown-item cursor-pointer"
                 onClick={onLogout}
-              >Logout</a></li>
+              >Logout</div></li>
             </ul>
           </li>
         </ul>
