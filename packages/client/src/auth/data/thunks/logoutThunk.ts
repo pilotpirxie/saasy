@@ -1,5 +1,4 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { isAxiosError } from "axios";
 import { GenericError } from "../../../shared/utils/errorMessages.ts";
 import { logout, LogoutParams } from "../api/logout.ts";
 
@@ -17,12 +16,9 @@ export const logoutThunk = createAsyncThunk<object, LogoutParams, ThunkArg>(
 
       return response;
     } catch (error) {
-      if (isAxiosError(error) && error.response?.data?.error) {
-        const errorMessage = error.response.data.error;
-        return rejectWithValue(errorMessage);
-      }
-
-      return rejectWithValue(GenericError);
+      let errorMessage = GenericError;
+      if (error instanceof Error) errorMessage = error.message;
+      return rejectWithValue(errorMessage);
     }
   }
 );

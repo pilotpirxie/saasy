@@ -1,5 +1,6 @@
 import "./Navbar.css";
 import { Link } from "react-router-dom";
+import { useFetchProfileQuery } from "../../data/userService.ts";
 
 export const Navbar = ({
   onLogout,
@@ -8,6 +9,8 @@ export const Navbar = ({
   onLogout: () => void;
   onNewProject: () => void;
 }) => {
+  const { data } = useFetchProfileQuery();
+
   return <nav className="navbar bg-light-subtle navbar-expand-sm border-bottom">
     <div className="container">
       <div className="d-flex">
@@ -81,7 +84,7 @@ export const Navbar = ({
               aria-expanded="false"
             >
               <img
-                src="https://picsum.photos/200/200"
+                src={data?.avatarUrl || "https://picsum.photos/200/200"}
                 alt="Logo"
                 width="24"
                 height="24"
