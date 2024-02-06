@@ -9,10 +9,10 @@ import { usePrismaClientFactory } from "./data/prismaClientFactory";
 import { NodeCacheAdapter } from "./data/cacheStore";
 import { NodemailerEmailService } from "./services/nodemailerEmailService";
 import { EmailTemplatesService } from "./services/emailTemplatesService";
-import initializeAuthController from "./controllers/initializeAuthController";
-import initializeUsersController from "./controllers/initializeUsersController";
-import initializeTeamsController from "./controllers/initializeTeamsController";
-import initializeInvitationsController from "./controllers/initializeInvitationsController";
+import initializeAuthController from "./controllers/authController";
+import initializeUsersController from "./controllers/usersController";
+import initializeTeamsController from "./controllers/teamsController";
+import initializeInvitationsController from "./controllers/invitationsController";
 
 dotenv.config();
 
