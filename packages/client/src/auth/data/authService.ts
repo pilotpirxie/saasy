@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import config from "../../../config.ts";
 import { RootState } from "../../store.ts";
+import { AuthCodes } from "./models.ts";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: `${config.baseUrl}/api/auth`,
@@ -15,33 +16,13 @@ const baseQuery = fetchBaseQuery({
   }
 });
 
-export type ExchangeCodeParams = {
-  code: string;
-}
-
-export type ExchangeCodeResponse = {
-  accessToken: string;
-  refreshToken: string;
-}
-
-export type LogoutParams = {
-  refreshToken: string;
-}
-
-export type RefreshCodeParams = {
-  refreshToken: string;
-}
-
-export type RefreshCodeResponse = {
-  accessToken: string;
-  refreshToken: string;
-}
-
 export const authService = createApi({
   reducerPath: "auth",
   baseQuery,
   endpoints: (builder) => ({
-    exchangeAuthCode: builder.mutation<ExchangeCodeResponse, ExchangeCodeParams>({
+    exchangeAuthCode: builder.mutation<AuthCodes, {
+      code: string;
+    }>({
       query: (body) => ({
         url: "exchange",
         method: "POST",
@@ -56,7 +37,9 @@ export const authService = createApi({
         }
       }
     }),
-    refresh: builder.mutation<RefreshCodeResponse, RefreshCodeParams>({
+    refresh: builder.mutation<AuthCodes, {
+      refreshToken: string;
+    }>({
       query: (body) => ({
         url: "refresh",
         method: "POST",
@@ -71,7 +54,9 @@ export const authService = createApi({
         }
       }
     }),
-    logout: builder.mutation<void, LogoutParams>({
+    logout: builder.mutation<void, {
+      refreshToken: string;
+    }>({
       query: (body) => ({
         url: "logout",
         method: "DELETE",

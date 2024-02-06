@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { authService, ExchangeCodeResponse } from "./authService.ts";
+import { authService } from "./authService.ts";
+import { AuthCodes } from "./models.ts";
 
 export type SessionState = {
   accessToken: string | null;
@@ -20,7 +21,7 @@ const sessionSlice = createSlice({
   extraReducers: (builder) => {
     builder.addMatcher(
       authService.endpoints.exchangeAuthCode.matchFulfilled,
-      (state, action: PayloadAction<ExchangeCodeResponse>) => {
+      (state, action: PayloadAction<AuthCodes>) => {
         state.accessToken = action.payload.accessToken;
         state.refreshToken = action.payload.refreshToken;
         state.signedIn = true;
@@ -29,7 +30,7 @@ const sessionSlice = createSlice({
 
     builder.addMatcher(
       authService.endpoints.refresh.matchFulfilled,
-      (state, action: PayloadAction<ExchangeCodeResponse>) => {
+      (state, action: PayloadAction<AuthCodes>) => {
         state.accessToken = action.payload.accessToken;
         state.refreshToken = action.payload.refreshToken;
         state.signedIn = true;
