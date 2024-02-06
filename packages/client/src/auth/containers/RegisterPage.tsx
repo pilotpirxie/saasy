@@ -3,7 +3,7 @@ import { SideLayout } from "../components/SideLayout.tsx";
 import { RegisterForm } from "../components/RegisterForm.tsx";
 import useIsMobile from "../../shared/hooks/useIsMobile.ts";
 import { CleanLayout } from "../components/CleanLayout.tsx";
-import { registerByEmail } from "../data/api/registerByEmail.ts";
+import { registerByEmail } from "../api/registerByEmail.ts";
 import { useNavigate } from "react-router-dom";
 
 export function RegisterPage() {

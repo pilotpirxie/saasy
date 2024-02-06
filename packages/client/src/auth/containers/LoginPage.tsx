@@ -9,9 +9,9 @@ import { EmailInput } from "../../shared/components/FormInputs/EmailInput.tsx";
 import { PasswordInput } from "../../shared/components/FormInputs/PasswordInput.tsx";
 import { TextInput } from "../../shared/components/FormInputs/TextInput.tsx";
 import { FormLink } from "../components/FormLink.tsx";
-import { loginByEmail } from "../data/api/loginByEmail.ts";
+import { loginByEmail } from "../api/loginByEmail.ts";
 import config from "../../../config.ts";
-import { verifyEmail } from "../data/api/verifyEmail.ts";
+import { verifyEmail } from "../api/verifyEmail.ts";
 
 export function LoginPage() {
   const [email, setEmail] = useState("");

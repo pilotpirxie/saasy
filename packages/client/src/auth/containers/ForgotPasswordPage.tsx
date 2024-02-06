@@ -6,9 +6,9 @@ import { EmailInput } from "../../shared/components/FormInputs/EmailInput.tsx";
 import { FormLink } from "../components/FormLink.tsx";
 import { TextInput } from "../../shared/components/FormInputs/TextInput.tsx";
 import { PasswordInput } from "../../shared/components/FormInputs/PasswordInput.tsx";
-import { sendResetCode } from "../data/api/sendResetCode.ts";
-import { checkResetCode } from "../data/api/checkResetCode.ts";
-import { resetPassword } from "../data/api/resetPassword.ts";
+import { sendResetCode } from "../api/sendResetCode.ts";
+import { checkResetCode } from "../api/checkResetCode.ts";
+import { resetPassword } from "../api/resetPassword.ts";
 
 export function ForgotPasswordPage() {
   const [email, setEmail] = useState("");

@@ -1,6 +1,6 @@
-import axiosInstance from "../../../shared/utils/httpClient.ts";
+import axiosInstance from "../../shared/utils/httpClient.ts";
 import { isAxiosError } from "axios";
-import { GenericError } from "../../../shared/utils/errorMessages.ts";
+import { GenericError } from "../../shared/utils/errorMessages.ts";
 
 export const verifyEmail = async ({ email, code }: {email: string, code: string}) => {
   try {
