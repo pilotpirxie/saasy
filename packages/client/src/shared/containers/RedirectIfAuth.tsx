@@ -3,7 +3,7 @@ import { useAppSelector } from "../../store.ts";
 import { useNavigate } from "react-router-dom";
 
 export const RedirectIfAuth = ({ children }: PropsWithChildren) => {
-  const sessionState = useAppSelector((state) => state.auth.session);
+  const sessionState = useAppSelector((state) => state.session);
   const navigate = useNavigate();
 
   useEffect(() => {

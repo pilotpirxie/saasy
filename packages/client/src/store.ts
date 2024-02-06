@@ -1,15 +1,17 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
-import { authReducer } from "./auth/data/slice.ts";
+import { sessionReducer } from "./auth/data/sessionSlice.ts";
 import { userService } from "./dashboard/data/userService.ts";
+import { authService } from "./auth/data/authService.ts";
 
 export const store = configureStore({
   reducer: {
-    auth: authReducer,
-    [userService.reducerPath]: userService.reducer
+    session: sessionReducer,
+    [userService.reducerPath]: userService.reducer,
+    [authService.reducerPath]: authService.reducer
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(userService.middleware)
+    getDefaultMiddleware().concat(userService.middleware, authService.middleware)
 });
 
 export type AppDispatch = typeof store.dispatch;

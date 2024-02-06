@@ -44,7 +44,12 @@ const jwtVerify = (jwtSecret: string) => (req: Request, res: Response, next: Nex
     req.userId = decoded.sub;
     return next();
   } catch (err) {
-    return res.sendStatus(401);
+    return errorResponse({
+      response: res,
+      message: "Invalid token",
+      status: 401,
+      error: "Unauthorized",
+    });
   }
 };
 

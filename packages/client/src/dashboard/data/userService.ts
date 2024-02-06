@@ -6,7 +6,7 @@ import config from "../../../config.ts";
 const baseQuery = fetchBaseQuery({
   baseUrl: `${config.baseUrl}/api/users`,
   prepareHeaders: (headers, { getState }) => {
-    const token = (getState() as RootState).auth.session.accessToken;
+    const token = (getState() as RootState).session.accessToken;
 
     if (token) {
       headers.set("authorization", `Bearer ${token}`);
@@ -23,7 +23,7 @@ export const userService = createApi({
     fetchProfile: builder.query<Profile, void>({
       query: () => "profile"
     }),
-    updateProfile: builder.mutation<Profile, Partial<Profile>>({
+    updateProfile: builder.mutation<void, Profile>({
       query: (body) => ({
         url: "profile",
         method: "PUT",

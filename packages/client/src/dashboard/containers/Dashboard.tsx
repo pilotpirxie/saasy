@@ -1,5 +1,4 @@
-import { useAppDispatch, useAppSelector } from "../../store.ts";
-import { logoutThunk } from "../../auth/data/thunks/logoutThunk.ts";
+import { useAppSelector } from "../../store.ts";
 import { useNavigate } from "react-router-dom";
 import { Navbar } from "../components/Navbar/Navbar.tsx";
 import { Tile } from "../components/Tile/Tile.tsx";
@@ -8,12 +7,13 @@ import { NewProjectModal } from "../components/NewProjectModal.tsx";
 import { useState } from "react";
 import { Footer } from "../components/Footer.tsx";
 import { ScreenContainer } from "../../shared/containers/ScreenContainer.tsx";
+import { useLogoutMutation } from "../../auth/data/authService.ts";
 
 export const Dashboard = () => {
-  const dispatch = useAppDispatch();
-  const sessionState = useAppSelector((state) => state.auth.session);
+  const sessionState = useAppSelector((state) => state.session);
   const navigate = useNavigate();
   const [showNewProjectModalForTeam, setShowNewProjectModalForTeam] = useState<string | null>(null);
+  const [logout] = useLogoutMutation();
 
   const teams = [{
     id: 1,
@@ -59,14 +59,14 @@ export const Dashboard = () => {
     }]
   }];
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     if (!sessionState.refreshToken) {
       return;
     }
 
-    dispatch(logoutThunk({
+    await logout({
       refreshToken: sessionState.refreshToken
-    }));
+    });
 
     navigate("/auth/login");
   };

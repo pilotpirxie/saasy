@@ -523,7 +523,7 @@ export default function initializeAuthController({
     },
   };
 
-  router.post(
+  router.delete(
     "/logout",
     validation(logoutSchema),
     async (req: TypedRequest<typeof logoutSchema>, res, next) => {

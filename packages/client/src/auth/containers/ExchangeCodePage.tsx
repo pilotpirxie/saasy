@@ -1,41 +1,40 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../../store.ts";
-import { exchangeAuthCodeThunk } from "../data/thunks/exchangeAuthCodeThunk.ts";
+import { useAppSelector } from "../../store.ts";
+import { useExchangeAuthCodeMutation } from "../data/authService.ts";
 
 export function ExchangeCodePage() {
   const navigate = useNavigate();
-  const sessionState = useAppSelector((state) => state.auth.session);
-  const exchangeAuthCodeState = useAppSelector((state) => state.auth.exchangeAuthCode);
-  const dispatch = useAppDispatch();
+  const sessionState = useAppSelector((state) => state.session);
+  const [exchangeAuthCode, { isSuccess, isError, error }] = useExchangeAuthCodeMutation();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get("code");
-    const error = urlParams.get("error");
+    const queryCode = urlParams.get("code");
+    const queryError = urlParams.get("error");
 
     if (error) {
+      navigate(`/auth/login?error=${queryError}`);
+      return;
+    }
+
+    if (queryCode) {
+      exchangeAuthCode({
+        code: queryCode,
+      });
+    }
+  }, [exchangeAuthCode, navigate, error]);
+
+  useEffect(() => {
+    if (isError) {
       navigate(`/auth/login?error=${error}`);
       return;
     }
 
-    if (code) {
-      dispatch(exchangeAuthCodeThunk({
-        code
-      }));
-    }
-  }, [dispatch, navigate]);
-
-  useEffect(() => {
-    if (exchangeAuthCodeState.error) {
-      navigate(`/auth/login?error=${exchangeAuthCodeState.error}`);
-      return;
-    }
-
-    if (sessionState.signedIn) {
+    if (sessionState.signedIn || isSuccess) {
       navigate("/dashboard");
     }
-  }, [exchangeAuthCodeState.error, navigate, sessionState.signedIn]);
+  }, [isError, isSuccess, navigate, sessionState.signedIn, error]);
 
   return null;
 }
