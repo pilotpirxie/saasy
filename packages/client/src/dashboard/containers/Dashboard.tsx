@@ -1,22 +1,17 @@
-import { useAppSelector } from "../../store.ts";
-import { useNavigate } from "react-router-dom";
-import { Navbar } from "../components/Navbar/Navbar.tsx";
+import { Navbar } from "./Navbar.tsx";
 import { Tile } from "../components/Tile/Tile.tsx";
 import { PlusTile } from "../components/Tile/PlusTile.tsx";
-import { NewProjectModal } from "../components/NewProjectModal.tsx";
-import { useState } from "react";
+import { NewProjectModal } from "./NewProjectModal.tsx";
 import { Footer } from "../components/Footer.tsx";
 import { ScreenContainer } from "../../shared/containers/ScreenContainer.tsx";
-import { useLogoutMutation } from "../../auth/data/authService.ts";
+import { useAppDispatch } from "../../store.ts";
+import { openNewProjectModal } from "../data/dashboardSlice.ts";
 
 export const Dashboard = () => {
-  const sessionState = useAppSelector((state) => state.session);
-  const navigate = useNavigate();
-  const [showNewProjectModalForTeam, setShowNewProjectModalForTeam] = useState<string | null>(null);
-  const [logout] = useLogoutMutation();
+  const dispatch = useAppDispatch();
 
   const teams = [{
-    id: 1,
+    id: "xd",
     name: "XantesS's Team",
     membersCount: 2,
     projects: [{
@@ -28,7 +23,7 @@ export const Dashboard = () => {
       color: "#2dc927"
     }]
   }, {
-    id: 2,
+    id: "a",
     name: "Team 2",
     membersCount: 2,
     projects: [{
@@ -45,7 +40,7 @@ export const Dashboard = () => {
       color: "#fe1fa5"
     }]
   }, {
-    id: 3,
+    id: "ab",
     name: "Team 3",
     membersCount: 2,
     projects: [{
@@ -59,36 +54,13 @@ export const Dashboard = () => {
     }]
   }];
 
-  const handleLogout = async () => {
-    if (!sessionState.refreshToken) {
-      return;
-    }
-
-    await logout({
-      refreshToken: sessionState.refreshToken
-    });
-
-    navigate("/auth/login");
+  const handleShowNewProjectModalForTeam = (teamId: string) => {
+    dispatch(openNewProjectModal(teamId));
   };
 
   return <ScreenContainer>
-    <Navbar
-      onLogout={handleLogout}
-      onNewProject={() => setShowNewProjectModalForTeam(teams[0].id.toString())}
-    />
-    <NewProjectModal
-      show={!!showNewProjectModalForTeam}
-      onClose={() => setShowNewProjectModalForTeam(null)}
-      teams={[
-        { id: "1", name: "Team 1" },
-        { id: "2", name: "Team 2" },
-        { id: "3", name: "Team 3" }
-      ]}
-      initialTeamId={showNewProjectModalForTeam || ""}
-      onCreate={(teamId, name, color) => {
-        console.info("Creating project", teamId, name, color);
-      }}
-    />
+    <Navbar />
+    <NewProjectModal />
     <div className="container">
       <div className="row">
         <div className="col-12">
@@ -129,7 +101,7 @@ export const Dashboard = () => {
                 })}
                 <PlusTile
                   onClick={
-                    () => setShowNewProjectModalForTeam(team.id.toString())
+                    () => handleShowNewProjectModalForTeam(team.id)
                   }
                 />
               </div>

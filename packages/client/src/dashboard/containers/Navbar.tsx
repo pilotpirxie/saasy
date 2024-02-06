@@ -1,15 +1,31 @@
-import "./Navbar.css";
-import { Link } from "react-router-dom";
-import { useFetchProfileQuery } from "../../data/userService.ts";
+import { Link, useNavigate } from "react-router-dom";
+import { useFetchProfileQuery } from "../data/userService.ts";
+import { useLogoutMutation } from "../../auth/data/authService.ts";
+import { useAppDispatch, useAppSelector } from "../../store.ts";
+import { openNewProjectModal } from "../data/dashboardSlice.ts";
 
-export const Navbar = ({
-  onLogout,
-  onNewProject,
-}: {
-  onLogout: () => void;
-  onNewProject: () => void;
-}) => {
+export const Navbar = () => {
   const { data } = useFetchProfileQuery();
+  const [logout] = useLogoutMutation();
+  const sessionState = useAppSelector((state) => state.session);
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
+  const handleLogout = async () => {
+    if (!sessionState.refreshToken) {
+      return;
+    }
+
+    await logout({
+      refreshToken: sessionState.refreshToken
+    });
+
+    navigate("/auth/login");
+  };
+
+  const onNewProject = () => {
+    dispatch(openNewProjectModal());
+  };
 
   return <nav className="navbar bg-light-subtle navbar-expand-sm border-bottom">
     <div className="container">
@@ -104,7 +120,7 @@ export const Navbar = ({
               >Help</Link></li>
               <li><div
                 className="dropdown-item cursor-pointer"
-                onClick={onLogout}
+                onClick={handleLogout}
               >Logout</div></li>
             </ul>
           </li>

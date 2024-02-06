@@ -1,44 +1,47 @@
-import { Modal } from "./Modal/Modal.tsx";
+import { Modal } from "../components/Modal/Modal.tsx";
 import { TextInput } from "../../shared/components/FormInputs/TextInput.tsx";
 import { ColorPicker } from "../../shared/components/FormInputs/ColorPicker.tsx";
 import { useEffect, useState } from "react";
 import { SelectInput } from "../../shared/components/FormInputs/SelectInput.tsx";
+import { useAppDispatch, useAppSelector } from "../../store.ts";
+import { closeNewProjectModal } from "../data/dashboardSlice.ts";
 
-export const NewProjectModal = ({
-  initialTeamId,
-  teams,
-  onCreate,
-  onClose,
-  show,
-}: {
-  initialTeamId: string;
-  teams: {
-    id: string;
-    name: string;
-  }[];
-  onCreate: (teamId: string, name: string, color: string) => void;
-  onClose: () => void;
-  show: boolean;
-}) => {
+export const NewProjectModal = () => {
   const [name, setName] = useState("");
   const [color, setColor] = useState("#ff5976");
-  const [teamId, setTeamId] = useState(initialTeamId);
+  const [teamId, setTeamId] = useState<string>("");
+  const dashboardState = useAppSelector((state) => state.dashboard);
+  const dispatch = useAppDispatch();
+
+  const teams = [
+    { id: "xd", name: "Team 1" },
+    { id: "a", name: "Team 2" },
+    { id: "ab", name: "Team 3" }
+  ];
+
+  const handleClose = () => {
+    dispatch(closeNewProjectModal());
+  };
+
+  const handleCreate = () => {
+    // ...
+  };
 
   useEffect(() => {
-    if (show) {
+    if (dashboardState.isNewProjectModalOpen) {
       setName("");
       setColor("#ff5976");
-      setTeamId(initialTeamId);
+      setTeamId(dashboardState.initialTeamIdInNewProjectModal || "");
     }
-  }, [initialTeamId, show]);
+  }, [dashboardState.initialTeamIdInNewProjectModal, dashboardState.isNewProjectModalOpen]);
 
   return <Modal
-    show={show}
-    onClose={() => onClose()}
+    show={dashboardState.isNewProjectModalOpen}
+    onClose={handleClose}
     title={"New project"}
     footerChildren={<button
       className="btn btn-sm btn-primary"
-      onClick={() => onCreate(teamId, name, color)}
+      onClick={handleCreate}
     >
       Create
     </button>}
