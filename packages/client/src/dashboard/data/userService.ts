@@ -19,26 +19,31 @@ const baseQuery = fetchBaseQuery({
 export const userService = createApi({
   reducerPath: "user",
   baseQuery,
+  tagTypes: ["profile", "account"],
   endpoints: (builder) => ({
     fetchProfile: builder.query<Profile, void>({
-      query: () => "profile"
+      query: () => "profile",
+      providesTags: ["profile"]
     }),
     updateProfile: builder.mutation<void, Profile>({
       query: (body) => ({
         url: "profile",
         method: "PUT",
         body
-      })
+      }),
+      invalidatesTags: ["profile"]
     }),
     fetchAccount: builder.query<Account, void>({
-      query: () => "account"
+      query: () => "account",
+      providesTags: ["account"]
     }),
     updateEmail: builder.mutation<void, { email: string }>({
       query: (body) => ({
         url: "email",
         method: "PUT",
         body
-      })
+      }),
+      invalidatesTags: ["account"]
     }),
     updatePassword: builder.mutation<void, { password: string }>({
       query: (body) => ({
