@@ -6,19 +6,27 @@ import { useFetchTeamsQuery } from "../data/teamsService.ts";
 import { ErrorMessage } from "../../shared/components/ErrorMessage.tsx";
 import { getErrorRTKQuery } from "../../shared/utils/errorMessages.ts";
 import dayjs from "dayjs";
+import { NewTeamModal } from "./NewTeamModal.tsx";
+import { useAppDispatch } from "../../store.ts";
+import { openNewTeamModal } from "../data/dashboardSlice.ts";
 
 export const Teams = () => {
   const {
-    data,
+    data: teams,
     isLoading,
     isError,
     error
   } = useFetchTeamsQuery();
-  const teams = data;
+  const dispatch = useAppDispatch();
+
+  const handleOpenNewTeamModal = () => {
+    dispatch(openNewTeamModal());
+  };
 
   return <ScreenContainer>
     <Navbar />
     <NewProjectModal />
+    <NewTeamModal />
 
     <div className="container">
       <div className="row">
@@ -26,7 +34,20 @@ export const Teams = () => {
           {isLoading && <div>Loading...</div>}
           {isError && <ErrorMessage message={getErrorRTKQuery(error)}/>}
 
-          <ul className="list-group mt-5">
+          <div className="mt-5 d-flex justify-content-between align-items-center">
+            <h4>Your teams</h4>
+            <div>
+              <button
+                className="btn btn-sm btn-primary"
+                onClick={handleOpenNewTeamModal}
+              >
+                <span className="me-1 ri-add-line"></span>
+                Create new team
+              </button>
+            </div>
+          </div>
+
+          <ul className="list-group mt-3">
             {teams && teams.map((team) => {
               return <li
                 className="list-group-item d-flex justify-content-between align-items-center flex-wrap"

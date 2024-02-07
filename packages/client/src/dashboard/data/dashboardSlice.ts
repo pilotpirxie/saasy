@@ -3,10 +3,12 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 export type DashboardState = {
   isNewProjectModalOpen: boolean;
   initialTeamIdInNewProjectModal?: string;
+  isNewTeamModalOpen: boolean;
 }
 
 const initialState: DashboardState = {
   isNewProjectModalOpen: false,
+  isNewTeamModalOpen: false,
 };
 
 const dashboardSlice = createSlice({
@@ -20,6 +22,12 @@ const dashboardSlice = createSlice({
     closeNewProjectModal: (state) => {
       state.isNewProjectModalOpen = false;
     },
+    openNewTeamModal: (state) => {
+      state.isNewTeamModalOpen = true;
+    },
+    closeNewTeamModal: (state) => {
+      state.isNewTeamModalOpen = false;
+    },
   },
 });
 
@@ -27,4 +35,6 @@ export const dashboardReducer = dashboardSlice.reducer;
 export const {
   openNewProjectModal,
   closeNewProjectModal,
+  openNewTeamModal,
+  closeNewTeamModal,
 } = dashboardSlice.actions;
