@@ -57,14 +57,23 @@ export default function initializeTeamsController({
     jwtVerify(jwtSecret),
     async (req, res, next) => {
       try {
-        const teams = await prisma.userTeam.findMany({
+        const userTeams = await prisma.userTeam.findMany({
           include: {
-            team: true,
+            team: {
+              include: {
+                projects: true,
+              },
+            },
           },
           where: {
             userId: req.userId,
           },
         });
+
+        const teams = userTeams.map((userTeam) => ({
+          ...userTeam.team,
+          role: userTeam.role,
+        }));
 
         return res.json(teams);
       } catch (error) {

@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useFetchProfileQuery } from "../data/userService.ts";
+import { useFetchProfileQuery } from "../data/usersService.ts";
 import { useLogoutMutation } from "../../auth/data/authService.ts";
 import { useAppDispatch, useAppSelector } from "../../store.ts";
 import { openNewProjectModal } from "../data/dashboardSlice.ts";

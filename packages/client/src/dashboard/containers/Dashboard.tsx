@@ -6,53 +6,20 @@ import { Footer } from "../components/Footer.tsx";
 import { ScreenContainer } from "../../shared/containers/ScreenContainer.tsx";
 import { useAppDispatch } from "../../store.ts";
 import { openNewProjectModal } from "../data/dashboardSlice.ts";
+import { useFetchTeamsQuery } from "../data/teamsService.ts";
+import { ErrorMessage } from "../../shared/components/ErrorMessage.tsx";
+import { getErrorRTKQuery } from "../../shared/utils/errorMessages.ts";
 
 export const Dashboard = () => {
   const dispatch = useAppDispatch();
 
-  const teams = [{
-    id: "xd",
-    name: "XantesS's Team",
-    membersCount: 2,
-    projects: [{
-      id: 1,
-      name: "Project 1",
-    }, {
-      id: 2,
-      name: "Project 2",
-      color: "#2dc927"
-    }]
-  }, {
-    id: "a",
-    name: "Team 2",
-    membersCount: 2,
-    projects: [{
-      id: 3,
-      name: "Project 3",
-      color: "#1ffe53"
-    }, {
-      id: 4,
-      name: "Project 4",
-      color: "#1fb0fe"
-    }, {
-      id: 7,
-      name: "Project 7",
-      color: "#fe1fa5"
-    }]
-  }, {
-    id: "ab",
-    name: "Team 3",
-    membersCount: 2,
-    projects: [{
-      id: 5,
-      name: "Super long project name that is very long and has a lot of text in it and is very long",
-      color: "#ffa300"
-    }, {
-      id: 6,
-      name: "Project 6",
-      color: "#fe1f5a"
-    }]
-  }];
+  const {
+    data,
+    isLoading,
+    isError,
+    error
+  } = useFetchTeamsQuery();
+  const teams = data;
 
   const handleShowNewProjectModalForTeam = (teamId: string) => {
     dispatch(openNewProjectModal(teamId));
@@ -64,7 +31,9 @@ export const Dashboard = () => {
     <div className="container">
       <div className="row">
         <div className="col-12">
-          {teams.map((team) => {
+          {isLoading && <div>Loading...</div>}
+          {isError && <ErrorMessage message={getErrorRTKQuery(error)} />}
+          {teams && teams.map((team) => {
             return <div
               key={team.id}
             >
@@ -96,7 +65,7 @@ export const Dashboard = () => {
                   return <Tile
                     key={project.id}
                     name={project.name}
-                    color={project.color}
+                    color={"blue"}
                   />;
                 })}
                 <PlusTile
@@ -107,6 +76,7 @@ export const Dashboard = () => {
               </div>
             </div>;
           })}
+          {(!teams || teams.length === 0) && !isLoading && !isError && <div>No teams found</div>}
         </div>
       </div>
     </div>

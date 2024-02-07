@@ -1,3 +1,6 @@
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import { SerializedError } from "@reduxjs/toolkit";
+
 export const errorMessages: Record<string, string> = {
   ValidationError: "Invalid data, check your data and try again",
   InvalidCredentials: "Invalid credentials, check your data and try again",
@@ -36,3 +39,12 @@ export function getErrorMessage(error: string | null, fallbackMessage?: string) 
   return errorMessages[error] || fallbackMessage || errorMessages[GenericError];
 }
 
+export function getErrorRTKQuery(error: FetchBaseQueryError | SerializedError | undefined): string {
+  if (!error) return errorMessages[GenericError];
+  if ("status" in error) {
+    const errorData = error.data as { error: string; message: string, timestamp: string };
+    return errorData.error || GenericError;
+  }
+
+  return GenericError;
+}

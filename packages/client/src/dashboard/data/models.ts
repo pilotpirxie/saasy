@@ -12,3 +12,23 @@ export type Account = {
   emailVerifiedAt: Date;
   authProviderType: "email" | "google" | "github";
 }
+
+export type Project = {
+  id:          string;
+  teamId:     string;
+  name:        string;
+  deleteAfter: Date | null;
+  createdAt:   Date;
+  updatedAt:   Date;
+}
+
+export type Team = {
+  id:          string;
+  name:        string;
+  deleteAfter: Date | null;
+  createdAt:   Date;
+  updatedAt:   Date;
+  projects:      Project[];
+  role:          "owner" | "member";
+}
+

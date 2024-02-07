@@ -16,7 +16,7 @@ const baseQuery = fetchBaseQuery({
   }
 });
 
-export const userService = createApi({
+export const usersService = createApi({
   reducerPath: "user",
   baseQuery,
   tagTypes: ["profile", "account"],
@@ -61,4 +61,4 @@ export const {
   useFetchAccountQuery,
   useUpdateEmailMutation,
   useUpdatePasswordMutation
-} = userService;
+} = usersService;
