@@ -73,8 +73,8 @@ export const Navbar = () => {
           <li className="nav-item">
             <Link
               className="nav-link"
-              to="/teams"
-            >Teams</Link>
+              to="/feedback"
+            >Feedback</Link>
           </li>
 
           <li className="nav-item align-items-center d-none d-sm-flex">

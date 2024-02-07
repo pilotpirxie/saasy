@@ -4,6 +4,7 @@ export type DashboardState = {
   isNewProjectModalOpen: boolean;
   initialTeamIdInNewProjectModal?: string;
   isNewTeamModalOpen: boolean;
+  teamIdInUpdateTeamModal?: string;
 }
 
 const initialState: DashboardState = {
@@ -21,12 +22,19 @@ const dashboardSlice = createSlice({
     },
     closeNewProjectModal: (state) => {
       state.isNewProjectModalOpen = false;
+      state.initialTeamIdInNewProjectModal = undefined;
     },
     openNewTeamModal: (state) => {
       state.isNewTeamModalOpen = true;
     },
     closeNewTeamModal: (state) => {
       state.isNewTeamModalOpen = false;
+    },
+    openUpdateTeamModal: (state, { payload }: PayloadAction<string>) => {
+      state.teamIdInUpdateTeamModal = payload;
+    },
+    closeUpdateTeamModal: (state) => {
+      state.teamIdInUpdateTeamModal = undefined;
     },
   },
 });
@@ -37,4 +45,6 @@ export const {
   closeNewProjectModal,
   openNewTeamModal,
   closeNewTeamModal,
+  openUpdateTeamModal,
+  closeUpdateTeamModal,
 } = dashboardSlice.actions;

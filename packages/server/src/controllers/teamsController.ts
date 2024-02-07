@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Router } from "express";
 import Joi from "joi";
+import dayjs from "dayjs";
 import jwtVerify from "../middlewares/jwt";
 import validation from "../middlewares/validation";
 import verifyUserTeamRole from "../middlewares/verifyUserTeamRole";
@@ -132,9 +133,37 @@ export default function initializeTeamsController({
       try {
         const { teamId } = req.params;
 
-        await prisma.team.delete({
+        await prisma.team.update({
           where: {
             id: teamId,
+          },
+          data: {
+            deleteAfter: dayjs().add(31, "day").toDate(),
+          },
+        });
+
+        return res.sendStatus(204);
+      } catch (error) {
+        next(error);
+      }
+    },
+  );
+
+  router.put(
+    "/:teamId/restore",
+    jwtVerify(jwtSecret),
+    verifyUserTeamRole(prisma, ["owner"]),
+    validation(deleteTeamSchema),
+    async (req, res, next) => {
+      try {
+        const { teamId } = req.params;
+
+        await prisma.team.update({
+          where: {
+            id: teamId,
+          },
+          data: {
+            deleteAfter: null,
           },
         });
 

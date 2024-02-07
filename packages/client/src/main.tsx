@@ -13,7 +13,6 @@ import { AppRoot } from "./app/containers/AppRoot.tsx";
 import { ErrorPage } from "./app/containers/ErrorPage.tsx";
 import { Dashboard } from "./dashboard/containers/Dashboard.tsx";
 import { RequiredAuth } from "./shared/containers/RequiredAuth.tsx";
-import { Teams } from "./dashboard/containers/Teams.tsx";
 
 const router = createBrowserRouter([
   {
@@ -55,12 +54,6 @@ const router = createBrowserRouter([
           <Dashboard />
         </RequiredAuth>
       },
-      {
-        path: "/teams",
-        element: <RequiredAuth>
-          <Teams />
-        </RequiredAuth>
-      }
     ]
   }
 ]);

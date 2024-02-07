@@ -8,7 +8,8 @@ import { getErrorRTKQuery } from "../../shared/utils/errorMessages.ts";
 import dayjs from "dayjs";
 import { NewTeamModal } from "./NewTeamModal.tsx";
 import { useAppDispatch } from "../../store.ts";
-import { openNewTeamModal } from "../data/dashboardSlice.ts";
+import { openNewTeamModal, openUpdateTeamModal } from "../data/dashboardSlice.ts";
+import { UpdateTeamModal } from "./UpdateTeamModal.tsx";
 
 export const Teams = () => {
   const {
@@ -23,10 +24,15 @@ export const Teams = () => {
     dispatch(openNewTeamModal());
   };
 
+  const handleOpenUpdateTeamModal = (teamId: string) => {
+    dispatch(openUpdateTeamModal(teamId));
+  };
+
   return <ScreenContainer>
     <Navbar />
     <NewProjectModal />
     <NewTeamModal />
+    <UpdateTeamModal />
 
     <div className="container">
       <div className="row">
@@ -78,6 +84,7 @@ export const Teams = () => {
                   </button>
                   <button
                     className="btn btn-sm btn-light"
+                    onClick={() => handleOpenUpdateTeamModal(team.id)}
                   >
                     <span className="ri-settings-3-line me-1"></span>
                     Settings

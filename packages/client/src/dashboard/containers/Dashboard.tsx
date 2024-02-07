@@ -5,10 +5,13 @@ import { NewProjectModal } from "./NewProjectModal.tsx";
 import { Footer } from "../components/Footer.tsx";
 import { ScreenContainer } from "../../shared/containers/ScreenContainer.tsx";
 import { useAppDispatch } from "../../store.ts";
-import { openNewProjectModal } from "../data/dashboardSlice.ts";
+import { openNewProjectModal, openNewTeamModal, openUpdateTeamModal } from "../data/dashboardSlice.ts";
 import { useFetchTeamsQuery } from "../data/teamsService.ts";
 import { ErrorMessage } from "../../shared/components/ErrorMessage.tsx";
 import { getErrorRTKQuery } from "../../shared/utils/errorMessages.ts";
+import { NewTeamModal } from "./NewTeamModal.tsx";
+import { UpdateTeamModal } from "./UpdateTeamModal.tsx";
+import dayjs from "dayjs";
 
 export const Dashboard = () => {
   const dispatch = useAppDispatch();
@@ -25,20 +28,49 @@ export const Dashboard = () => {
     dispatch(openNewProjectModal(teamId));
   };
 
+  const handleOpenNewTeamModal = () => {
+    dispatch(openNewTeamModal());
+  };
+
+  const handleOpenUpdateTeamModal = (teamId: string) => {
+    dispatch(openUpdateTeamModal(teamId));
+  };
+
   return <ScreenContainer>
     <Navbar />
     <NewProjectModal />
+    <NewTeamModal />
+    <UpdateTeamModal />
+
     <div className="container">
       <div className="row">
         <div className="col-12">
           {isLoading && <div>Loading...</div>}
-          {isError && <ErrorMessage message={getErrorRTKQuery(error)} />}
+          {isError && <ErrorMessage message={getErrorRTKQuery(error)}/>}
+
+          <div className="mt-5 d-flex justify-content-between align-items-center">
+            <h4 className="mb-0">Your teams & projects</h4>
+            <div>
+              <button
+                className="btn btn-sm btn-primary"
+                onClick={handleOpenNewTeamModal}
+              >
+                <span className="me-1 ri-add-line"></span>
+                Create new team
+              </button>
+            </div>
+          </div>
+
           {teams && teams.map((team) => {
             return <div
               key={team.id}
             >
               <div className="mt-5 d-flex align-items-center flex-wrap">
-                <h5 className='fw-bold me-2'>{team.name}</h5>
+                <h5 className='fw-bold me-2 mb-0'>{team.name}</h5>
+                {team.deleteAfter && <div className='badge bg-danger'>
+                  <span className="ri-alarm-warning-line me-1"></span>
+                  Will be deleted on {dayjs(team.deleteAfter).format("DD-MM-YYYY")}
+                </div>}
                 <div className='ms-sm-auto gap-2 d-flex flex-wrap'>
                   <button
                     className="btn btn-sm btn-light"
@@ -48,6 +80,7 @@ export const Dashboard = () => {
                   </button>
                   <button
                     className="btn btn-sm btn-light"
+                    onClick={() => handleOpenUpdateTeamModal(team.id)}
                   >
                     <span className="ri-settings-3-line me-1"></span>
                     Settings
@@ -80,6 +113,6 @@ export const Dashboard = () => {
         </div>
       </div>
     </div>
-    <Footer />
+    <Footer/>
   </ScreenContainer>;
 };

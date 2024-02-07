@@ -25,9 +25,41 @@ export const teamsService = createApi({
       query: () => "/",
       providesTags: ["teams"]
     }),
+    createTeam: builder.mutation<Team, { name: string }>({
+      query: (body) => ({
+        url: "/",
+        method: "POST",
+        body
+      }),
+      invalidatesTags: ["teams"]
+    }),
+    updateTeam: builder.mutation<Team, {teamId: string, body: {name: string}}>({
+      query: ({ teamId, body }) => ({
+        url: `/${teamId}`,
+        method: "PUT",
+        body
+      }),
+      invalidatesTags: ["teams"]
+    }),
+    deleteTeam: builder.mutation<void, string>({
+      query: (teamId) => ({
+        url: `/${teamId}`,
+        method: "DELETE"
+      }),
+      invalidatesTags: ["teams"]
+    }),
+    restoreTeam: builder.mutation<void, string>({
+      query: (teamId) => ({
+        url: `/${teamId}/restore`,
+        method: "PUT"
+      }),
+      invalidatesTags: ["teams"]
+    }),
   }),
 });
 
 export const {
   useFetchTeamsQuery,
+  useCreateTeamMutation,
+  useUpdateTeamMutation,
 } = teamsService;

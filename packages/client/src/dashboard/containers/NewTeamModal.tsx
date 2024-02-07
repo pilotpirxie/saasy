@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal } from "../components/Modal/Modal.tsx";
 import { TextInput } from "../../shared/components/FormInputs/TextInput.tsx";
 import { useAppDispatch, useAppSelector } from "../../store.ts";
 import { closeNewTeamModal } from "../data/dashboardSlice.ts";
+import { createTeamAndCloseModal } from "../data/dashboardThunks.ts";
 
 export const NewTeamModal = () => {
   const [name, setName] = useState("");
@@ -14,8 +15,16 @@ export const NewTeamModal = () => {
   };
 
   const handleCreate = () => {
-    // ...
+    if (!name) {
+      return;
+    }
+
+    dispatch(createTeamAndCloseModal(name));
   };
+
+  useEffect(() => {
+    setName("");
+  }, [dashboardState.isNewTeamModalOpen]);
 
   return <Modal
     show={dashboardState.isNewTeamModalOpen}
