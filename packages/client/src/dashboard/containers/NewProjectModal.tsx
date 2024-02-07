@@ -5,6 +5,9 @@ import { useEffect, useState } from "react";
 import { SelectInput } from "../../shared/components/FormInputs/SelectInput.tsx";
 import { useAppDispatch, useAppSelector } from "../../store.ts";
 import { closeNewProjectModal } from "../data/dashboardSlice.ts";
+import { useFetchTeamsQuery } from "../data/teamsService.ts";
+import { ErrorMessage } from "../../shared/components/ErrorMessage.tsx";
+import { getErrorRTKQuery } from "../../shared/utils/errorMessages.ts";
 
 export const NewProjectModal = () => {
   const [name, setName] = useState("");
@@ -13,11 +16,13 @@ export const NewProjectModal = () => {
   const dashboardState = useAppSelector((state) => state.dashboard);
   const dispatch = useAppDispatch();
 
-  const teams = [
-    { id: "xd", name: "Team 1" },
-    { id: "a", name: "Team 2" },
-    { id: "ab", name: "Team 3" }
-  ];
+  const {
+    data,
+    isLoading,
+    isError,
+    error
+  } = useFetchTeamsQuery();
+  const teams = data;
 
   const handleClose = () => {
     dispatch(closeNewProjectModal());
@@ -35,8 +40,16 @@ export const NewProjectModal = () => {
     }
   }, [dashboardState.initialTeamIdInNewProjectModal, dashboardState.isNewProjectModalOpen]);
 
+  const teamsOptions = [
+    { label: "Select team", value: "" },
+  ];
+
+  teams && teams.forEach((team) => {
+    teamsOptions.push({ label: team.name, value: team.id });
+  });
+
   return <Modal
-    show={dashboardState.isNewProjectModalOpen}
+    show={dashboardState.isNewProjectModalOpen && !isLoading}
     onClose={handleClose}
     title={"New project"}
     footerChildren={<button
@@ -48,11 +61,13 @@ export const NewProjectModal = () => {
 
   >
     <div>
+      {isError && <ErrorMessage message={getErrorRTKQuery(error)}/>}
+
       <SelectInput
         label={"Team"}
         value={teamId}
         onChange={(value) => setTeamId(value)}
-        items={teams.map((team) => ({ label: team.name, value: team.id }))}
+        items={teamsOptions}
       />
 
       <div className="mt-3">
