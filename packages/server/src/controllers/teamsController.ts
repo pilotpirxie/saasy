@@ -35,6 +35,7 @@ export default function initializeTeamsController({
         const team = await prisma.team.create({
           data: {
             name,
+            planId: "00000000-0000-0000-0000-000000000000",
           },
         });
 
@@ -63,6 +64,11 @@ export default function initializeTeamsController({
             team: {
               include: {
                 projects: true,
+                plan: {
+                  select: {
+                    name: true,
+                  },
+                },
               },
             },
           },
@@ -74,6 +80,7 @@ export default function initializeTeamsController({
         const teams = userTeams.map((userTeam) => ({
           ...userTeam.team,
           role: userTeam.role,
+          plan: userTeam.team?.plan,
         }));
 
         return res.json(teams);

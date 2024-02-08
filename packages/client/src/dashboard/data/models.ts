@@ -30,5 +30,8 @@ export type Team = {
   updatedAt:   Date;
   projects:      Project[];
   role:          "owner" | "member";
+  plan: {
+    name: string;
+  }
 }
 

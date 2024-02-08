@@ -124,6 +124,7 @@ model Plan {
   createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt     DateTime       @map("updated_at") @db.Timestamp(6)
   subscriptions Subscription[]
+  Team          Team[]
 
   @@map("plans")
 }
@@ -254,6 +255,8 @@ model Team {
   projects      Project[]
   subscriptions Subscription[]
   usersTeams    UserTeam[]
+  planId        String         @map("plan_id") @db.Uuid
+  plan          Plan           @relation(fields: [planId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("teams")
 }
