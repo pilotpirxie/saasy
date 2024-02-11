@@ -7,12 +7,14 @@ export const Modal = ({
   children,
   title,
   footerChildren,
+  size = "md"
 }: {
   show: boolean;
   onClose: () => void;
   children: ReactNode;
   footerChildren?: ReactNode;
   title: string;
+  size?: "sm" | "md" | "lg" | "xl";
 }) => {
   const ref = useRef(null);
   // useClickOutside(ref, onClose);
@@ -22,7 +24,7 @@ export const Modal = ({
   }
 
   return <div
-    className="modal fade show d-block bg-modal"
+    className={`modal fade show d-block bg-modal modal-${size}`}
   >
     <div
       className="modal-dialog"

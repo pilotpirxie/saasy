@@ -324,5 +324,107 @@ export default function initializeTeamsController({
     },
   );
 
+  const getAllTeamMembersSchema = {
+    params: {
+      teamId: Joi.string().required(),
+    },
+  };
+
+  router.get(
+    "/:teamId/members",
+    jwtVerify(jwtSecret),
+    verifyUserTeamRole(prisma, ["owner"]),
+    validation(getAllTeamMembersSchema),
+    async (req, res, next) => {
+      try {
+        const { teamId } = req.params;
+
+        const teamMembers = await prisma.userTeam.findMany({
+          where: {
+            teamId,
+          },
+          include: {
+            user: {
+              select: {
+                id: true,
+                email: true,
+                displayName: true,
+              },
+            },
+          },
+        });
+
+        return res.json(teamMembers);
+      } catch (error) {
+        next(error);
+      }
+    },
+  );
+
+  const getAllInvitedMembersSchema = {
+    params: {
+      teamId: Joi.string().required(),
+    },
+  };
+
+  router.get(
+    "/:teamId/invitations",
+    jwtVerify(jwtSecret),
+    verifyUserTeamRole(prisma, ["owner"]),
+    validation(getAllInvitedMembersSchema),
+    async (req, res, next) => {
+      try {
+        const { teamId } = req.params;
+
+        const invitedMembers = await prisma.invitation.findMany({
+          where: {
+            teamId,
+          },
+        });
+
+        return res.json(invitedMembers);
+      } catch (error) {
+        next(error);
+      }
+    },
+  );
+
+  const inviteMemberSchema = {
+    params: {
+      teamId: Joi.string().required(),
+    },
+    body: {
+      email: Joi.string().email().required(),
+      role: Joi.string().valid("owner", "editor", "viewer").required(),
+    },
+  };
+
+  router.post(
+    "/:teamId/invitations",
+    jwtVerify(jwtSecret),
+    verifyUserTeamRole(prisma, ["owner"]),
+    validation(inviteMemberSchema),
+    async (req, res, next) => {
+      try {
+        const { teamId } = req.params;
+        const { email, role } = req.body;
+
+        const invitedMember = await prisma.invitation.create({
+          data: {
+            teamId,
+            role,
+            email,
+            invitedBy: req.userId,
+            expiresAt: dayjs().add(7, "day").toDate(),
+          },
+        });
+
+        return res.json(invitedMember);
+      } catch (error) {
+        next(error);
+      }
+    },
+  );
+
   return router;
 }

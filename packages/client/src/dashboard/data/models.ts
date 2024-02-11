@@ -22,6 +22,8 @@ export type Project = {
   updatedAt:   Date;
 }
 
+export type Role = "owner" | "editor" | "viewer";
+
 export type Team = {
   id:          string;
   name:        string;
@@ -29,9 +31,23 @@ export type Team = {
   createdAt:   Date;
   updatedAt:   Date;
   projects:      Project[];
-  role:          "owner" | "member";
+  role:          Role;
   plan: {
     name: string;
   }
 }
 
+export type UserTeam = {
+  userId:    string;
+  teamId:    string;
+  role:      Role;
+  createdAt: Date;
+  updatedAt: Date;
+  user:      TeamMember;
+}
+
+export type TeamMember = {
+  id:          string;
+  email:       string;
+  displayName: string;
+}

@@ -5,13 +5,19 @@ import { NewProjectModal } from "./NewProjectModal.tsx";
 import { Footer } from "../components/Footer.tsx";
 import { ScreenContainer } from "../../shared/containers/ScreenContainer.tsx";
 import { useAppDispatch } from "../../store.ts";
-import { openNewProjectModal, openNewTeamModal, openUpdateTeamModal } from "../data/dashboardSlice.ts";
+import {
+  openNewProjectModal,
+  openNewTeamModal,
+  openTeamMembersModal,
+  openUpdateTeamModal
+} from "../data/dashboardSlice.ts";
 import { useFetchTeamsQuery } from "../data/teamsService.ts";
 import { ErrorMessage } from "../../shared/components/ErrorMessage.tsx";
 import { getErrorRTKQuery } from "../../shared/utils/errorMessages.ts";
 import { NewTeamModal } from "./NewTeamModal.tsx";
 import { UpdateTeamModal } from "./UpdateTeamModal.tsx";
 import dayjs from "dayjs";
+import { TeamMembersModal } from "./TeamMembersModal.tsx";
 
 export const Dashboard = () => {
   const dispatch = useAppDispatch();
@@ -36,11 +42,16 @@ export const Dashboard = () => {
     dispatch(openUpdateTeamModal(teamId));
   };
 
+  const handleOpenTeamMembersModal = (teamId: string) => {
+    dispatch(openTeamMembersModal(teamId));
+  };
+
   return <ScreenContainer>
     <Navbar />
     <NewProjectModal />
     <NewTeamModal />
     <UpdateTeamModal />
+    <TeamMembersModal />
 
     <div className="container">
       <div className="row">
@@ -79,6 +90,7 @@ export const Dashboard = () => {
                 <div className='ms-sm-auto gap-2 d-flex flex-wrap'>
                   <button
                     className="btn btn-sm btn-light"
+                    onClick={() => handleOpenTeamMembersModal(team.id)}
                   >
                     <span className="ri-user-2-line me-1"></span>
                     Members

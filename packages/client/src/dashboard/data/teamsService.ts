@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { RootState } from "../../store.ts";
 import config from "../../../config.ts";
-import { Team } from "./models.ts";
+import { Team, UserTeam } from "./models.ts";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: `${config.baseUrl}/api/teams`,
@@ -55,6 +55,9 @@ export const teamsService = createApi({
       }),
       invalidatesTags: ["teams"]
     }),
+    fetchTeamMembers: builder.query<UserTeam[], string>({
+      query: (teamId) => `/${teamId}/members`
+    }),
   }),
 });
 
@@ -62,4 +65,7 @@ export const {
   useFetchTeamsQuery,
   useCreateTeamMutation,
   useUpdateTeamMutation,
+  useDeleteTeamMutation,
+  useRestoreTeamMutation,
+  useFetchTeamMembersQuery
 } = teamsService;
