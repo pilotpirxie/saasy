@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { RootState } from "../../store.ts";
 import config from "../../../config.ts";
-import { Team, UserTeam } from "./models.ts";
+import { InvitedUser, Team, UserTeam } from "./models.ts";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: `${config.baseUrl}/api/teams`,
@@ -19,7 +19,7 @@ const baseQuery = fetchBaseQuery({
 export const teamsService = createApi({
   reducerPath: "teams",
   baseQuery,
-  tagTypes: ["teams"],
+  tagTypes: ["teams", "invitedUsers"],
   endpoints: (builder) => ({
     fetchTeams: builder.query<Team[], void>({
       query: () => "/",
@@ -58,6 +58,25 @@ export const teamsService = createApi({
     fetchTeamMembers: builder.query<UserTeam[], string>({
       query: (teamId) => `/${teamId}/members`
     }),
+    fetchInvitedUsers: builder.query<InvitedUser[], string>({
+      query: (teamId) => `/${teamId}/invitations`,
+      providesTags: ["invitedUsers"]
+    }),
+    inviteUserToTeam: builder.mutation<void, { teamId: string, email: string, role: string }>({
+      query: ({ teamId, email, role }) => ({
+        url: `/${teamId}/invitations`,
+        method: "POST",
+        body: { email, role },
+      }),
+      invalidatesTags: ["invitedUsers"]
+    }),
+    cancelInvitation: builder.mutation<void, { teamId: string, invitationId: string }>({
+      query: ({ teamId, invitationId }) => ({
+        url: `/${teamId}/invitations/${invitationId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["invitedUsers"]
+    }),
   }),
 });
 
@@ -67,5 +86,8 @@ export const {
   useUpdateTeamMutation,
   useDeleteTeamMutation,
   useRestoreTeamMutation,
-  useFetchTeamMembersQuery
+  useFetchTeamMembersQuery,
+  useFetchInvitedUsersQuery,
+  useInviteUserToTeamMutation,
+  useCancelInvitationMutation,
 } = teamsService;

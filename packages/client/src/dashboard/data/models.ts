@@ -51,3 +51,15 @@ export type TeamMember = {
   email:       string;
   displayName: string;
 }
+
+export type InvitedUser = {
+  id:         string;
+  email:      string;
+  invitedBy:  string;
+  teamId:     string;
+  role:       Role;
+  acceptedAt: null;
+  expiresAt:  Date;
+  createdAt:  Date;
+  updatedAt:  Date;
+}

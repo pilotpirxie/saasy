@@ -1,25 +1,48 @@
 import { useState } from "react";
 import { Modal } from "../components/Modal/Modal.tsx";
 import { useAppDispatch, useAppSelector } from "../../store.ts";
-import { useFetchTeamMembersQuery, useFetchTeamsQuery } from "../data/teamsService.ts";
+import {
+  useCancelInvitationMutation,
+  useFetchInvitedUsersQuery,
+  useFetchTeamMembersQuery,
+  useFetchTeamsQuery,
+  useInviteUserToTeamMutation
+} from "../data/teamsService.ts";
 import { closeTeamMembersModal } from "../data/dashboardSlice.ts";
 import { TextInput } from "../../shared/components/FormInputs/TextInput.tsx";
 import { RoleBadge } from "../components/RoleBadge.tsx";
 import { SelectInput } from "../../shared/components/FormInputs/SelectInput.tsx";
 import { Role } from "../data/models.ts";
+import dayjs from "dayjs";
+import { ErrorMessage } from "../../shared/components/ErrorMessage.tsx";
+import { getErrorRTKQuery } from "../../shared/utils/errorMessages.ts";
 
 
 export const TeamMembersModal = () => {
-  const dashboardState = useAppSelector((state) => state.dashboard);
   const dispatch = useAppDispatch();
+
+  const dashboardState = useAppSelector((state) => state.dashboard);
   const { data: teams } = useFetchTeamsQuery();
   const team = teams?.find((t) => t.id === dashboardState.teamIdInTeamMembersModal);
   const { data: members } = useFetchTeamMembersQuery(dashboardState.teamIdInTeamMembersModal || "");
+
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState<"all" | "invite">("all");
 
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<Role>("editor");
+
+  const { data: invitedUsers } = useFetchInvitedUsersQuery(dashboardState.teamIdInTeamMembersModal || "");
+  const [inviteUserToTeam, {
+    isError: isInvitingUserError,
+    error: invitingUserError,
+    isSuccess: isInvitingUserSuccess,
+  }] = useInviteUserToTeamMutation();
+
+  const [cancelInvitation, {
+    isError: isCancelingInvitationError,
+    error: cancelingInvitationError,
+  }] = useCancelInvitationMutation();
 
   const handleClose = () => {
     dispatch(closeTeamMembersModal());
@@ -29,8 +52,27 @@ export const TeamMembersModal = () => {
     return null;
   }
 
-  const handleChangeRole = (userId: string, teamId: string, role: Role) => {
+  const handleChangeRole = (userId: string, role: Role) => {
     // ...
+  };
+
+  const handleInvite = () => {
+    if (!inviteEmail) {
+      return;
+    }
+
+    inviteUserToTeam({
+      teamId: team.id,
+      email: inviteEmail,
+      role: inviteRole,
+    });
+  };
+
+  const handleCancelInvitation = (invitationId: string) => {
+    cancelInvitation({
+      teamId: team.id,
+      invitationId,
+    });
   };
 
   const isAtLeastTwoOwners =
@@ -89,19 +131,19 @@ export const TeamMembersModal = () => {
                     <div>
                       <RoleBadge
                         member={member}
-                        onClick={() => handleChangeRole(member.userId, member.teamId, "owner")}
+                        onClick={() => handleChangeRole(member.userId, "owner")}
                         role={"owner"}
                         displayRole={"Owner"}
                       />
                       <RoleBadge
                         member={member}
-                        onClick={() => handleChangeRole(member.userId, member.teamId, "editor")}
+                        onClick={() => handleChangeRole(member.userId, "editor")}
                         role={"editor"}
                         displayRole={"Editor"}
                       />
                       <RoleBadge
                         member={member}
-                        onClick={() => handleChangeRole(member.userId, member.teamId, "viewer")}
+                        onClick={() => handleChangeRole(member.userId, "viewer")}
                         role={"viewer"}
                         displayRole={"Viewer"}
                       />
@@ -122,6 +164,12 @@ export const TeamMembersModal = () => {
         </div>}
 
         {activeTab === "invite" && <div>
+          {(isInvitingUserError || isCancelingInvitationError)
+            && <ErrorMessage message={getErrorRTKQuery(invitingUserError || cancelingInvitationError)}/>}
+          {isInvitingUserSuccess && <div className="alert alert-success">
+            User invited successfully
+          </div>}
+
           <div>
             <TextInput
               label={"Email"}
@@ -144,10 +192,48 @@ export const TeamMembersModal = () => {
           <div className='d-flex justify-content-end mt-3'>
             <button
               className="btn btn-primary"
+              onClick={handleInvite}
             >
               Invite
             </button>
           </div>
+
+          {invitedUsers && <div>
+            <hr/>
+
+            <h6>Invited users</h6>
+
+            <div className="list-group">
+              {invitedUsers?.map((invitedUser) => {
+                return <div
+                  key={invitedUser.id}
+                  className='list-group-item'
+                >
+                  <div className="d-flex justify-content-between align-items-center">
+                    <div className="left">
+                      <b>
+                        {invitedUser.email}
+                      </b>
+                      <div>
+                        Role: {invitedUser.role}
+                      </div>
+                      <div>
+                        Expires on: {dayjs(invitedUser.expiresAt).format("DD-MM-YYYY")}
+                      </div>
+                    </div>
+                    <div className="right">
+                      <button
+                        className="btn btn-sm btn-outline-danger"
+                        onClick={() => handleCancelInvitation(invitedUser.id)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>;
+              })}
+            </div>
+          </div>}
         </div>}
       </div>
     </div>

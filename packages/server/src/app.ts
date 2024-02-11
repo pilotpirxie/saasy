@@ -1,18 +1,17 @@
 import express, { Express } from "express";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
-import NodeCache from "node-cache";
 import cors from "cors";
 import { errorHandler } from "./middlewares/errors";
 import { checkPrismaConnection } from "./data/prismaConnectionTest";
 import { usePrismaClientFactory } from "./data/prismaClientFactory";
-import { NodeCacheAdapter } from "./data/cacheStore";
 import { NodemailerEmailService } from "./services/nodemailerEmailService";
 import { EmailTemplatesService } from "./services/emailTemplatesService";
 import initializeAuthController from "./controllers/authController";
 import initializeUsersController from "./controllers/usersController";
 import initializeTeamsController from "./controllers/teamsController";
 import initializeInvitationsController from "./controllers/invitationsController";
+import { jsonSendStatus } from "./middlewares/jsonSendStatus";
 
 dotenv.config();
 
@@ -27,17 +26,9 @@ app.use(cors());
 const prisma = usePrismaClientFactory({
   isDevelopment: process.env.NODE_ENV === "development",
 });
+app.use(jsonSendStatus);
 
 checkPrismaConnection(prisma);
-
-const nodeCache = new NodeCache({
-  stdTTL: 10,
-  checkperiod: 1,
-});
-
-const cache = new NodeCacheAdapter({
-  nodeCache,
-});
 
 const emailService = new NodemailerEmailService({
   smtpConfig: {

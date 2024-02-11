@@ -379,6 +379,9 @@ export default function initializeTeamsController({
         const invitedMembers = await prisma.invitation.findMany({
           where: {
             teamId,
+            expiresAt: {
+              gt: new Date(),
+            },
           },
         });
 
@@ -409,17 +412,92 @@ export default function initializeTeamsController({
         const { teamId } = req.params;
         const { email, role } = req.body;
 
-        const invitedMember = await prisma.invitation.create({
+        const userAlreadyInTeam = await prisma.userTeam.findFirst({
+          where: {
+            user: {
+              email,
+            },
+            teamId,
+          },
+        });
+
+        if (userAlreadyInTeam) {
+          return errorResponse({
+            error: "UserAlreadyInTeam",
+            message: "User already in team",
+            response: res,
+            status: 400,
+          });
+        }
+
+        const userAlreadyInvited = await prisma.invitation.findFirst({
+          where: {
+            email,
+            teamId,
+            expiresAt: {
+              gt: new Date(),
+            },
+          },
+        });
+
+        if (userAlreadyInvited) {
+          return errorResponse({
+            error: "UserAlreadyInvited",
+            message: "User already invited",
+            response: res,
+            status: 400,
+          });
+        }
+
+        await prisma.invitation.deleteMany({
+          where: {
+            email,
+            expiresAt: {
+              lt: new Date(),
+            },
+          },
+        });
+
+        await prisma.invitation.create({
           data: {
             teamId,
             role,
             email,
             invitedBy: req.userId,
-            expiresAt: dayjs().add(7, "day").toDate(),
+            expiresAt: dayjs().add(14, "day").toDate(),
           },
         });
 
-        return res.json(invitedMember);
+        return res.sendStatus(201);
+      } catch (error) {
+        next(error);
+      }
+    },
+  );
+
+  const cancelInvitationSchema = {
+    params: {
+      teamId: Joi.string().required(),
+      invitationId: Joi.string().required(),
+    },
+  };
+
+  router.delete(
+    "/:teamId/invitations/:invitationId",
+    jwtVerify(jwtSecret),
+    verifyUserTeamRole(prisma, ["owner"]),
+    validation(cancelInvitationSchema),
+    async (req, res, next) => {
+      try {
+        const { invitationId } = req.params;
+
+        await prisma.invitation.delete({
+          where: {
+            id: invitationId,
+          },
+        });
+
+        return res.sendStatus(204);
       } catch (error) {
         next(error);
       }

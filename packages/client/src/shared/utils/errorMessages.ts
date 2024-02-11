@@ -30,6 +30,8 @@ export const errorMessages: Record<string, string> = {
   AuthorizationCodeExpired: "Authorization code expired",
   VerificationCodeExpired: "Verification code expired. Please refresh the page and try again",
   TooFastResend: "You just requested a verification email. Please wait a few minutes before trying again",
+  UserAlreadyInTeam: "User already in team",
+  UserAlreadyInvited: "User already invited",
 };
 
 export const GenericError = "GenericError";
