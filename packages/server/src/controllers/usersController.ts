@@ -129,6 +129,9 @@ export default function initializeUsersController({
             email: true,
             emailVerifiedAt: true,
             authProviderType: true,
+            totpAddedAt: true,
+            newsletterConsentGrantedAt: true,
+            marketingConsentGrantedAt: true,
           },
           where: {
             id: req.userId,

@@ -110,22 +110,30 @@ export const Navbar = () => {
               <div className="ms-1">Profile</div>
             </div>
             <ul className="dropdown-menu dropdown-menu-sm-end">
-              <li><Link
-                className="dropdown-item"
-                to="/account"
-              >Settings</Link></li>
-              <li><Link
-                className="dropdown-item"
-                to="/dashboard/invitations"
-              >Invitations</Link></li>
-              <li><Link
-                className="dropdown-item"
-                to="/help"
-              >Help</Link></li>
-              <li><div
-                className="dropdown-item cursor-pointer"
-                onClick={handleLogout}
-              >Logout</div></li>
+              <li>
+                <Link
+                  className="dropdown-item"
+                  to="/dashboard/settings"
+                >Settings</Link>
+              </li>
+              <li>
+                <Link
+                  className="dropdown-item"
+                  to="/dashboard/invitations"
+                >Invitations</Link>
+              </li>
+              <li>
+                <Link
+                  className="dropdown-item"
+                  to="/help"
+                >Help</Link>
+              </li>
+              <li>
+                <div
+                  className="dropdown-item cursor-pointer"
+                  onClick={handleLogout}
+                >Logout</div>
+              </li>
             </ul>
           </li>
         </ul>

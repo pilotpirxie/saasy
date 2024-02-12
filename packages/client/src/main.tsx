@@ -14,6 +14,7 @@ import { ErrorPage } from "./app/containers/ErrorPage.tsx";
 import { Dashboard } from "./dashboard/containers/Dashboard.tsx";
 import { RequiredAuth } from "./shared/containers/RequiredAuth.tsx";
 import { Invitations } from "./dashboard/containers/Invitations.tsx";
+import { AccountSettings } from "./dashboard/containers/AccountSettings.tsx";
 
 const router = createBrowserRouter([
   {
@@ -53,6 +54,12 @@ const router = createBrowserRouter([
         path: "/dashboard/invitations",
         element: <RequiredAuth>
           <Invitations />
+        </RequiredAuth>
+      },
+      {
+        path: "/dashboard/settings",
+        element: <RequiredAuth>
+          <AccountSettings />
         </RequiredAuth>
       },
       {

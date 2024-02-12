@@ -1,16 +1,19 @@
 export type Profile = {
   displayName: string;
-  avatarUrl:   string;
-  country:     string;
-  address:     string;
-  phone:       string;
-  fullName:    string;
+  avatarUrl:   string | null;
+  country:     string | null;
+  address:     string | null;
+  phone:       string | null;
+  fullName:    string | null;
 }
 
 export type Account = {
   email: string;
   emailVerifiedAt: Date;
   authProviderType: "email" | "google" | "github";
+  totpAddedAt:                string | null;
+  newsletterConsentGrantedAt: string | null;
+  marketingConsentGrantedAt:  string | null;
 }
 
 export type Project = {

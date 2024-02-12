@@ -9,6 +9,7 @@ import {
 import { ErrorMessage } from "../../shared/components/ErrorMessage.tsx";
 import { getErrorRTKQuery } from "../../shared/utils/errorMessages.ts";
 import dayjs from "dayjs";
+import { NewProjectModal } from "./NewProjectModal.tsx";
 
 export const Invitations = () => {
   const { data: invitations,
@@ -53,6 +54,7 @@ export const Invitations = () => {
 
   return <ScreenContainer>
     <Navbar />
+    <NewProjectModal />
 
     <div className="container">
       <div className="row">
