@@ -46,7 +46,9 @@ export const NewProjectModal = () => {
   ];
 
   teams && teams.forEach((team) => {
-    teamsOptions.push({ label: team.name, value: team.id });
+    if (["owner", "editor"].includes(team.role)) {
+      teamsOptions.push({ label: team.name, value: team.id });
+    }
   });
 
   return <Modal
