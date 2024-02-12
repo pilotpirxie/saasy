@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { teamsService } from "./teamsService.ts";
-import { closeNewTeamModal, closeUpdateTeamModal } from "./dashboardSlice.ts";
+import { closeNewProjectModal, closeNewTeamModal, closeUpdateTeamModal } from "./dashboardSlice.ts";
+import { projectsService } from "./projectsService.ts";
 
 export const createTeamAndCloseModal = createAsyncThunk(
   "dashboard/createTeamAndCloseModal",
@@ -46,5 +47,17 @@ export const restoreTeamAndCloseModal = createAsyncThunk(
       dispatch(closeUpdateTeamModal());
     } catch (error) {
       console.warn("Failed to restore team", error);
+    }
+  });
+
+export const createProjectAndCloseModal = createAsyncThunk(
+  "dashboard/createProjectAndCloseModal",
+  async ({ teamId, name }: {teamId: string, name: string}, { dispatch }) => {
+    try {
+      await dispatch(projectsService.endpoints.createProject.initiate({ teamId, name }));
+      dispatch(teamsService.util.invalidateTags(["teams"]));
+      dispatch(closeNewProjectModal());
+    } catch (error) {
+      console.warn("Failed to create project", error);
     }
   });

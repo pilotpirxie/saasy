@@ -8,6 +8,7 @@ import { closeNewProjectModal } from "../data/dashboardSlice.ts";
 import { useFetchTeamsQuery } from "../data/teamsService.ts";
 import { ErrorMessage } from "../../shared/components/ErrorMessage.tsx";
 import { getErrorRTKQuery } from "../../shared/utils/errorMessages.ts";
+import { createProjectAndCloseModal } from "../data/dashboardThunks.ts";
 
 export const NewProjectModal = () => {
   const [name, setName] = useState("");
@@ -29,7 +30,7 @@ export const NewProjectModal = () => {
   };
 
   const handleCreate = () => {
-    // ...
+    dispatch(createProjectAndCloseModal({ teamId, name }));
   };
 
   useEffect(() => {

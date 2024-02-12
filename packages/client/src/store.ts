@@ -5,6 +5,7 @@ import { usersService } from "./dashboard/data/usersService.ts";
 import { authService } from "./auth/data/authService.ts";
 import { dashboardReducer } from "./dashboard/data/dashboardSlice.ts";
 import { teamsService } from "./dashboard/data/teamsService.ts";
+import { projectsService } from "./dashboard/data/projectsService.ts";
 
 export const store = configureStore({
   reducer: {
@@ -13,9 +14,15 @@ export const store = configureStore({
     [usersService.reducerPath]: usersService.reducer,
     [authService.reducerPath]: authService.reducer,
     [teamsService.reducerPath]: teamsService.reducer,
+    [projectsService.reducerPath]: projectsService.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(usersService.middleware, authService.middleware, teamsService.middleware),
+    getDefaultMiddleware().concat(
+      usersService.middleware,
+      authService.middleware,
+      teamsService.middleware,
+      projectsService.middleware
+    ),
 });
 
 export type AppDispatch = typeof store.dispatch;
