@@ -63,3 +63,14 @@ export type InvitedUser = {
   createdAt:  Date;
   updatedAt:  Date;
 }
+
+export type Invitation = {
+  id:        string;
+  expiresAt: Date;
+  role:      string;
+  team:      {
+    id:   string;
+    name: string;
+  }
+}
+

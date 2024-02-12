@@ -60,7 +60,7 @@ export const Dashboard = () => {
           {isError && <ErrorMessage message={getErrorRTKQuery(error)}/>}
 
           <div className="mt-5 d-flex justify-content-between align-items-center">
-            <h4 className="mb-0">Your teams & projects</h4>
+            <h4>Your teams & projects</h4>
             <div>
               <button
                 className="btn btn-sm btn-primary"

@@ -347,11 +347,46 @@ export default function initializeUsersController({
     jwtVerify(jwtSecret),
     async (req, res, next) => {
       try {
-        const { teamId } = req.params;
+        const user = await prisma.user.findFirst({
+          where: {
+            id: req.userId,
+          },
+          select: {
+            id: true,
+            email: true,
+          },
+        });
+
+        if (!user) {
+          return errorResponse({
+            response: res,
+            message: "User not found",
+            error: "UserNotFound",
+            status: 404,
+          });
+        }
+
+        if (!user.email) {
+          return res.json([]);
+        }
 
         const invitations = await prisma.invitation.findMany({
           where: {
-            teamId,
+            email: user.email,
+            expiresAt: {
+              gte: dayjs().toDate(),
+            },
+          },
+          select: {
+            id: true,
+            expiresAt: true,
+            role: true,
+            team: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
           },
         });
 

@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { RootState } from "../../store.ts";
-import { Account, Profile } from "./models.ts";
+import { Account, Invitation, Profile } from "./models.ts";
 import config from "../../../config.ts";
 
 const baseQuery = fetchBaseQuery({
@@ -19,7 +19,7 @@ const baseQuery = fetchBaseQuery({
 export const usersService = createApi({
   reducerPath: "user",
   baseQuery,
-  tagTypes: ["profile", "account"],
+  tagTypes: ["profile", "account", "invitations"],
   endpoints: (builder) => ({
     fetchProfile: builder.query<Profile, void>({
       query: () => "profile",
@@ -52,6 +52,10 @@ export const usersService = createApi({
         body
       })
     }),
+    fetchInvitations: builder.query<Invitation[], void>({
+      query: () => "invitations",
+      providesTags: ["invitations"]
+    }),
   }),
 });
 
@@ -60,5 +64,6 @@ export const {
   useUpdateProfileMutation,
   useFetchAccountQuery,
   useUpdateEmailMutation,
-  useUpdatePasswordMutation
+  useUpdatePasswordMutation,
+  useFetchInvitationsQuery
 } = usersService;
