@@ -1,10 +1,12 @@
 import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import { useAppSelector } from "../../store.ts";
+import { useAppDispatch, useAppSelector } from "../../store.ts";
 import { useRefreshMutation } from "../../auth/data/authService.ts";
+import { initializeOnly } from "../../auth/data/sessionSlice.ts";
 
 export const AppRoot = () => {
   const [refresh] = useRefreshMutation();
+  const dispatch = useAppDispatch();
 
   const refreshToken = useAppSelector(
     (state) => state.session.refreshToken,
@@ -17,8 +19,10 @@ export const AppRoot = () => {
       refresh({
         refreshToken: refreshTokenFromLocalStorage,
       });
+    } else {
+      dispatch(initializeOnly());
     }
-  }, [refresh]);
+  }, [dispatch, refresh]);
 
   useEffect(() => {
     const refreshInterval = setInterval(

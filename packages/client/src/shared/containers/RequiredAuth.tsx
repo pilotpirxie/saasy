@@ -7,10 +7,10 @@ export const RequiredAuth = ({ children }: PropsWithChildren) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!sessionState.signedIn) {
+    if (!sessionState.signedIn && sessionState.isInitialized) {
       navigate("/auth/login");
     }
-  }, [navigate, sessionState.signedIn]);
+  }, [navigate, sessionState.isInitialized, sessionState.signedIn]);
 
   return sessionState.signedIn ? children : null;
 };

@@ -13,6 +13,7 @@ import { AppRoot } from "./app/containers/AppRoot.tsx";
 import { ErrorPage } from "./app/containers/ErrorPage.tsx";
 import { Dashboard } from "./dashboard/containers/Dashboard.tsx";
 import { RequiredAuth } from "./shared/containers/RequiredAuth.tsx";
+import { Invitations } from "./dashboard/containers/Invitations.tsx";
 
 const router = createBrowserRouter([
   {
@@ -47,6 +48,12 @@ const router = createBrowserRouter([
         element: <RedirectIfAuth>
           <ExchangeCodePage />
         </RedirectIfAuth>
+      },
+      {
+        path: "/dashboard/invitations",
+        element: <RequiredAuth>
+          <Invitations />
+        </RequiredAuth>
       },
       {
         path: "/dashboard",

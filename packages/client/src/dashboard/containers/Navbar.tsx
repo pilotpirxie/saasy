@@ -116,6 +116,10 @@ export const Navbar = () => {
               >Settings</Link></li>
               <li><Link
                 className="dropdown-item"
+                to="/dashboard/invitations"
+              >Invitations</Link></li>
+              <li><Link
+                className="dropdown-item"
                 to="/help"
               >Help</Link></li>
               <li><div
