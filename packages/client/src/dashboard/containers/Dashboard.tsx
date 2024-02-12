@@ -91,6 +91,7 @@ export const Dashboard = () => {
                   <button
                     className="btn btn-sm btn-light"
                     onClick={() => handleOpenTeamMembersModal(team.id)}
+                    disabled={team.role !== "owner"}
                   >
                     <span className="ri-user-2-line me-1"></span>
                     Members
@@ -98,12 +99,14 @@ export const Dashboard = () => {
                   <button
                     className="btn btn-sm btn-light"
                     onClick={() => handleOpenUpdateTeamModal(team.id)}
+                    disabled={team.role !== "owner"}
                   >
                     <span className="ri-settings-3-line me-1"></span>
                     Settings
                   </button>
                   <button
                     className="btn btn-sm btn-primary"
+                    disabled={team.role !== "owner"}
                   >
                     <span className="me-1 ri-suitcase-2-line"></span>
                     Upgrade

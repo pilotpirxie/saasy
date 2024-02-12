@@ -26,7 +26,11 @@ export const TeamMembersModal = () => {
   const dashboardState = useAppSelector((state) => state.dashboard);
   const { data: teams } = useFetchTeamsQuery();
   const team = teams?.find((t) => t.id === dashboardState.teamIdInTeamMembersModal);
-  const { data: members } = useFetchTeamMembersQuery(dashboardState.teamIdInTeamMembersModal || "");
+  const {
+    data: members,
+    isError: isMembersError,
+    error: membersError
+  } = useFetchTeamMembersQuery(dashboardState.teamIdInTeamMembersModal || "");
 
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState<"all" | "invite">("all");
@@ -34,7 +38,12 @@ export const TeamMembersModal = () => {
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<Role>("editor");
 
-  const { data: invitedUsers } = useFetchInvitedUsersQuery(dashboardState.teamIdInTeamMembersModal || "");
+  const {
+    data: invitedUsers,
+    isError: isInvitedUsersError,
+    error: invitedUsersError,
+  } = useFetchInvitedUsersQuery(dashboardState.teamIdInTeamMembersModal || "");
+
   const [inviteUserToTeam, {
     isError: isInvitingUserError,
     error: invitingUserError,
@@ -141,8 +150,8 @@ export const TeamMembersModal = () => {
       </ul>
       <div>
         {activeTab === "all" && <div>
-          {(isUpdatingRoleError || isRevokingRoleError)
-            && <ErrorMessage message={getErrorRTKQuery(updatingRoleError || revokingRoleError)}/>}
+          {(isMembersError || isUpdatingRoleError || isRevokingRoleError)
+            && <ErrorMessage message={getErrorRTKQuery(membersError || updatingRoleError || revokingRoleError)}/>}
 
           <div className="mb-3">
             <TextInput
@@ -207,8 +216,8 @@ export const TeamMembersModal = () => {
         </div>}
 
         {activeTab === "invite" && <div>
-          {(isInvitingUserError || isCancelingInvitationError)
-            && <ErrorMessage message={getErrorRTKQuery(invitingUserError || cancelingInvitationError)}/>}
+          {(isInvitedUsersError || isInvitingUserError || isCancelingInvitationError)
+            && <ErrorMessage message={getErrorRTKQuery(invitedUsersError || invitingUserError || cancelingInvitationError)}/>}
           {isInvitingUserSuccess && <div className="alert alert-success">
             User invited successfully
           </div>}

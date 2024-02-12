@@ -376,6 +376,7 @@ export default function initializeUsersController({
             expiresAt: {
               gte: dayjs().toDate(),
             },
+            acceptedAt: null,
           },
           select: {
             id: true,
@@ -393,6 +394,107 @@ export default function initializeUsersController({
         return res.json(invitations);
       } catch (error) {
         next(error);
+      }
+    },
+  );
+
+  const acceptInvitationSchema = {
+    params: {
+      invitationId: Joi.string().uuid().required(),
+    },
+  };
+
+  router.put(
+    "/invitations/:invitationId/accept",
+    jwtVerify(jwtSecret),
+    validation(acceptInvitationSchema),
+    async (req: TypedRequest<typeof acceptInvitationSchema>, res, next) => {
+      try {
+        const { invitationId } = req.params;
+
+        const invitation = await prisma.invitation.findFirst({
+          where: {
+            id: invitationId,
+            expiresAt: {
+              gte: dayjs().toDate(),
+            },
+          },
+        });
+
+        if (!invitation) {
+          return errorResponse({
+            response: res,
+            message: "Invitation not found",
+            error: "InvitationNotFound",
+            status: 404,
+          });
+        }
+
+        await prisma.userTeam.create({
+          data: {
+            userId: req.userId,
+            teamId: invitation.teamId,
+            role: invitation.role,
+          },
+        });
+
+        await prisma.invitation.update({
+          where: {
+            id: invitationId,
+          },
+          data: {
+            acceptedAt: dayjs().toDate(),
+          },
+        });
+
+        return res.sendStatus(204);
+      } catch (error) {
+        return next(error);
+      }
+    },
+  );
+
+  const declineInvitationSchema = {
+    params: {
+      invitationId: Joi.string().uuid().required(),
+    },
+  };
+
+  router.put(
+    "/invitations/:invitationId/decline",
+    jwtVerify(jwtSecret),
+    validation(declineInvitationSchema),
+    async (req: TypedRequest<typeof declineInvitationSchema>, res, next) => {
+      try {
+        const { invitationId } = req.params;
+
+        const invitation = await prisma.invitation.findFirst({
+          where: {
+            id: invitationId,
+            expiresAt: {
+              gte: dayjs().toDate(),
+            },
+          },
+        });
+
+        if (!invitation) {
+          return errorResponse({
+            response: res,
+            message: "Invitation not found",
+            error: "InvitationNotFound",
+            status: 404,
+          });
+        }
+
+        await prisma.invitation.delete({
+          where: {
+            id: invitationId,
+          },
+        });
+
+        return res.sendStatus(204);
+      } catch (error) {
+        return next(error);
       }
     },
   );

@@ -56,6 +56,20 @@ export const usersService = createApi({
       query: () => "invitations",
       providesTags: ["invitations"]
     }),
+    acceptInvitation: builder.mutation<void, { invitationId: string }>({
+      query: ({ invitationId }) => ({
+        url: `invitations/${invitationId}/accept`,
+        method: "PUT"
+      }),
+      invalidatesTags: ["invitations"]
+    }),
+    declineInvitation: builder.mutation<void, { invitationId: string }>({
+      query: ({ invitationId }) => ({
+        url: `invitations/${invitationId}/decline`,
+        method: "PUT"
+      }),
+      invalidatesTags: ["invitations"]
+    })
   }),
 });
 
@@ -65,5 +79,7 @@ export const {
   useFetchAccountQuery,
   useUpdateEmailMutation,
   useUpdatePasswordMutation,
-  useFetchInvitationsQuery
+  useFetchInvitationsQuery,
+  useAcceptInvitationMutation,
+  useDeclineInvitationMutation
 } = usersService;
