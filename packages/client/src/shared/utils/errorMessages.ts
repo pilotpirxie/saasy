@@ -32,6 +32,8 @@ export const errorMessages: Record<string, string> = {
   TooFastResend: "You just requested a verification email. Please wait a few minutes before trying again",
   UserAlreadyInTeam: "User already in team",
   UserAlreadyInvited: "User already invited",
+  CannotRevokeRoleFromSelf: "Cannot revoke role from self",
+  CannotRevokeRoleMustHaveOneOwner: "Cannot revoke role, team must have at least one owner",
 };
 
 export const GenericError = "GenericError";

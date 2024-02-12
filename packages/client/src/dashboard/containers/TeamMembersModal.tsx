@@ -6,7 +6,9 @@ import {
   useFetchInvitedUsersQuery,
   useFetchTeamMembersQuery,
   useFetchTeamsQuery,
-  useInviteUserToTeamMutation
+  useInviteUserToTeamMutation,
+  useRevokeTeamMemberRoleMutation,
+  useUpdateTeamMemberRoleMutation
 } from "../data/teamsService.ts";
 import { closeTeamMembersModal } from "../data/dashboardSlice.ts";
 import { TextInput } from "../../shared/components/FormInputs/TextInput.tsx";
@@ -37,14 +39,36 @@ export const TeamMembersModal = () => {
     isError: isInvitingUserError,
     error: invitingUserError,
     isSuccess: isInvitingUserSuccess,
+    reset: resetInviteUserToTeam,
   }] = useInviteUserToTeamMutation();
 
   const [cancelInvitation, {
     isError: isCancelingInvitationError,
     error: cancelingInvitationError,
+    reset: resetCancelInvitation,
   }] = useCancelInvitationMutation();
 
+  const [updateTeamMemberRoleMutation, {
+    isError: isUpdatingRoleError,
+    error: updatingRoleError,
+    reset: resetUpdateTeamMemberRole,
+  }] = useUpdateTeamMemberRoleMutation();
+
+  const [revokeTeamMemberRoleMutation, {
+    isError: isRevokingRoleError,
+    error: revokingRoleError,
+    reset: resetRevokeTeamMemberRole,
+  }] = useRevokeTeamMemberRoleMutation();
+
+  const resetAll = () => {
+    resetInviteUserToTeam();
+    resetCancelInvitation();
+    resetUpdateTeamMemberRole();
+    resetRevokeTeamMemberRole();
+  };
+
   const handleClose = () => {
+    resetAll();
     dispatch(closeTeamMembersModal());
   };
 
@@ -53,13 +77,30 @@ export const TeamMembersModal = () => {
   }
 
   const handleChangeRole = (userId: string, role: Role) => {
-    // ...
+    resetAll();
+
+    updateTeamMemberRoleMutation({
+      teamId: team.id,
+      userId,
+      role,
+    });
+  };
+
+  const handleRemove = (userId: string) => {
+    resetAll();
+
+    revokeTeamMemberRoleMutation({
+      teamId: team.id,
+      userId,
+    });
   };
 
   const handleInvite = () => {
     if (!inviteEmail) {
       return;
     }
+
+    resetAll();
 
     inviteUserToTeam({
       teamId: team.id,
@@ -69,14 +110,13 @@ export const TeamMembersModal = () => {
   };
 
   const handleCancelInvitation = (invitationId: string) => {
+    resetAll();
+
     cancelInvitation({
       teamId: team.id,
       invitationId,
     });
   };
-
-  const isAtLeastTwoOwners =
-    members && members?.filter((m) => m.role === "owner").length > 1;
 
   return <Modal
     show={!!dashboardState.teamIdInTeamMembersModal}
@@ -101,6 +141,9 @@ export const TeamMembersModal = () => {
       </ul>
       <div>
         {activeTab === "all" && <div>
+          {(isUpdatingRoleError || isRevokingRoleError)
+            && <ErrorMessage message={getErrorRTKQuery(updatingRoleError || revokingRoleError)}/>}
+
           <div className="mb-3">
             <TextInput
               label={"Search"}
@@ -153,7 +196,7 @@ export const TeamMembersModal = () => {
                 <div className="right">
                   <button
                     className="btn btn-sm btn-outline-danger"
-                    disabled={member.role === "owner" && !isAtLeastTwoOwners}
+                    onClick={() => handleRemove(member.userId)}
                   >
                     Remove
                   </button>
@@ -198,7 +241,7 @@ export const TeamMembersModal = () => {
             </button>
           </div>
 
-          {invitedUsers && <div>
+          {invitedUsers && invitedUsers.length > 0 && <div>
             <hr/>
 
             <h6>Invited users</h6>

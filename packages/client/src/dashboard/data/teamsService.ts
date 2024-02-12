@@ -19,7 +19,7 @@ const baseQuery = fetchBaseQuery({
 export const teamsService = createApi({
   reducerPath: "teams",
   baseQuery,
-  tagTypes: ["teams", "invitedUsers"],
+  tagTypes: ["teams", "invitedUsers", "teamMembers"],
   endpoints: (builder) => ({
     fetchTeams: builder.query<Team[], void>({
       query: () => "/",
@@ -56,7 +56,8 @@ export const teamsService = createApi({
       invalidatesTags: ["teams"]
     }),
     fetchTeamMembers: builder.query<UserTeam[], string>({
-      query: (teamId) => `/${teamId}/members`
+      query: (teamId) => `/${teamId}/members`,
+      providesTags: ["teamMembers"]
     }),
     fetchInvitedUsers: builder.query<InvitedUser[], string>({
       query: (teamId) => `/${teamId}/invitations`,
@@ -77,6 +78,22 @@ export const teamsService = createApi({
       }),
       invalidatesTags: ["invitedUsers"]
     }),
+    updateTeamMemberRole: builder.mutation<void, { teamId: string, userId: string, role: string }>({
+      query: ({ teamId, userId, role }) => ({
+        url: `/${teamId}/roles`,
+        method: "PUT",
+        body: { role, userId },
+      }),
+      invalidatesTags: ["teamMembers"]
+    }),
+    revokeTeamMemberRole: builder.mutation<void, { teamId: string, userId: string }>({
+      query: ({ teamId, userId }) => ({
+        url: `/${teamId}/roles`,
+        method: "DELETE",
+        body: { userId }
+      }),
+      invalidatesTags: ["teamMembers"]
+    }),
   }),
 });
 
@@ -90,4 +107,6 @@ export const {
   useFetchInvitedUsersQuery,
   useInviteUserToTeamMutation,
   useCancelInvitationMutation,
+  useUpdateTeamMemberRoleMutation,
+  useRevokeTeamMemberRoleMutation,
 } = teamsService;

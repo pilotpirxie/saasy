@@ -307,7 +307,7 @@ export default function initializeTeamsController({
 
         if (!teamOwner) {
           return errorResponse({
-            error: "CannotRevokeRole",
+            error: "CannotRevokeRoleMustHaveOneOwner",
             message: "Cannot revoke role, there must be at least one owner",
             response: res,
             status: 400,
