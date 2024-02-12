@@ -91,6 +91,8 @@ app.use("/api/users", initializeUsersController({
 app.use("/api/teams", initializeTeamsController({
   jwtSecret: process.env.JWT_SECRET || "",
   prisma,
+  emailService,
+  emailTemplatesService,
 }));
 
 app.use("/api/invitations", initializeInvitationsController({

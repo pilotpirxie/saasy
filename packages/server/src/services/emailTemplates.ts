@@ -15,4 +15,8 @@ export type EmailTemplates = {
     invoiceUrl: string;
     description: string;
   }): string;
+
+  getInvitationEmailTemplate(options: {
+    teamName: string;
+  }): string;
 };

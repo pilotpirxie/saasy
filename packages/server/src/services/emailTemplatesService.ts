@@ -54,4 +54,17 @@ export class EmailTemplatesService implements EmailTemplates {
     );
     return handlebars.compile(invoiceTemplate)(options);
   }
+
+  getInvitationEmailTemplate(options: {
+    teamName: string;
+  }): string {
+    const invitationTemplate = fs.readFileSync(
+      path.join(__dirname, "../templates/invitation.hbs"),
+      "utf8",
+    );
+    return handlebars.compile(invitationTemplate)({
+      companyName: this.companyName,
+      ...options,
+    });
+  }
 }

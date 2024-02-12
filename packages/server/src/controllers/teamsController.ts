@@ -6,15 +6,21 @@ import jwtVerify from "../middlewares/jwt";
 import validation from "../middlewares/validation";
 import verifyUserTeamRole from "../middlewares/verifyUserTeamRole";
 import errorResponse from "../utils/errorResponse";
+import { EmailService } from "../services/emailService";
+import { EmailTemplates } from "../services/emailTemplates";
 
 type UserControllersConfig = {
   jwtSecret: string;
   prisma: PrismaClient;
+  emailService: EmailService;
+  emailTemplatesService: EmailTemplates;
 }
 
 export default function initializeTeamsController({
   jwtSecret,
   prisma,
+  emailService,
+  emailTemplatesService,
 }: UserControllersConfig): Router {
   const router = Router();
 
@@ -412,6 +418,21 @@ export default function initializeTeamsController({
         const { teamId } = req.params;
         const { email, role } = req.body;
 
+        const team = await prisma.team.findFirst({
+          where: {
+            id: teamId,
+          },
+        });
+
+        if (!team) {
+          return errorResponse({
+            error: "TeamNotFound",
+            message: "Team not found",
+            response: res,
+            status: 404,
+          });
+        }
+
         const userAlreadyInTeam = await prisma.userTeam.findFirst({
           where: {
             user: {
@@ -466,6 +487,14 @@ export default function initializeTeamsController({
             invitedBy: req.userId,
             expiresAt: dayjs().add(14, "day").toDate(),
           },
+        });
+
+        emailService.sendEmail({
+          to: email,
+          subject: "You have been invited to a team",
+          html: emailTemplatesService.getInvitationEmailTemplate({
+            teamName: team?.name || "Team",
+          }),
         });
 
         return res.sendStatus(201);
