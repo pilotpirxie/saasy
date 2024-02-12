@@ -22,24 +22,24 @@ export const usersService = createApi({
   tagTypes: ["profile", "account", "invitations"],
   endpoints: (builder) => ({
     fetchProfile: builder.query<Profile, void>({
-      query: () => "profile",
+      query: () => "/profile",
       providesTags: ["profile"]
     }),
     updateProfile: builder.mutation<void, Profile>({
       query: (body) => ({
-        url: "profile",
+        url: "/profile",
         method: "PUT",
         body
       }),
       invalidatesTags: ["profile"]
     }),
     fetchAccount: builder.query<Account, void>({
-      query: () => "account",
+      query: () => "/account",
       providesTags: ["account"]
     }),
     updateEmail: builder.mutation<void, { email: string }>({
       query: (body) => ({
-        url: "email",
+        url: "/email",
         method: "PUT",
         body
       }),
@@ -47,25 +47,25 @@ export const usersService = createApi({
     }),
     updatePassword: builder.mutation<void, { password: string }>({
       query: (body) => ({
-        url: "password",
+        url: "/password",
         method: "PUT",
         body
       })
     }),
     fetchInvitations: builder.query<Invitation[], void>({
-      query: () => "invitations",
+      query: () => "/invitations",
       providesTags: ["invitations"]
     }),
     acceptInvitation: builder.mutation<void, { invitationId: string }>({
       query: ({ invitationId }) => ({
-        url: `invitations/${invitationId}/accept`,
+        url: `/invitations/${invitationId}/accept`,
         method: "PUT"
       }),
       invalidatesTags: ["invitations"]
     }),
     declineInvitation: builder.mutation<void, { invitationId: string }>({
       query: ({ invitationId }) => ({
-        url: `invitations/${invitationId}/decline`,
+        url: `/invitations/${invitationId}/decline`,
         method: "PUT"
       }),
       invalidatesTags: ["invitations"]

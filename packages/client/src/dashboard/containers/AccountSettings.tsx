@@ -98,37 +98,62 @@ export const AccountSettings = () => {
             <a
               href="#display-name"
               className="list-group-item list-group-item-action"
-            >Change Display Name</a>
+            >
+              <span className="ri-user-line me-2" />
+              Change Display Name
+            </a>
             <a
               href="#email"
               className="list-group-item list-group-item-action"
-            >Change Email</a>
-            <a
+            >
+              <span className="ri-mail-line me-2" />
+              Change Email
+            </a>
+            {account.data?.authProviderType === "email" && <a
               href="#password"
               className="list-group-item list-group-item-action"
-            >Change Password</a>
+            >
+              <span className="ri-lock-line me-2" />
+              Change Password
+            </a>}
+
             <a
               href="#address"
               className="list-group-item list-group-item-action"
-            >Change Address</a>
+            >
+              <span className="ri-map-pin-line me-2" />
+              Change Address
+            </a>
             <a
               href="#newsletter-marketing"
               className="list-group-item list-group-item-action"
-            >Newsletter & Marketing</a>
+            >
+              <span className="ri-news-line me-2" />
+              Newsletter & Marketing
+            </a>
             <a
               href="#2fa"
               className="list-group-item list-group-item-action"
-            >Two Factor Authentication</a>
+            >
+              <span className="ri-shield-check-line me-2" />
+              Two Factor Authentication
+            </a>
             <a
               href="#delete"
               className="list-group-item list-group-item-action"
-            >Delete Account</a>
+            >
+              <span className="ri-delete-bin-line me-2" />
+              Delete Account
+            </a>
           </div>
         </div>
         <div className="col-12 col-md-8">
 
           <div className="card card-body">
-            <h5 id="display-name">Change Display Name</h5>
+            <h5 id="display-name">
+              <span className="ri-user-line me-2" />
+              Change Display Name
+            </h5>
             <div>
               <TextInput
                 label="Display Name"
@@ -146,7 +171,10 @@ export const AccountSettings = () => {
           </div>
 
           <div className="card card-body mt-3">
-            <h5 id="email">Change Email</h5>
+            <h5 id="email">
+              <span className="ri-mail-line me-2" />
+              Change Email
+            </h5>
             <div>
               <EmailInput
                 label="Email"
@@ -163,8 +191,11 @@ export const AccountSettings = () => {
             </div>
           </div>
 
-          <div className="card card-body mt-3">
-            <h5 id="password">Change Password</h5>
+          {account.data?.authProviderType === "email" && <div className="card card-body mt-3">
+            <h5 id="password">
+              <span className="ri-lock-line me-2" />
+              Change Password
+            </h5>
             <div>
               <PasswordInput
                 label="Current password"
@@ -183,10 +214,13 @@ export const AccountSettings = () => {
                 Change password
               </button>
             </div>
-          </div>
+          </div>}
 
           <div className="card card-body mt-3">
-            <h5 id="address">Change Address</h5>
+            <h5 id="address">
+              <span className="ri-map-pin-line me-2" />
+              Change Address
+            </h5>
             <div>
               <TextInput
                 label="Full Name"
@@ -218,7 +252,10 @@ export const AccountSettings = () => {
           </div>
 
           <div className="card card-body mt-3">
-            <h5 id="newsletter-marketing">Newsletter & Marketing</h5>
+            <h5 id="newsletter-marketing">
+              <span className="ri-news-line me-2" />
+              Newsletter & Marketing
+            </h5>
             <div>
               <div className="form-check">
                 <input
@@ -260,28 +297,38 @@ export const AccountSettings = () => {
           </div>
 
           <div className="card card-body mt-3">
-            <h5 id="2fa">Two Factor Authentication</h5>
+            <h5 id="2fa">
+              <span className="ri-shield-check-line me-2" />
+              Two Factor Authentication
+            </h5>
             <div>
-              <div className="form-check">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="twoFactorAuth"
-                  checked={isTwoFactorAuthEnabled}
-                  onChange={(e) => setIsTwoFactorAuthEnabled(e.target.checked)}
-                />
-                <label
-                  className="form-check-label"
-                  htmlFor="twoFactorAuth"
+              {isTwoFactorAuthEnabled && <div>
+                <div>Two factor authentication is enabled</div>
+                <button
+                  className="btn btn-sm btn-danger"
+                  type="button"
+                >
+                  Disable two factor authentication
+                </button>
+              </div>}
+
+              {!isTwoFactorAuthEnabled && <div>
+                <div>Two factor authentication is disabled</div>
+                <button
+                  className="btn btn-sm btn-primary"
+                  type="button"
                 >
                   Enable two factor authentication
-                </label>
-              </div>
+                </button>
+              </div>}
             </div>
           </div>
 
           <div className="card card-body mt-3">
-            <h5 id="delete">Delete Account</h5>
+            <h5 id="delete">
+              <span className="ri-delete-bin-line me-2" />
+              Delete Account
+            </h5>
             <div>
               <div className="form-check">
                 <input

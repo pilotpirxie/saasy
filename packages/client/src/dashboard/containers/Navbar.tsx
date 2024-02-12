@@ -66,7 +66,7 @@ export const Navbar = () => {
         <ul className="navbar-nav me-auto">
           <li className="nav-item">
             <Link
-              className="nav-link active"
+              className="nav-link"
               to="/dashboard"
             >Projects</Link>
           </li>

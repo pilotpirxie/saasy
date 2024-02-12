@@ -16,7 +16,7 @@ export const TextInput = ({
   return (<div>
     <label
       htmlFor={label.replaceAll(" ", "_").toLowerCase()}
-      className="form-label"
+      className="form-label mt-2 mb-0"
     >
       {label}
     </label>

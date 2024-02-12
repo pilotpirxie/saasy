@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import { LoginPage } from "./auth/containers/LoginPage.tsx";
-import "remixicon/fonts/remixicon.css";
+// import "remixicon/fonts/remixicon.css";
 import { RegisterPage } from "./auth/containers/RegisterPage.tsx";
 import { ForgotPasswordPage } from "./auth/containers/ForgotPasswordPage.tsx";
 import { ExchangeCodePage } from "./auth/containers/ExchangeCodePage.tsx";

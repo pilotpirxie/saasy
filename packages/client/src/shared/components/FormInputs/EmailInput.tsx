@@ -4,17 +4,19 @@ export const EmailInput = ({
   onChange,
   autoFocus,
   required,
+  disabled,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   autoFocus?: boolean;
   required?: boolean;
+  disabled?: boolean;
 }) => {
   return (<div>
     <label
       htmlFor={label.replaceAll(" ", "_").toLowerCase()}
-      className="form-label"
+      className="form-label mt-2 mb-0"
     >
       {label}
     </label>
@@ -26,6 +28,7 @@ export const EmailInput = ({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       required={required}
+      disabled={disabled}
     />
   </div>);
 };
