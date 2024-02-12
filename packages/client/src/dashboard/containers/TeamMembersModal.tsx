@@ -121,8 +121,8 @@ export const TeamMembersModal = () => {
   return <Modal
     show={!!dashboardState.teamIdInTeamMembersModal}
     onClose={handleClose}
-    title={"Team members"}
-    size='lg'
+    title="Team members"
+    size="lg"
   >
     <div>
       <ul className="nav nav-tabs mb-3">
@@ -146,19 +146,19 @@ export const TeamMembersModal = () => {
 
           <div className="mb-3">
             <TextInput
-              label={"Search"}
+              label="Search"
               value={search}
               onChange={setSearch}
             />
           </div>
 
-          <div className='list-group'>
+          <div className="list-group">
             {members?.filter(member => {
               return member.user.displayName.toLowerCase().includes(search.toLowerCase()) || member.user.email.toLowerCase().includes(search.toLowerCase());
             }).map((member) => {
               return <div
                 key={member.userId}
-                className='list-group-item d-flex justify-content-between align-items-center'
+                className="list-group-item d-flex justify-content-between align-items-center"
               >
                 <div className="left">
                   <b>
@@ -167,7 +167,7 @@ export const TeamMembersModal = () => {
                   <div>
                     {member.user.email}
                   </div>
-                  <div className={"d-flex align-items-center"}>
+                  <div className="d-flex align-items-center">
                     <div className="me-2">
                       Role:
                     </div>
@@ -175,20 +175,20 @@ export const TeamMembersModal = () => {
                       <RoleBadge
                         member={member}
                         onClick={() => handleChangeRole(member.userId, "owner")}
-                        role={"owner"}
-                        displayRole={"Owner"}
+                        role="owner"
+                        displayRole="Owner"
                       />
                       <RoleBadge
                         member={member}
                         onClick={() => handleChangeRole(member.userId, "editor")}
-                        role={"editor"}
-                        displayRole={"Editor"}
+                        role="editor"
+                        displayRole="Editor"
                       />
                       <RoleBadge
                         member={member}
                         onClick={() => handleChangeRole(member.userId, "viewer")}
-                        role={"viewer"}
-                        displayRole={"Viewer"}
+                        role="viewer"
+                        displayRole="Viewer"
                       />
                     </div>
                   </div>
@@ -215,14 +215,14 @@ export const TeamMembersModal = () => {
 
           <div>
             <TextInput
-              label={"Email"}
+              label="Email"
               value={inviteEmail}
               onChange={setInviteEmail}
             />
           </div>
-          <div className='mt-3'>
+          <div className="mt-3">
             <SelectInput
-              label={"Role"}
+              label="Role"
               value={inviteRole}
               onChange={(role) => setInviteRole(role as Role)}
               items={[
@@ -232,7 +232,7 @@ export const TeamMembersModal = () => {
               ]}
             />
           </div>
-          <div className='d-flex justify-content-end mt-3'>
+          <div className="d-flex justify-content-end mt-3">
             <button
               className="btn btn-primary"
               onClick={handleInvite}
@@ -250,7 +250,7 @@ export const TeamMembersModal = () => {
               {invitedUsers?.map((invitedUser) => {
                 return <div
                   key={invitedUser.id}
-                  className='list-group-item'
+                  className="list-group-item"
                 >
                   <div className="d-flex justify-content-between align-items-center">
                     <div className="left">
@@ -280,7 +280,5 @@ export const TeamMembersModal = () => {
         </div>}
       </div>
     </div>
-
-
   </Modal>;
 };

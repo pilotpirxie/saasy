@@ -134,7 +134,7 @@ export function LoginPage() {
       {!showVerifyEmail && <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <EmailInput
-            label={"Email address"}
+            label="Email address"
             value={email}
             onChange={setEmail}
             autoFocus
@@ -144,7 +144,7 @@ export function LoginPage() {
 
         <div className="mb-3">
           <PasswordInput
-            label={"Password"}
+            label="Password"
             value={password}
             onChange={setPassword}
             required
@@ -161,7 +161,7 @@ export function LoginPage() {
 
         {showTotpInput && <div className="mb-3">
           <TextInput
-            label={"Two-factor code"}
+            label="Two-factor code"
             value={totp}
             onChange={setTotp}
             required
@@ -179,7 +179,7 @@ export function LoginPage() {
       {showVerifyEmail && <form onSubmit={handleSubmitVerifyEmail}>
         <div className="mb-3">
           <TextInput
-            label={"Verification code"}
+            label="Verification code"
             value={verificationCode}
             onChange={setVerificationCode}
             required
@@ -196,8 +196,8 @@ export function LoginPage() {
 
       <FormLink
         label={"Don't have an account?"}
-        linkLabel={"Sign Up"}
-        linkTo={"/auth/register"}
+        linkLabel="Sign Up"
+        linkTo="/auth/register"
       />
 
       <ReCaptchaNote/>

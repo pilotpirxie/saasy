@@ -82,7 +82,7 @@ export function ForgotPasswordPage() {
       {passwordResetStep === 0 && <form onSubmit={handleSendCode}>
         <div className="mb-3">
           <EmailInput
-            label={"Email address"}
+            label="Email address"
             value={email}
             onChange={setEmail}
             autoFocus
@@ -108,7 +108,7 @@ export function ForgotPasswordPage() {
 
         <div className="mb-3">
           <TextInput
-            label={"Verification code"}
+            label="Verification code"
             value={verificationCode}
             onChange={setVerificationCode}
             required
@@ -126,7 +126,7 @@ export function ForgotPasswordPage() {
       {passwordResetStep === 2 && <form onSubmit={handleResetPassword}>
         <div className="mb-3">
           <PasswordInput
-            label={"New password"}
+            label="New password"
             value={newPassword}
             onChange={setNewPassword}
             required
@@ -150,8 +150,8 @@ export function ForgotPasswordPage() {
 
       <FormLink
         label="Remember your password?"
-        linkLabel={"Back to login"}
-        linkTo={"/auth/login"}
+        linkLabel="Back to login"
+        linkTo="/auth/login"
       />
 
       <ReCaptchaNote />

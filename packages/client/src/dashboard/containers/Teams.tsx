@@ -71,7 +71,7 @@ export const Teams = () => {
                     {team.role === "owner" && <span className="badge bg-primary ms-1">Owner</span>}
                     {team.role === "member" && <span className="badge bg-info ms-1">Member</span>}
                   </div>
-                  {team.deleteAfter && <div className='badge bg-danger'>
+                  {team.deleteAfter && <div className="badge bg-danger">
                     Scheduled for deletion on {dayjs(team.deleteAfter).format("DD-MM-YYYY")}
                   </div>}
                 </div>

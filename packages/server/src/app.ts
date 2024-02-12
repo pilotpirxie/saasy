@@ -10,7 +10,6 @@ import { EmailTemplatesService } from "./services/emailTemplatesService";
 import initializeAuthController from "./controllers/authController";
 import initializeUsersController from "./controllers/usersController";
 import initializeTeamsController from "./controllers/teamsController";
-import initializeInvitationsController from "./controllers/invitationsController";
 import { jsonSendStatus } from "./middlewares/jsonSendStatus";
 
 dotenv.config();
@@ -93,13 +92,6 @@ app.use("/api/teams", initializeTeamsController({
   prisma,
   emailService,
   emailTemplatesService,
-}));
-
-app.use("/api/invitations", initializeInvitationsController({
-  jwtSecret: process.env.JWT_SECRET || "",
-  emailService,
-  emailTemplatesService,
-  prisma,
 }));
 
 app.use(errorHandler);

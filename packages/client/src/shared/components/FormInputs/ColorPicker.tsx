@@ -27,7 +27,7 @@ export const ColorPicker = ({
       {label}
     </label>
 
-    <div className='d-flex flex-wrap justify-content-around align-items-center'>
+    <div className="d-flex flex-wrap justify-content-around align-items-center">
       {PREDEFINED_COLORS.map((color) => {
         return <button
           key={color}
@@ -40,12 +40,12 @@ export const ColorPicker = ({
           }}
           onClick={() => onChange(color)}
         >
-          {value === color && <span className='ri-check-line text-white fs-4'></span>}
+          {value === color && <span className="ri-check-line text-white fs-4"></span>}
         </button>;
       })}
 
       {allowCustomColor && <input
-        className='btn p-0'
+        className="btn p-0"
         style={{
           width: "40px",
           height: "40px",

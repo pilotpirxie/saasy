@@ -46,7 +46,7 @@ export const Footer = () => {
               </div>
             </div>
 
-            <div className='d-block d-md-none justify-content-between'>
+            <div className="d-block d-md-none justify-content-between">
               <div className="text-muted text-decoration-none text-center">
                 &copy; {year} App Name
               </div>

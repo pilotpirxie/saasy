@@ -61,7 +61,7 @@ export const UpdateTeamModal = () => {
   return <Modal
     show={!!dashboardState.teamIdInUpdateTeamModal}
     onClose={handleClose}
-    title={"Update team"}
+    title="Update team"
     footerChildren={<div className="d-flex w-100 justify-content-between">
       {isMarkedForDeletion && <button
         className="btn btn-sm btn-outline-info"
@@ -85,11 +85,11 @@ export const UpdateTeamModal = () => {
   >
     <div>
       <TextInput
-        label={"Name"}
+        label="Name"
         value={name}
         onChange={(value) => setName(value)}
       />
-      <div className='small'>This can be your company, team or organization.</div>
+      <div className="small">This can be your company, team or organization.</div>
     </div>
 
 

@@ -40,7 +40,7 @@ export const RegisterForm = ({
     <form onSubmit={onSubmit}>
       <div className="mb-3">
         <EmailInput
-          label={"Email address"}
+          label="Email address"
           value={email}
           onChange={onEmailChange}
           autoFocus
@@ -50,7 +50,7 @@ export const RegisterForm = ({
 
       <div className="mb-3">
         <PasswordInput
-          label={"Password"}
+          label="Password"
           value={password}
           onChange={onPasswordChange}
           required
@@ -66,9 +66,9 @@ export const RegisterForm = ({
     </form>
 
     <FormLink
-      label={"Already have an account?"}
-      linkLabel={"Log in"}
-      linkTo={"/auth/login"}
+      label="Already have an account?"
+      linkLabel="Log in"
+      linkTo="/auth/login"
     />
 
     <TermsNote />

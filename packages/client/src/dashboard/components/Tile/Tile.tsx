@@ -12,8 +12,8 @@ export const Tile = ({ name, color }: {
       background: `linear-gradient(120deg, rgba(0, 0, 0, 0.5), 5%, ${backgroundColor} 100%)`,
     }}
   >
-    <span className='tile-name'>{name}</span>
-    <div className='fw-normal small'>
+    <span className="tile-name">{name}</span>
+    <div className="fw-normal small">
       <div className="">Lorem ipsum dolor sit amet.</div>
       <div className="d-flex gap-2">
         <div>1240 <span className="ri-error-warning-line"></span></div>

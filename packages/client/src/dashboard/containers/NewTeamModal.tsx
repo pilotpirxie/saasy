@@ -29,7 +29,7 @@ export const NewTeamModal = () => {
   return <Modal
     show={dashboardState.isNewTeamModalOpen}
     onClose={handleClose}
-    title={"New team"}
+    title="New team"
     footerChildren={<button
       className="btn btn-sm btn-primary"
       onClick={handleCreate}
@@ -39,11 +39,11 @@ export const NewTeamModal = () => {
   >
     <div>
       <TextInput
-        label={"Name"}
+        label="Name"
         value={name}
         onChange={(value) => setName(value)}
       />
-      <div className='small'>This can be your company, team or organization.</div>
+      <div className="small">This can be your company, team or organization.</div>
     </div>
 
 

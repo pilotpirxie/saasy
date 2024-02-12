@@ -21,8 +21,6 @@ type UserControllersConfig = {
 export default function initializeUsersController({
   jwtSecret,
   prisma,
-  emailService,
-  emailTemplatesService,
 }: UserControllersConfig): Router {
   const router = Router();
 

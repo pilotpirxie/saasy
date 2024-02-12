@@ -1,5 +1,7 @@
-import { Request } from "express";
-import { ParamsDictionary, Query } from "express-serve-static-core";
+/* eslint-disable */
+
+import {Request} from "express";
+import {ParamsDictionary, Query} from "express-serve-static-core";
 import {
   ArraySchema,
   BinarySchema,

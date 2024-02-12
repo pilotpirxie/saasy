@@ -1,4 +1,9 @@
 module.exports = {
+    "settings": {
+        "react": {
+            "version": "detect"
+        },
+    },
     "env": {
         "browser": true,
         "es2021": true
@@ -59,5 +64,7 @@ module.exports = {
         "react/jsx-indent-props": ["error", 2],
         "react/jsx-indent": ["error", 2],
         "react/jsx-closing-bracket-location": ["error", "line-aligned"],
+        "jsx-quotes": ["error", "prefer-double"],
+        "react/jsx-curly-brace-presence": ["error", { props: "never", children: "never" }],
     }
 };

@@ -51,7 +51,7 @@ export const NewProjectModal = () => {
   return <Modal
     show={dashboardState.isNewProjectModalOpen && !isLoading}
     onClose={handleClose}
-    title={"New project"}
+    title="New project"
     footerChildren={<button
       className="btn btn-sm btn-primary"
       onClick={handleCreate}
@@ -64,7 +64,7 @@ export const NewProjectModal = () => {
       {isError && <ErrorMessage message={getErrorRTKQuery(error)}/>}
 
       <SelectInput
-        label={"Team"}
+        label="Team"
         value={teamId}
         onChange={(value) => setTeamId(value)}
         items={teamsOptions}
@@ -72,7 +72,7 @@ export const NewProjectModal = () => {
 
       <div className="mt-3">
         <TextInput
-          label={"Project name"}
+          label="Project name"
           value={name}
           onChange={setName}
         />
@@ -80,7 +80,7 @@ export const NewProjectModal = () => {
       </div>
       <div className="mt-3">
         <ColorPicker
-          label={"Color"}
+          label="Color"
           value={color}
           onChange={setColor}
         />

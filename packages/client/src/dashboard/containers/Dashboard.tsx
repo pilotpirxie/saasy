@@ -77,17 +77,17 @@ export const Dashboard = () => {
               key={team.id}
             >
               <div className="mt-5 d-flex align-items-center flex-wrap">
-                <h5 className='fw-bold me-2 mb-0'>
+                <h5 className="fw-bold me-2 mb-0">
                   {team.name}
-                  {team.plan.name === "Free" && <div className='badge bg-primary-subtle text-primary ms-2'>Free</div>}
-                  {team.plan.name === "Professional" && <div className='badge bg-success-subtle text-success ms-2'>Professional</div>}
-                  {team.plan.name === "Enterprise" && <div className='badge bg-dark-subtle text-dark ms-2'>Enterprise</div>}
+                  {team.plan.name === "Free" && <div className="badge bg-primary-subtle text-primary ms-2">Free</div>}
+                  {team.plan.name === "Professional" && <div className="badge bg-success-subtle text-success ms-2">Professional</div>}
+                  {team.plan.name === "Enterprise" && <div className="badge bg-dark-subtle text-dark ms-2">Enterprise</div>}
                 </h5>
-                {team.deleteAfter && <div className='badge bg-danger'>
+                {team.deleteAfter && <div className="badge bg-danger">
                   <span className="ri-alarm-warning-line me-1"></span>
                   Will be deleted on {dayjs(team.deleteAfter).format("DD-MM-YYYY")}
                 </div>}
-                <div className='ms-sm-auto gap-2 d-flex flex-wrap'>
+                <div className="ms-sm-auto gap-2 d-flex flex-wrap">
                   <button
                     className="btn btn-sm btn-light"
                     onClick={() => handleOpenTeamMembersModal(team.id)}
@@ -110,12 +110,12 @@ export const Dashboard = () => {
                   </button>
                 </div>
               </div>
-              <div className='d-flex flex-wrap gap-2 mt-2'>
+              <div className="d-flex flex-wrap gap-2 mt-2">
                 {team.projects.map((project) => {
                   return <Tile
                     key={project.id}
                     name={project.name}
-                    color={"blue"}
+                    color="blue"
                   />;
                 })}
                 <PlusTile
