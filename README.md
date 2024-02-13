@@ -31,8 +31,7 @@ git clone https://github.com/pilotpirxie/saasy.git
 # Install dependencies
 cd saasy && yarn
 
-# Copy .env.example to .env and fill in the environment variables
-cp .env.example .env
+# Create .env file in the packages/server directory
 
 # Run server
 yarn server
