@@ -1,6 +1,5 @@
 import { Modal } from "../components/Modal/Modal.tsx";
 import { TextInput } from "../../shared/components/FormInputs/TextInput.tsx";
-import { ColorPicker } from "../../shared/components/FormInputs/ColorPicker.tsx";
 import { useEffect, useState } from "react";
 import { SelectInput } from "../../shared/components/FormInputs/SelectInput.tsx";
 import { useAppDispatch, useAppSelector } from "../../store.ts";
@@ -12,7 +11,6 @@ import { createProjectAndCloseModal } from "../data/dashboardThunks.ts";
 
 export const NewProjectModal = () => {
   const [name, setName] = useState("");
-  const [color, setColor] = useState("#ff5976");
   const [teamId, setTeamId] = useState<string>("");
   const dashboardState = useAppSelector((state) => state.dashboard);
   const dispatch = useAppDispatch();
@@ -36,7 +34,6 @@ export const NewProjectModal = () => {
   useEffect(() => {
     if (dashboardState.isNewProjectModalOpen) {
       setName("");
-      setColor("#ff5976");
       setTeamId(dashboardState.initialTeamIdInNewProjectModal || "");
     }
   }, [dashboardState.initialTeamIdInNewProjectModal, dashboardState.isNewProjectModalOpen]);
@@ -69,7 +66,7 @@ export const NewProjectModal = () => {
       <SelectInput
         label="Team"
         value={teamId}
-        onChange={(value) => setTeamId(value)}
+        onChange={setTeamId}
         items={teamsOptions}
       />
 
@@ -80,13 +77,6 @@ export const NewProjectModal = () => {
           onChange={setName}
         />
 
-      </div>
-      <div className="mt-3">
-        <ColorPicker
-          label="Color"
-          value={color}
-          onChange={setColor}
-        />
       </div>
     </div>
   </Modal>;

@@ -41,7 +41,7 @@ export const NewTeamModal = () => {
       <TextInput
         label="Name"
         value={name}
-        onChange={(value) => setName(value)}
+        onChange={setName}
       />
       <div className="small">This can be your company, team or organization.</div>
     </div>

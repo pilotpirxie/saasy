@@ -34,6 +34,7 @@ export const errorMessages: Record<string, string> = {
   UserAlreadyInvited: "User already invited",
   CannotRevokeRoleFromSelf: "Cannot revoke role from self",
   CannotRevokeRoleMustHaveOneOwner: "Cannot revoke role, team must have at least one owner",
+  InvalidCode: "Code is invalid or expired",
 };
 
 export const GenericError = "GenericError";

@@ -6,11 +6,13 @@ export type DashboardState = {
   isNewTeamModalOpen: boolean;
   teamIdInUpdateTeamModal?: string;
   teamIdInTeamMembersModal?: string;
+  isEnableTwoFactorAuthenticationModalOpen: boolean;
 }
 
 const initialState: DashboardState = {
   isNewProjectModalOpen: false,
   isNewTeamModalOpen: false,
+  isEnableTwoFactorAuthenticationModalOpen: false,
 };
 
 const dashboardSlice = createSlice({
@@ -43,6 +45,12 @@ const dashboardSlice = createSlice({
     closeTeamMembersModal: (state) => {
       state.teamIdInTeamMembersModal = undefined;
     },
+    openEnableTwoFactorAuthenticationModal: (state) => {
+      state.isEnableTwoFactorAuthenticationModalOpen = true;
+    },
+    closeEnableTwoFactorAuthenticationModal: (state) => {
+      state.isEnableTwoFactorAuthenticationModalOpen = false;
+    },
   },
 });
 
@@ -55,5 +63,7 @@ export const {
   openUpdateTeamModal,
   closeUpdateTeamModal,
   openTeamMembersModal,
-  closeTeamMembersModal
+  closeTeamMembersModal,
+  openEnableTwoFactorAuthenticationModal,
+  closeEnableTwoFactorAuthenticationModal,
 } = dashboardSlice.actions;

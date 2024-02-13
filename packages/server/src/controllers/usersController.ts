@@ -3,6 +3,7 @@ import { Router } from "express";
 import Joi from "joi";
 import crypto from "crypto";
 import dayjs from "dayjs";
+import totp from "totp-generator";
 import { EmailService } from "../services/emailService";
 import { EmailTemplates } from "../services/emailTemplates";
 import jwtVerify from "../middlewares/jwt";
@@ -10,6 +11,7 @@ import errorResponse from "../utils/errorResponse";
 import validation from "../middlewares/validation";
 import { TypedRequest } from "../express";
 import { getHashedPassword } from "../utils/passwordManager";
+import { generateCode } from "../utils/generateCode";
 
 type UserControllersConfig = {
   jwtSecret: string;
@@ -21,6 +23,8 @@ type UserControllersConfig = {
 export default function initializeUsersController({
   jwtSecret,
   prisma,
+  emailService,
+  emailTemplatesService,
 }: UserControllersConfig): Router {
   const router = Router();
 
@@ -315,24 +319,89 @@ export default function initializeUsersController({
           });
         }
 
-        // const emailVerification = await prisma.emailVerification.create({
-        //   data: {
-        //     userId: user.id,
-        //     email: newEmail,
-        //   },
-        // });
-        //
-        // emailService.sendEmail({
-        //   to: newEmail,
-        //   subject: "Verify your email",
-        //   html: emailTemplatesService.getVerifyEmailTemplate({
-        //     code: emailVerification.id,
-        //     username: user.displayName,
-        //     userId: user.id,
-        //   }),
-        // });
+        await prisma.emailVerification.deleteMany({
+          where: {
+            userId: user.id,
+          },
+        });
+
+        const code = generateCode();
+
+        await prisma.emailVerification.create({
+          data: {
+            code,
+            email: newEmail,
+            userId: user.id,
+            expiresAt: dayjs().add(15, "minutes").toDate(),
+          },
+        });
+
+        emailService.sendEmail({
+          to: newEmail,
+          subject: `${code} is your verification code`,
+          html: emailTemplatesService.getVerifyEmailTemplate({
+            code,
+            username: user.displayName,
+          }),
+        });
 
         return res.sendStatus(200);
+      } catch (error) {
+        return next(error);
+      }
+    },
+  );
+
+  const verifyNewEmailSchema = {
+    body: {
+      code: Joi.string().required(),
+    },
+  };
+
+  router.put(
+    "/email-verify",
+    jwtVerify(jwtSecret),
+    validation(verifyNewEmailSchema),
+    async (req: TypedRequest<typeof verifyNewEmailSchema>, res, next) => {
+      try {
+        const { code } = req.body;
+
+        const emailVerification = await prisma.emailVerification.findFirst({
+          where: {
+            code,
+            userId: req.userId,
+            expiresAt: {
+              gte: dayjs().toDate(),
+            },
+          },
+        });
+
+        if (!emailVerification) {
+          return errorResponse({
+            response: res,
+            message: "Code is invalid or expired",
+            error: "InvalidCode",
+            status: 400,
+          });
+        }
+
+        await prisma.user.update({
+          where: {
+            id: req.userId,
+          },
+          data: {
+            email: emailVerification.email,
+            emailVerifiedAt: dayjs().toDate(),
+          },
+        });
+
+        await prisma.emailVerification.deleteMany({
+          where: {
+            userId: req.userId,
+          },
+        });
+
+        return res.sendStatus(204);
       } catch (error) {
         return next(error);
       }
@@ -544,6 +613,71 @@ export default function initializeUsersController({
         await prisma.invitation.delete({
           where: {
             id: invitationId,
+          },
+        });
+
+        return res.sendStatus(204);
+      } catch (error) {
+        return next(error);
+      }
+    },
+  );
+
+  const enableTotpSchema = {
+    body: {
+      totpCode: Joi.string().required(),
+      totpToken: Joi.string().required(),
+    },
+  };
+
+  router.post(
+    "/totp",
+    jwtVerify(jwtSecret),
+    validation(enableTotpSchema),
+    async (req: TypedRequest<typeof enableTotpSchema>, res, next) => {
+      try {
+        const { totpCode, totpToken } = req.body;
+
+        const expectedTotpCode = totp(totpToken);
+
+        if (expectedTotpCode !== totpCode) {
+          return errorResponse({
+            response: res,
+            message: "Invalid TOTP code",
+            status: 401,
+            error: "InvalidTotpCode",
+          });
+        }
+
+        await prisma.user.update({
+          where: {
+            id: req.userId,
+          },
+          data: {
+            totpAddedAt: dayjs().toDate(),
+            totpToken,
+          },
+        });
+
+        return res.sendStatus(204);
+      } catch (error) {
+        return next(error);
+      }
+    },
+  );
+
+  router.delete(
+    "/totp",
+    jwtVerify(jwtSecret),
+    async (req, res, next) => {
+      try {
+        await prisma.user.update({
+          where: {
+            id: req.userId,
+          },
+          data: {
+            totpAddedAt: null,
+            totpToken: null,
           },
         });
 

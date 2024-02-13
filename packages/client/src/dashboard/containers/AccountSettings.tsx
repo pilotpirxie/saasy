@@ -8,17 +8,24 @@ import { EmailInput } from "../../shared/components/FormInputs/EmailInput.tsx";
 import { NewProjectModal } from "./NewProjectModal.tsx";
 import {
   useDeleteAccountMutation,
+  useDisableTwoFactorAuthenticationMutation,
   useFetchAccountQuery,
   useFetchProfileQuery,
   useUpdateAddressMutation,
   useUpdateConsentsMutation,
   useUpdateDisplayNameMutation,
   useUpdateEmailMutation,
-  useUpdatePasswordMutation
+  useUpdatePasswordMutation,
+  useVerifyEmailChangeMutation
 } from "../data/usersService.ts";
 import { useLogoutMutation } from "../../auth/data/authService.ts";
 import { useNavigate } from "react-router-dom";
-import { useAppSelector } from "../../store.ts";
+import { useAppDispatch, useAppSelector } from "../../store.ts";
+import { ErrorMessage } from "../../shared/components/ErrorMessage.tsx";
+import { getErrorRTKQuery } from "../../shared/utils/errorMessages.ts";
+import { CheckboxInput } from "../../shared/components/FormInputs/CheckboxInput.tsx";
+import { openEnableTwoFactorAuthenticationModal } from "../data/dashboardSlice.ts";
+import { EnableTwoFactorAuthenticationModal } from "./EnableTwoFactorAuthenticationModal.tsx";
 
 export const AccountSettings = () => {
   const profile = useFetchProfileQuery();
@@ -27,6 +34,8 @@ export const AccountSettings = () => {
   const [displayName, setDisplayName] = useState("");
 
   const [email, setEmail] = useState("");
+  const [emailVerificationCode, setEmailVerificationCode] = useState("");
+  const [isWaitingForCode, setIsWaitingForCode] = useState(false);
 
   const [newPassword, setNewPassword] = useState("");
   const [repeatNewPassword, setRepeatNewPassword] = useState("");
@@ -45,6 +54,7 @@ export const AccountSettings = () => {
 
   const navigate = useNavigate();
   const sessionState = useAppSelector((state) => state.session);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (profile.data) {
@@ -65,31 +75,74 @@ export const AccountSettings = () => {
 
   const [
     updateProfileAddress,
+    {
+      isError: isUpdatingAddressError,
+      error: updateAddressError,
+      isLoading: isUpdatingAddressLoading
+    }
   ] = useUpdateAddressMutation();
 
   const [
     updateProfileDisplayName,
+    {
+      isError: isUpdatingDisplayNameError,
+      error: updateDisplayNameError,
+      isLoading: isUpdatingDisplayNameLoading
+    }
   ] = useUpdateDisplayNameMutation();
 
   const [
     updateProfileEmail,
+    {
+      isError: isUpdatingEmailError,
+      error: updateEmailError,
+      isLoading: isUpdatingEmailLoading
+    }
   ] = useUpdateEmailMutation();
 
   const [
+    verifyEmailChange,
+    {
+      isError: isVerifyingEmailError,
+      error: verifyEmailError,
+      isLoading: isVerifyingEmailLoading
+    }
+  ] = useVerifyEmailChangeMutation();
+
+  const [
     updatePassword,
+    {
+      isError: isUpdatingPasswordError,
+      error: updatePasswordError,
+      isLoading: isUpdatingPasswordLoading
+    }
   ] = useUpdatePasswordMutation();
 
   const [
     updateConsents,
+    {
+      isError: isUpdatingConsentsError,
+      error: updateConsentsError,
+      isLoading: isUpdatingConsentsLoading
+    }
   ] = useUpdateConsentsMutation();
 
   const [
     deleteAccount,
+    {
+      isError: isDeletingAccountError,
+      error: deleteAccountError,
+      isLoading: isDeletingAccountLoading
+    }
   ] = useDeleteAccountMutation();
 
   const [
     logout,
   ] = useLogoutMutation();
+
+  const [
+    disableTwoFactorAuth,
+  ] = useDisableTwoFactorAuthenticationMutation();
 
   const handleChangeDisplayName = () => {
     if (!displayName) {
@@ -99,12 +152,30 @@ export const AccountSettings = () => {
     updateProfileDisplayName({ displayName });
   };
 
-  const handleChangeEmail = () => {
-    if (!email) {
-      return;
-    }
+  const handleChangeEmail = async () => {
+    try {
+      if (!email) {
+        return;
+      }
 
-    updateProfileEmail({ email });
+      await updateProfileEmail({ newEmail: email }).unwrap();
+      setIsWaitingForCode(true);
+    } catch (e) {
+      console.warn(e);
+    }
+  };
+
+  const handleVerifyEmail = async () => {
+    try {
+      if (!emailVerificationCode) {
+        return;
+      }
+
+      await verifyEmailChange({ code: emailVerificationCode }).unwrap();
+      setIsWaitingForCode(false);
+    } catch (e) {
+      console.warn(e);
+    }
   };
 
   const handleChangePassword = () => {
@@ -128,11 +199,11 @@ export const AccountSettings = () => {
   };
 
   const handleEnableTwoFactorAuth = () => {
-    // ...
+    dispatch(openEnableTwoFactorAuthenticationModal());
   };
 
   const handleDisableTwoFactorAuth = () => {
-    // ...
+    disableTwoFactorAuth();
   };
 
   const handleDeleteAccount = () => {
@@ -156,6 +227,7 @@ export const AccountSettings = () => {
   return <ScreenContainer>
     <Navbar />
     <NewProjectModal />
+    <EnableTwoFactorAuthenticationModal />
 
     <div className="container">
       <div className="row">
@@ -228,6 +300,8 @@ export const AccountSettings = () => {
               Change Display Name
             </h5>
             <div>
+              {(isUpdatingDisplayNameError) && <ErrorMessage message={getErrorRTKQuery(updateDisplayNameError)}/>}
+
               <TextInput
                 label="Display Name"
                 value={displayName}
@@ -238,6 +312,7 @@ export const AccountSettings = () => {
                 className="btn btn-sm btn-primary mt-2"
                 type="button"
                 onClick={handleChangeDisplayName}
+                disabled={isUpdatingDisplayNameLoading}
               >
                 Change display name
               </button>
@@ -250,19 +325,43 @@ export const AccountSettings = () => {
               Change Email
             </h5>
             <div>
+              {(isUpdatingEmailError || isVerifyingEmailError) && <ErrorMessage message={getErrorRTKQuery(updateEmailError || verifyEmailError)}/>}
+
+              {!(isUpdatingEmailError || isVerifyingEmailError) && isWaitingForCode && <div className="alert alert-info">
+                We sent a verification code to your new email. Please check your inbox and enter the code below.
+              </div>}
+
               <EmailInput
                 label="Email"
                 value={email}
                 onChange={setEmail}
+                disabled={isWaitingForCode}
               />
 
-              <button
+              {!isWaitingForCode && <button
                 className="btn btn-sm btn-primary mt-2"
                 type="button"
                 onClick={handleChangeEmail}
+                disabled={isUpdatingEmailLoading}
               >
                 Change email
-              </button>
+              </button>}
+
+              {isWaitingForCode && <div>
+                <TextInput
+                  label="Verification code"
+                  value={emailVerificationCode}
+                  onChange={setEmailVerificationCode}
+                />
+                <button
+                  className="btn btn-sm btn-primary mt-2"
+                  type="button"
+                  onClick={handleVerifyEmail}
+                  disabled={isVerifyingEmailLoading}
+                >
+                  Verify email
+                </button>
+              </div>}
             </div>
           </div>
 
@@ -272,6 +371,8 @@ export const AccountSettings = () => {
               Change Password
             </h5>
             <div>
+              {(isUpdatingPasswordError) && <ErrorMessage message={getErrorRTKQuery(updatePasswordError)}/>}
+
               <PasswordInput
                 label="New password"
                 value={newPassword}
@@ -286,6 +387,7 @@ export const AccountSettings = () => {
                 className="btn btn-sm btn-primary mt-2"
                 type="button"
                 onClick={handleChangePassword}
+                disabled={isUpdatingPasswordLoading}
               >
                 Change password
               </button>
@@ -298,6 +400,8 @@ export const AccountSettings = () => {
               Change Address
             </h5>
             <div>
+              {(isUpdatingAddressError) && <ErrorMessage message={getErrorRTKQuery(updateAddressError)}/>}
+
               <TextInput
                 label="Full Name"
                 value={fullName}
@@ -322,6 +426,7 @@ export const AccountSettings = () => {
                 className="btn btn-sm btn-primary mt-2"
                 type="button"
                 onClick={handleChangeAddress}
+                disabled={isUpdatingAddressLoading}
               >
                 Change address
               </button>
@@ -334,40 +439,25 @@ export const AccountSettings = () => {
               Newsletter & Marketing
             </h5>
             <div>
-              <div className="form-check">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="newsletterConsent"
-                  checked={isNewsletterConsentGranted}
-                  onChange={(e) => setIsNewsletterConsentGranted(e.target.checked)}
-                />
-                <label
-                  className="form-check-label"
-                  htmlFor="newsletterConsent"
-                >
-                  I consent to receive newsletters
-                </label>
-              </div>
-              <div className="form-check">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="marketingConsent"
-                  checked={isMarketingConsentGranted}
-                  onChange={(e) => setIsMarketingConsentGranted(e.target.checked)}
-                />
-                <label
-                  className="form-check-label"
-                  htmlFor="marketingConsent"
-                >
-                  I consent to receive marketing emails
-                </label>
-              </div>
+              {(isUpdatingConsentsError) && <ErrorMessage message={getErrorRTKQuery(updateConsentsError)}/>}
+
+              <CheckboxInput
+                label="I consent to receive newsletters"
+                value={isNewsletterConsentGranted}
+                onChange={setIsNewsletterConsentGranted}
+              />
+
+              <CheckboxInput
+                label="I consent to receive marketing emails"
+                value={isMarketingConsentGranted}
+                onChange={setIsMarketingConsentGranted}
+              />
+
               <button
                 className="btn btn-sm btn-primary mt-2"
                 type="button"
                 onClick={handleSaveConsent}
+                disabled={isUpdatingConsentsLoading}
               >
                 Save consent
               </button>
@@ -410,25 +500,20 @@ export const AccountSettings = () => {
               Delete Account
             </h5>
             <div>
-              <div className="form-check">
-                <input
-                  className="form-check-input"
-                  type="checkbox"
-                  id="deleteAccountConfirmation"
-                  checked={deleteAccountConfirmation}
-                  onChange={(e) => setDeleteAccountConfirmation(e.target.checked)}
-                />
-                <label
-                  className="form-check-label"
-                  htmlFor="deleteAccountConfirmation"
-                >
-                  I understand that this action is irreversible even if I change my mind later. You must delete or leave all your teams and projects before you can delete your account.
-                </label>
-              </div>
+              {(isDeletingAccountError) && <ErrorMessage message={getErrorRTKQuery(deleteAccountError)}/>}
+
+              <CheckboxInput
+                label="I understand that this action is irreversible even if I change my mind later. You must delete or leave all your teams and projects before you can delete your account."
+                value={deleteAccountConfirmation}
+                onChange={setDeleteAccountConfirmation}
+                required
+              />
+
               <button
                 className="btn btn-sm btn-danger mt-2"
                 type="button"
                 onClick={handleDeleteAccount}
+                disabled={isDeletingAccountLoading}
               >
                 Delete account
               </button>

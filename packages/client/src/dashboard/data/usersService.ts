@@ -45,9 +45,17 @@ export const usersService = createApi({
       query: () => "/account",
       providesTags: ["account"]
     }),
-    updateEmail: builder.mutation<void, { email: string }>({
+    updateEmail: builder.mutation<void, { newEmail: string }>({
       query: (body) => ({
         url: "/email",
+        method: "PUT",
+        body
+      }),
+      invalidatesTags: ["account"]
+    }),
+    verifyEmailChange: builder.mutation<void, { code: string }>({
+      query: (body) => ({
+        url: "/email-verify",
         method: "PUT",
         body
       }),
@@ -60,7 +68,7 @@ export const usersService = createApi({
         body
       })
     }),
-    updateConsents: builder.mutation<void, { isNewsletterConsentGranted: boolean, isMarketingConsentGranted: boolean }>({
+    updateConsents: builder.mutation<void, { newsletterConsent: boolean, marketingConsent: boolean }>({
       query: (body) => ({
         url: "/consents",
         method: "PUT",
@@ -91,7 +99,22 @@ export const usersService = createApi({
         method: "PUT"
       }),
       invalidatesTags: ["invitations"]
-    })
+    }),
+    enableTwoFactorAuthentication: builder.mutation<void, { totpCode: string, totpToken: string }>({
+      query: (body) => ({
+        url: "/totp",
+        method: "POST",
+        body
+      }),
+      invalidatesTags: ["account"]
+    }),
+    disableTwoFactorAuthentication: builder.mutation<void, void>({
+      query: () => ({
+        url: "/totp",
+        method: "DELETE",
+      }),
+      invalidatesTags: ["account"]
+    }),
   }),
 });
 
@@ -106,5 +129,8 @@ export const {
   useUpdateDisplayNameMutation,
   useUpdateAddressMutation,
   useUpdateConsentsMutation,
-  useDeleteAccountMutation
+  useDeleteAccountMutation,
+  useVerifyEmailChangeMutation,
+  useEnableTwoFactorAuthenticationMutation,
+  useDisableTwoFactorAuthenticationMutation
 } = usersService;
