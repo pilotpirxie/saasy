@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import { SelectInput } from "../../shared/components/FormInputs/SelectInput.tsx";
 import { useAppDispatch, useAppSelector } from "../../store.ts";
 import { closeNewProjectModal } from "../data/dashboardSlice.ts";
-import { useFetchTeamsQuery } from "../data/teamsService.ts";
+import { teamsService, useFetchTeamsQuery } from "../data/teamsService.ts";
 import { ErrorMessage } from "../../shared/components/ErrorMessage.tsx";
 import { getErrorRTKQuery } from "../../shared/utils/errorMessages.ts";
-import { createProjectAndCloseModal } from "../data/dashboardThunks.ts";
+import { useCreateProjectMutation } from "../data/projectsService.ts";
 
 export const NewProjectModal = () => {
   const [name, setName] = useState("");
@@ -21,14 +21,33 @@ export const NewProjectModal = () => {
     isError,
     error
   } = useFetchTeamsQuery();
+
+  const [
+    createProject,
+    {
+      isError: isCreateProjectError,
+      error: createProjectError
+    }
+  ] = useCreateProjectMutation();
+
   const teams = data;
 
   const handleClose = () => {
     dispatch(closeNewProjectModal());
   };
 
-  const handleCreate = () => {
-    dispatch(createProjectAndCloseModal({ teamId, name }));
+  const handleCreate = async () => {
+    if (!name || !teamId) {
+      return;
+    }
+
+    try {
+      await createProject({ teamId, name }).unwrap();
+      dispatch(teamsService.util.invalidateTags(["teams"]));
+      dispatch(closeNewProjectModal());
+    } catch (err) {
+      console.warn(err);
+    }
   };
 
   useEffect(() => {
@@ -61,7 +80,7 @@ export const NewProjectModal = () => {
 
   >
     <div>
-      {isError && <ErrorMessage message={getErrorRTKQuery(error)}/>}
+      {(isError || isCreateProjectError) && <ErrorMessage message={getErrorRTKQuery((error || createProjectError))}/>}
 
       <SelectInput
         label="Team"
