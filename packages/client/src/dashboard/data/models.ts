@@ -1,11 +1,21 @@
-export type Profile = {
-  displayName: string;
-  avatarUrl:   string | null;
-  country:     string | null;
-  address:     string | null;
-  phone:       string | null;
-  fullName:    string | null;
+export type ProfileAddress = {
+  address: string | null;
+  country: string | null;
+  phone: string | null;
+  fullName: string | null;
 }
+
+export type ProfileDisplayName = {
+  displayName: string;
+}
+
+export type ProfileAvatar = {
+  avatarUrl: string | null;
+}
+
+export type Profile = ProfileAddress
+  & ProfileDisplayName
+  & ProfileAvatar;
 
 export type Account = {
   email: string;

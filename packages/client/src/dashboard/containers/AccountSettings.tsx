@@ -6,7 +6,19 @@ import { useEffect, useState } from "react";
 import { PasswordInput } from "../../shared/components/FormInputs/PasswordInput.tsx";
 import { EmailInput } from "../../shared/components/FormInputs/EmailInput.tsx";
 import { NewProjectModal } from "./NewProjectModal.tsx";
-import { useFetchAccountQuery, useFetchProfileQuery } from "../data/usersService.ts";
+import {
+  useDeleteAccountMutation,
+  useFetchAccountQuery,
+  useFetchProfileQuery,
+  useUpdateAddressMutation,
+  useUpdateConsentsMutation,
+  useUpdateDisplayNameMutation,
+  useUpdateEmailMutation,
+  useUpdatePasswordMutation
+} from "../data/usersService.ts";
+import { useLogoutMutation } from "../../auth/data/authService.ts";
+import { useNavigate } from "react-router-dom";
+import { useAppSelector } from "../../store.ts";
 
 export const AccountSettings = () => {
   const profile = useFetchProfileQuery();
@@ -16,8 +28,8 @@ export const AccountSettings = () => {
 
   const [email, setEmail] = useState("");
 
-  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [repeatNewPassword, setRepeatNewPassword] = useState("");
 
   const [fullName, setFullName] = useState("");
   const [address, setAddress] = useState("");
@@ -30,6 +42,9 @@ export const AccountSettings = () => {
   const [isTwoFactorAuthEnabled, setIsTwoFactorAuthEnabled] = useState(false);
 
   const [deleteAccountConfirmation, setDeleteAccountConfirmation] = useState(false);
+
+  const navigate = useNavigate();
+  const sessionState = useAppSelector((state) => state.session);
 
   useEffect(() => {
     if (profile.data) {
@@ -48,24 +63,68 @@ export const AccountSettings = () => {
     }
   }, [account.data, profile.data]);
 
+  const [
+    updateProfileAddress,
+  ] = useUpdateAddressMutation();
+
+  const [
+    updateProfileDisplayName,
+  ] = useUpdateDisplayNameMutation();
+
+  const [
+    updateProfileEmail,
+  ] = useUpdateEmailMutation();
+
+  const [
+    updatePassword,
+  ] = useUpdatePasswordMutation();
+
+  const [
+    updateConsents,
+  ] = useUpdateConsentsMutation();
+
+  const [
+    deleteAccount,
+  ] = useDeleteAccountMutation();
+
+  const [
+    logout,
+  ] = useLogoutMutation();
+
   const handleChangeDisplayName = () => {
-    // ...
+    if (!displayName) {
+      return;
+    }
+
+    updateProfileDisplayName({ displayName });
   };
 
   const handleChangeEmail = () => {
-    // ...
+    if (!email) {
+      return;
+    }
+
+    updateProfileEmail({ email });
   };
 
   const handleChangePassword = () => {
-    // ...
+    if (newPassword !== repeatNewPassword) {
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      return;
+    }
+
+    updatePassword({ newPassword });
   };
 
   const handleChangeAddress = () => {
-    // ...
+    updateProfileAddress({ address, country, phone, fullName });
   };
 
   const handleSaveConsent = () => {
-    // ...
+    updateConsents({ newsletterConsent: isNewsletterConsentGranted, marketingConsent: isMarketingConsentGranted });
   };
 
   const handleEnableTwoFactorAuth = () => {
@@ -77,7 +136,21 @@ export const AccountSettings = () => {
   };
 
   const handleDeleteAccount = () => {
-    // ...
+    if (!deleteAccountConfirmation) {
+      return;
+    }
+
+    deleteAccount();
+
+    if (!sessionState.refreshToken) {
+      return;
+    }
+
+    logout({
+      refreshToken: sessionState.refreshToken
+    });
+
+    navigate("/auth/login");
   };
 
   return <ScreenContainer>
@@ -164,6 +237,7 @@ export const AccountSettings = () => {
               <button
                 className="btn btn-sm btn-primary mt-2"
                 type="button"
+                onClick={handleChangeDisplayName}
               >
                 Change display name
               </button>
@@ -185,6 +259,7 @@ export const AccountSettings = () => {
               <button
                 className="btn btn-sm btn-primary mt-2"
                 type="button"
+                onClick={handleChangeEmail}
               >
                 Change email
               </button>
@@ -198,18 +273,19 @@ export const AccountSettings = () => {
             </h5>
             <div>
               <PasswordInput
-                label="Current password"
-                value={currentPassword}
-                onChange={setCurrentPassword}
-              />
-              <PasswordInput
                 label="New password"
                 value={newPassword}
                 onChange={setNewPassword}
               />
+              <PasswordInput
+                label="Repeat new password"
+                value={repeatNewPassword}
+                onChange={setRepeatNewPassword}
+              />
               <button
                 className="btn btn-sm btn-primary mt-2"
                 type="button"
+                onClick={handleChangePassword}
               >
                 Change password
               </button>
@@ -245,6 +321,7 @@ export const AccountSettings = () => {
               <button
                 className="btn btn-sm btn-primary mt-2"
                 type="button"
+                onClick={handleChangeAddress}
               >
                 Change address
               </button>
@@ -290,6 +367,7 @@ export const AccountSettings = () => {
               <button
                 className="btn btn-sm btn-primary mt-2"
                 type="button"
+                onClick={handleSaveConsent}
               >
                 Save consent
               </button>
@@ -307,6 +385,7 @@ export const AccountSettings = () => {
                 <button
                   className="btn btn-sm btn-danger"
                   type="button"
+                  onClick={handleDisableTwoFactorAuth}
                 >
                   Disable two factor authentication
                 </button>
@@ -317,6 +396,7 @@ export const AccountSettings = () => {
                 <button
                   className="btn btn-sm btn-primary"
                   type="button"
+                  onClick={handleEnableTwoFactorAuth}
                 >
                   Enable two factor authentication
                 </button>
@@ -348,6 +428,7 @@ export const AccountSettings = () => {
               <button
                 className="btn btn-sm btn-danger mt-2"
                 type="button"
+                onClick={handleDeleteAccount}
               >
                 Delete account
               </button>

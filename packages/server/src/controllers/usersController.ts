@@ -59,25 +59,23 @@ export default function initializeUsersController({
     },
   );
 
-  const updateProfileSchema = {
+  const updateProfileAddressSchema = {
     body: {
-      displayName: Joi.string().min(1).max(32).required(),
-      avatarUrl: Joi.string().optional(),
-      country: Joi.string().optional(),
-      address: Joi.string().optional(),
-      phone: Joi.string().optional(),
-      fullName: Joi.string().optional(),
+      country: Joi.string().optional().allow(""),
+      address: Joi.string().optional().allow(""),
+      phone: Joi.string().optional().allow(""),
+      fullName: Joi.string().optional().allow(""),
     },
   };
 
   router.put(
-    "/profile",
+    "/profile/address",
     jwtVerify(jwtSecret),
-    validation(updateProfileSchema),
-    async (req: TypedRequest<typeof updateProfileSchema>, res, next) => {
+    validation(updateProfileAddressSchema),
+    async (req: TypedRequest<typeof updateProfileAddressSchema>, res, next) => {
       try {
         const {
-          displayName, avatarUrl, country, address, phone, fullName,
+          country, address, phone, fullName,
         } = req.body;
 
         const user = await prisma.user.findFirst({
@@ -103,12 +101,58 @@ export default function initializeUsersController({
             id: req.userId,
           },
           data: {
+            country: country || "",
+            address: address || "",
+            phone: phone || "",
+            fullName: fullName || "",
+          },
+        });
+
+        return res.sendStatus(204);
+      } catch (error) {
+        return next(error);
+      }
+    },
+  );
+
+  const updateProfileDisplayNameSchema = {
+    body: {
+      displayName: Joi.string().required(),
+    },
+  };
+
+  router.put(
+    "/profile/display-name",
+    jwtVerify(jwtSecret),
+    validation(updateProfileDisplayNameSchema),
+    async (req: TypedRequest<typeof updateProfileDisplayNameSchema>, res, next) => {
+      try {
+        const { displayName } = req.body;
+
+        const user = await prisma.user.findFirst({
+          where: {
+            id: req.userId,
+          },
+          select: {
+            id: true,
+          },
+        });
+
+        if (!user) {
+          return errorResponse({
+            response: res,
+            status: 404,
+            message: "User not found",
+            error: "UserNotFound",
+          });
+        }
+
+        await prisma.user.update({
+          where: {
+            id: req.userId,
+          },
+          data: {
             displayName,
-            avatarUrl,
-            country,
-            address,
-            phone,
-            fullName,
           },
         });
 
@@ -300,6 +344,14 @@ export default function initializeUsersController({
     jwtVerify(jwtSecret),
     async (req, res, next) => {
       try {
+        // check if user belongs to any team
+
+        // remove all invitations for user
+
+        // remove all password reset tokens for user
+
+        // remove all email verifications for user
+
         await prisma.user.delete({
           where: {
             id: req.userId,
@@ -315,8 +367,8 @@ export default function initializeUsersController({
 
   const updateConsentsSchema = {
     body: {
-      isNewsletterConsentGranted: Joi.boolean().required(),
-      isMarketingConsentGranted: Joi.boolean().required(),
+      marketingConsent: Joi.boolean().required(),
+      newsletterConsent: Joi.boolean().required(),
     },
   };
 
@@ -326,15 +378,15 @@ export default function initializeUsersController({
     validation(updateConsentsSchema),
     async (req: TypedRequest<typeof updateConsentsSchema>, res, next) => {
       try {
-        const { isNewsletterConsentGranted, isMarketingConsentGranted } = req.body;
+        const { marketingConsent, newsletterConsent } = req.body;
 
         await prisma.user.update({
           where: {
             id: req.userId,
           },
           data: {
-            newsletterConsentGrantedAt: isNewsletterConsentGranted ? dayjs().toDate() : null,
-            marketingConsentGrantedAt: isMarketingConsentGranted ? dayjs().toDate() : null,
+            newsletterConsentGrantedAt: newsletterConsent ? dayjs().toDate() : null,
+            marketingConsentGrantedAt: marketingConsent ? dayjs().toDate() : null,
           },
         });
 

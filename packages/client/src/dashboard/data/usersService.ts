@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { RootState } from "../../store.ts";
-import { Account, Invitation, Profile } from "./models.ts";
+import { Account, Invitation, Profile, ProfileAddress, ProfileDisplayName } from "./models.ts";
 import config from "../../../config.ts";
 
 const baseQuery = fetchBaseQuery({
@@ -25,9 +25,17 @@ export const usersService = createApi({
       query: () => "/profile",
       providesTags: ["profile"]
     }),
-    updateProfile: builder.mutation<void, Profile>({
+    updateDisplayName: builder.mutation<void, ProfileDisplayName>({
       query: (body) => ({
-        url: "/profile",
+        url: "/profile/display-name",
+        method: "PUT",
+        body
+      }),
+      invalidatesTags: ["profile"]
+    }),
+    updateAddress: builder.mutation<void, ProfileAddress>({
+      query: (body) => ({
+        url: "/profile/address",
         method: "PUT",
         body
       }),
@@ -45,11 +53,25 @@ export const usersService = createApi({
       }),
       invalidatesTags: ["account"]
     }),
-    updatePassword: builder.mutation<void, { password: string }>({
+    updatePassword: builder.mutation<void, { newPassword: string }>({
       query: (body) => ({
         url: "/password",
         method: "PUT",
         body
+      })
+    }),
+    updateConsents: builder.mutation<void, { isNewsletterConsentGranted: boolean, isMarketingConsentGranted: boolean }>({
+      query: (body) => ({
+        url: "/consents",
+        method: "PUT",
+        body
+      }),
+      invalidatesTags: ["account"]
+    }),
+    deleteAccount: builder.mutation<void, void>({
+      query: () => ({
+        url: "/account",
+        method: "DELETE"
       })
     }),
     fetchInvitations: builder.query<Invitation[], void>({
@@ -75,11 +97,14 @@ export const usersService = createApi({
 
 export const {
   useFetchProfileQuery,
-  useUpdateProfileMutation,
   useFetchAccountQuery,
   useUpdateEmailMutation,
   useUpdatePasswordMutation,
   useFetchInvitationsQuery,
   useAcceptInvitationMutation,
-  useDeclineInvitationMutation
+  useDeclineInvitationMutation,
+  useUpdateDisplayNameMutation,
+  useUpdateAddressMutation,
+  useUpdateConsentsMutation,
+  useDeleteAccountMutation
 } = usersService;
