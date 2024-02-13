@@ -413,13 +413,32 @@ export default function initializeUsersController({
     jwtVerify(jwtSecret),
     async (req, res, next) => {
       try {
-        // check if user belongs to any team
+        const userTeams = await prisma.userTeam.findMany({
+          where: {
+            userId: req.userId,
+          },
+        });
 
-        // remove all invitations for user
+        if (userTeams.length > 0) {
+          return errorResponse({
+            response: res,
+            message: "User belongs to a team",
+            error: "UserBelongsToTeam",
+            status: 403,
+          });
+        }
 
-        // remove all password reset tokens for user
+        await prisma.passwordRecovery.deleteMany({
+          where: {
+            userId: req.userId,
+          },
+        });
 
-        // remove all email verifications for user
+        await prisma.emailVerification.deleteMany({
+          where: {
+            userId: req.userId,
+          },
+        });
 
         await prisma.user.delete({
           where: {

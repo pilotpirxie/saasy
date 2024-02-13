@@ -15,6 +15,9 @@ import { Dashboard } from "./dashboard/containers/Dashboard.tsx";
 import { RequiredAuth } from "./shared/containers/RequiredAuth.tsx";
 import { Invitations } from "./dashboard/containers/Invitations.tsx";
 import { AccountSettings } from "./dashboard/containers/AccountSettings.tsx";
+import { Terms } from "./dashboard/containers/Terms.tsx";
+import { Privacy } from "./dashboard/containers/Privacy.tsx";
+import { Feedback } from "./dashboard/containers/Feedback.tsx";
 
 const router = createBrowserRouter([
   {
@@ -67,6 +70,18 @@ const router = createBrowserRouter([
         element: <RequiredAuth>
           <Dashboard />
         </RequiredAuth>
+      },
+      {
+        path: "/terms",
+        element: <Terms />
+      },
+      {
+        path: "/privacy",
+        element: <Privacy />
+      },
+      {
+        path: "/feedback",
+        element: <Feedback />
       },
     ]
   }

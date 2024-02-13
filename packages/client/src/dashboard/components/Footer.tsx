@@ -30,10 +30,10 @@ export const Footer = () => {
                   target="_blank"
                 >Home</a>
                 <a
-                  href="/docs"
+                  href="/help"
                   className="text-muted text-decoration-none"
                   target="_blank"
-                >Docs</a>
+                >Help</a>
                 <a
                   href="https://github.com/"
                   className="text-muted text-decoration-none"
@@ -69,10 +69,10 @@ export const Footer = () => {
                 target="_blank"
               >Home</a>
               <a
-                href="/docs"
+                href="/help"
                 className="text-muted text-decoration-none"
                 target="_blank"
-              >Docs</a>
+              >Help</a>
               <a
                 href="#"
                 className="text-muted text-decoration-none"
